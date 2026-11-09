@@ -13,6 +13,8 @@ interface BoardGraphicProps {
   usedPins: Set<string>
   /** 전선을 끄는 중일 때 연결 가능한 핀 (null 이면 강조 없음) */
   compatiblePins: Set<string> | null
+  /** 고른 부품에서 이어지는 보드 핀 (강조) */
+  litPins?: Set<string>
   onSelect: () => void
   /** 보드 본체를 눌렀을 때 (선택 + 이동 시작) */
   onBodyPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => void
@@ -37,6 +39,7 @@ export function BoardGraphic({
   selected,
   usedPins,
   compatiblePins,
+  litPins,
   onSelect,
   onBodyPointerDown,
   onPinPointerDown,
@@ -59,6 +62,7 @@ export function BoardGraphic({
           if (board.headers && (pin.group === 'power' || pin.group === 'control')) classes.push('board-pin--power')
           if (usedPins.has(pin.id)) classes.push('is-used')
           if (compatiblePins) classes.push(compatiblePins.has(pin.id) ? 'is-compatible' : 'is-incompatible')
+          if (litPins?.has(pin.id)) classes.push('is-lit')
           return (
             <span
               key={pin.id}

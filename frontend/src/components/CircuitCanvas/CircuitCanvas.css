@@ -334,6 +334,245 @@
   stroke-width: 1;
 }
 
+/* 끌어서 옮길 수 있는 전선 끝 */
+.wire__grip {
+  fill: transparent;
+  stroke: transparent;
+  pointer-events: all;
+  cursor: grab;
+  touch-action: none;
+}
+
+.wire__grip--hole:hover {
+  stroke: var(--wire-color);
+  stroke-width: 1.5;
+  fill: color-mix(in srgb, var(--wire-color) 18%, transparent);
+}
+
+.wire__grip--pin {
+  fill: var(--surface);
+  stroke: var(--selection);
+  stroke-width: 2.5;
+}
+
+.wire__grip--pin:hover {
+  fill: var(--selection);
+}
+
+/* 부품을 고르면 그 부품의 전선과 보드까지의 경로만 빛나고 나머지는 흐려진다 */
+.wire-layer.has-focus .wire:not(.is-lit):not(.is-path):not(.is-selected) .wire__line,
+.wire-layer.has-focus .wire:not(.is-lit):not(.is-path):not(.is-selected) .wire__end {
+  opacity: 0.18;
+}
+
+.wire.is-lit .wire__line {
+  stroke-width: 4.5;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--wire-color) 80%, white)) drop-shadow(0 0 2px var(--wire-color));
+}
+
+.wire.is-path .wire__line {
+  stroke-width: 4;
+  stroke-dasharray: 10 4;
+  filter: drop-shadow(0 0 3px var(--wire-color));
+  animation: wire-flow 1.2s linear infinite;
+}
+
+@keyframes wire-flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire.is-path .wire__line {
+    animation: none;
+  }
+}
+
+.wire-delete {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.wire-delete circle {
+  fill: #dc2626;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.wire-delete path {
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.wire-delete:hover circle {
+  fill: #b91c1c;
+}
+
+.wire.is-dragging .wire__line {
+  opacity: 0.3;
+}
+
+.circuit-canvas__surface.is-gripping,
+.circuit-canvas__surface.is-gripping .wire__grip {
+  cursor: grabbing;
+}
+
+/* 핀 공유 그룹에 든 부품 핀 */
+.module-pin.is-shared {
+  outline: 2px dashed #8b5cf6;
+  outline-offset: 1px;
+}
+
+/* 모터 카드를 드라이버 카드에 놓기 */
+.placed-module.is-attach-ok {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #16a34a 30%, transparent), var(--shadow-md);
+}
+
+.placed-module.is-attach-bad {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #dc2626 30%, transparent), var(--shadow-md);
+}
+
+.attach-tip {
+  position: absolute;
+  z-index: 7;
+  max-width: 300px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid #16a34a;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  font-size: 0.78rem;
+  pointer-events: none;
+}
+
+.attach-tip.is-bad {
+  border-color: #dc2626;
+}
+
+/* 카드의 전원·드라이버 필요 표시 */
+.card-badges {
+  position: absolute;
+  top: -11px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+}
+
+.card-badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.card-badge--power {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.card-badge--driver {
+  background: #e0e7ff;
+  border-color: #6366f1;
+  color: #3730a3;
+}
+
+.card-badge:hover {
+  filter: brightness(0.95);
+}
+
+.card-popover {
+  position: absolute;
+  z-index: 8;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  font-size: 0.82rem;
+  cursor: default;
+}
+
+.card-popover__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-popover__close {
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.driver-quick {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.driver-quick p {
+  margin: 0;
+}
+
+.hole-target__node {
+  fill: color-mix(in srgb, var(--target-color) 16%, transparent);
+  stroke: var(--target-color);
+  stroke-width: 1.5;
+}
+
+.hole-target__hole {
+  fill: var(--target-color);
+}
+
+.hole-target.is-ok { --target-color: #16a34a; }
+.hole-target.is-bad { --target-color: #dc2626; }
+
+.hole-tip {
+  position: absolute;
+  z-index: 6;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface);
+  border: 1px solid #16a34a;
+  box-shadow: var(--shadow-md);
+  font-size: 0.78rem;
+  pointer-events: none;
+}
+
+.hole-tip strong {
+  font-family: var(--font-mono);
+}
+
+.hole-tip.is-bad {
+  border-color: #dc2626;
+  color: var(--text);
+}
+
+.hole-tip.is-bad strong {
+  color: #dc2626;
+}
+
 .wire--lead { --wire-color: #2563eb; }
 .wire--power { --wire-color: var(--wire-power); }
 .wire--ground { --wire-color: var(--wire-ground); }
@@ -500,4 +739,25 @@
 .placed-module--dense .module-pin {
   padding: 1px 3px;
   font-size: 0.55rem;
+}
+
+/* 핀이 아주 많은 부품 (예: 16채널 서보 드라이버) */
+.placed-module--xdense {
+  gap: 3px;
+}
+
+.placed-module--xdense .placed-module__pins {
+  gap: 1px;
+}
+
+.placed-module--xdense .module-pin {
+  padding: 0 2px;
+  font-size: 0.5rem;
+  line-height: 1.35;
+}
+
+/* 고른 부품에서 이어지는 보드 핀 */
+.board-pin.is-lit {
+  box-shadow: 0 0 0 2px #facc15, 0 0 10px 2px #facc15;
+  z-index: 1;
 }

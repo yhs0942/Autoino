@@ -28,10 +28,12 @@ class Circuit:
     connections: list[Connection]
     links: list[BoardLink]
     catalog: Catalog = field(default_factory=get_catalog)
+    #: 핀 공유 그룹
+    shares: list = field(default_factory=list)
 
     @classmethod
     def from_project(cls, project: ProjectData, catalog: Catalog | None = None) -> "Circuit":
-        return cls(list(project.boards), list(project.placed), list(project.connections), list(project.links), catalog or get_catalog())
+        return cls(list(project.boards), list(project.placed), list(project.connections), list(project.links), catalog or get_catalog(), list(project.shares or []))
 
     def board_instance(self, board_instance_id: str) -> PlacedBoard | None:
         return next((b for b in self.boards if b.instance_id == board_instance_id), None)

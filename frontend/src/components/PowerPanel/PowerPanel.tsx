@@ -6,6 +6,58 @@ interface PowerPanelProps {
   report: PowerReport
   /** 예시를 회로에 적용한다: 외부 전원을 놓고 need.pins 에 연결 */
   onApply: (need: PowerNeed, example: SupplyExample) => void
+  /** 전압이 같아 합칠 수 있는 외부 전원 묶음 */
+  merges: { voltage: number; items: { instanceId: string; label: string }[] }[]
+  onMerge: (keepId: string, otherIds: string[]) => void
+}
+
+/** 부품 카드·속성 패널에서 쓰는 짧은 전원 안내: 필요한 전압·전류와 바로 연결할 예시 */
+export function NeedQuick({ need, onApply, onMore }: { need: PowerNeed; onApply: PowerPanelProps['onApply']; onMore?: () => void }) {
+  return (
+    <div className="need-quick" data-testid="need-quick">
+      <div className="need-quick__figures">
+        <span className="need-quick__value">{need.targetVoltage} V</span>
+        <span className="need-quick__value">{formatCurrent(need.recommendedMa)}</span>
+        <span className="muted small">
+          허용 {voltageRange(need)} · 최소 {formatCurrent(need.minimumMa)}
+        </span>
+      </div>
+      <p className="muted small">쓰는 부품: {[...new Set(need.consumers.map((c) => c.label))].join(', ')}</p>
+      {need.servedBy ? (
+        <p className="callout callout--ok">{need.servedBy} 연결됨</p>
+      ) : need.examples.length ? (
+        <ul className="need-quick__examples">
+          {need.examples.slice(0, 3).map((e) => (
+            <li key={e.id}>
+              <div>
+                <strong>{e.name}</strong>
+                <span className="muted small">
+                  {e.voltage} V · 최대 {formatCurrent(e.maxCurrentMa)}
+                  {e.level === 'minimum' ? ' · 최소 전류만 충족' : ''}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="button button--small button--primary"
+                disabled={!need.pins.length}
+                onClick={() => onApply(need, e)}
+                data-testid={`quick-apply-${e.id}`}
+              >
+                연결
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="callout callout--warning">이 전압·전류에 맞는 예시가 없습니다. 전원 탭에서 조건을 확인하세요.</p>
+      )}
+      {onMore && (
+        <button type="button" className="link-button" onClick={onMore}>
+          전원 탭에서 자세히 보기
+        </button>
+      )}
+    </div>
+  )
 }
 
 const STATUS_LABELS: Record<PowerSource['status'], string> = { ok: '여유 있음', peak: '순간 부족', overload: '용량 초과', unused: '연결 없음' }
@@ -115,7 +167,7 @@ function SourceRow({ source }: { source: PowerSource }) {
 }
 
 /** 필요한 외부 전원의 전압·전류, 맞는 전원 예시, 현재 전원 상태를 보여 준다 */
-export function PowerPanel({ report, onApply }: PowerPanelProps) {
+export function PowerPanel({ report, onApply, merges, onMerge }: PowerPanelProps) {
   return (
     <div className="power-panel" data-testid="power-panel">
       <h3 className="small-heading">필요한 외부 전원</h3>
@@ -147,6 +199,16 @@ export function PowerPanel({ report, onApply }: PowerPanelProps) {
       ) : (
         <p className="muted small">연결된 전원이 없습니다.</p>
       )}
+      {merges.map((m) => (
+        <div className="callout callout--ok power-merge" key={m.voltage} data-testid={`merge-${m.voltage}`}>
+          <span>
+            전압이 같은 외부 전원 {m.items.length}개({m.voltage} V): {m.items.map((i) => i.label).join(', ')}. 전류가 충분한 전원 하나로 합치면 배선이 줄어듭니다.
+          </span>
+          <button type="button" className="button button--small" onClick={() => onMerge(m.items[0].instanceId, m.items.slice(1).map((i) => i.instanceId))}>
+            하나로 합치기
+          </button>
+        </div>
+      ))}
       {report.sources.some((s) => s.unknown.length) && (
         <p className="muted small">소비 전류를 모르는 부품: {[...new Set(report.sources.flatMap((s) => s.unknown))].join(', ')}</p>
       )}

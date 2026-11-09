@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from ..models import BoardEndpoint, Connection, DriverChannel, Module, ModulePin, PlacedModule
+from ..models import BoardEndpoint, Connection, DriverChannel, Module, ModuleEndpoint, ModulePin, PlacedModule
 from .circuit import (
+    parse_endpoint_key,
     Circuit,
     as_module_board_link,
     board_ep,
@@ -149,6 +150,8 @@ def _free_channel(c: Circuit, connections: list[Connection], motor_item: PlacedM
 def auto_assign(c: Circuit, next_conn_seq: int, route: str = "direct", only: set[str] | None = None) -> AutoAssignResult:
     """route 는 새 전선의 경로, only 를 주면 그 모듈 핀(끝점 키)만 배정하고 기존 전선은 그대로 둔다."""
 
+    from .shares import share_of, share_token
+
     def in_scope(instance_id: str, pin_id: str) -> bool:
         return only is None or endpoint_key(module_ep(instance_id, pin_id)) in only
 
@@ -186,7 +189,8 @@ def auto_assign(c: Circuit, next_conn_seq: int, route: str = "direct", only: set
         if not target or link_error(target.board, r.module, r.pin, target.pin, r.placed):
             removed.append(conn)
             continue
-        if target.pin and is_gpio(target.pin) and not claim(link.board_instance_id, target.pin.id, shared_bus_capability(r.pin)):
+        token = share_token(c, endpoint_key(module_ep(link.instance_id, link.module_pin_id))) or shared_bus_capability(r.pin)
+        if target.pin and is_gpio(target.pin) and not claim(link.board_instance_id, target.pin.id, token):
             removed.append(conn)
             continue
         kept.append(conn)
@@ -206,7 +210,7 @@ def auto_assign(c: Circuit, next_conn_seq: int, route: str = "direct", only: set
         seq += 1
         result.append(conn)
         if route == "breadboard":
-            trial = Circuit(c.boards, c.placed, result, c.links, c.catalog)
+            trial = Circuit(c.boards, c.placed, result, c.links, c.catalog, c.shares)
             if wire_peak_ma(trial, from_, to) < BREADBOARD_CURRENT_LIMIT_MA:
                 conn.via = "breadboard"
         added.append(conn)
@@ -310,7 +314,27 @@ def auto_assign(c: Circuit, next_conn_seq: int, route: str = "direct", only: set
             else:
                 failed.append(f"{item.label} · {pin.name}")
             continue
-        bus = shared_bus_capability(pin)
+        # 핀 공유 그룹: 다른 멤버가 이미 보드 핀에 연결되어 있으면 같은 핀에 잇는다
+        share_key = endpoint_key(module_ep(item.instance_id, pin.id))
+        token = share_token(c, share_key)
+        share = share_of(c, share_key) if token else None
+        mate = None
+        if share:
+            for k in share.members:
+                if k == share_key:
+                    continue
+                e = parse_endpoint_key(k)
+                if not isinstance(e, ModuleEndpoint):
+                    continue
+                link = next((l for l in (as_module_board_link(x) for x in result) if l and l.instance_id == e.instance_id and l.module_pin_id == e.pin_id), None)
+                if link and link.board_instance_id == host.instance_id:
+                    mate = link
+                    break
+        if mate:
+            used[f"{host.instance_id}:{mate.pin_id}"] = token
+            connect(item.instance_id, pin.id, host.instance_id, mate.pin_id)
+            continue
+        bus = token or shared_bus_capability(pin)
         candidates = []
         for index, bp in enumerate([p for p in board.pins if is_gpio(p)]):
             if link_error(board, module, pin, bp) is not None:

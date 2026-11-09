@@ -20,6 +20,7 @@ int digitalRead(uint8_t pin);
 int analogRead(uint8_t pin);
 void analogWrite(uint8_t pin, int val);
 unsigned long millis(void);
+long map(long value, long fromLow, long fromHigh, long toLow, long toHigh);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
 

@@ -141,6 +141,8 @@ export interface Board {
   pins: BoardPin[]
   /** 캔버스에서 보드가 차지하는 크기(px) */
   footprint: { width: number; height: number }
+  /** 대표 실물 크기 (mm, 위에서 본 가로×세로). 실물 배치 모드에 쓴다 */
+  sizeMm?: { width: number; height: number }
   notes: string[]
   sourceUrl: string
 }
@@ -234,7 +236,8 @@ export interface ModuleParameter {
   bom?: boolean
 }
 
-export type MotorKind = 'dc' | 'stepper-bipolar' | 'stepper-unipolar' | 'bldc'
+/** 드라이버 채널이 받는 모터 종류. servo 는 서보 드라이버(PCA9685 등) 채널 */
+export type MotorKind = 'dc' | 'stepper-bipolar' | 'stepper-unipolar' | 'bldc' | 'servo'
 
 /** 모터 사양. 전류는 드라이버 전원 쪽으로 계산한다. */
 export interface MotorSpec {
@@ -298,6 +301,8 @@ export interface Module {
   category: ModuleCategory
   /** public/ 기준 아이콘 경로 */
   icon: string
+  /** 대표 실물 크기 (mm, 위에서 본 가로×세로). 실물 배치 모드에 쓴다 */
+  sizeMm?: { width: number; height: number }
   description: string
   pins: ModulePin[]
   parameters?: ModuleParameter[]
@@ -386,6 +391,12 @@ export type RouteMode = 'direct' | 'breadboard'
  * 전선 한 가닥. 핀 배정은 별도로 저장하지 않고 연결 목록에서 계산한다
  * (모듈 핀 → 보드 핀 연결 = 그 모듈 핀의 배정).
  */
+/** 한 보드 핀을 함께 쓰는 부품 핀 묶음 (핀 공유). members 는 부품 핀 끝점 키 */
+export interface PinShare {
+  id: string
+  members: string[]
+}
+
 export interface Connection {
   id: string
   from: Endpoint

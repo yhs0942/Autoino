@@ -1,6 +1,8 @@
 import { findBoard } from '../data/boards'
 import { findModule } from '../data/modules'
-import type { BoardLink, BoardLinkEnd, BusProtocol, Connection, Endpoint, PlacedBoard, PlacedModule, Point } from '../types'
+import type { BoardLink, BoardLinkEnd, BusProtocol, Connection, Endpoint, PinShare, PlacedBoard, PlacedModule, Point } from '../types'
+import { parseHoleId } from './breadboard'
+import { parseEndpointKey } from './connections'
 
 // 프로젝트 파일(.autoino.json) 직렬화와 불러오기 검증
 //
@@ -19,6 +21,12 @@ export interface ProjectData {
   links: BoardLink[]
   /** 브레드보드 위치 (예전 파일에는 없다) */
   breadboard?: Point
+  /** 사람이 브레드보드에서 옮긴 전선의 구멍: 끝점 키 → 구멍 ID (없으면 자동 배치) */
+  breadboardHoles?: Record<string, string>
+  /** 핀 공유 그룹 */
+  shares?: PinShare[]
+  /** 실물 배치 모드의 위치 (보드·부품 인스턴스 ID 또는 'breadboard' → 좌표) */
+  layout?: Record<string, Point>
   nextSeq: number
   nextConnSeq: number
   nextBoardSeq: number
@@ -47,6 +55,9 @@ export function toProjectFile(data: ProjectData, now = new Date()): ProjectFile 
     connections: data.connections,
     links: data.links,
     ...(data.breadboard ? { breadboard: data.breadboard } : {}),
+    ...(data.breadboardHoles && Object.keys(data.breadboardHoles).length ? { breadboardHoles: data.breadboardHoles } : {}),
+    ...(data.shares?.length ? { shares: data.shares } : {}),
+    ...(data.layout && Object.keys(data.layout).length ? { layout: data.layout } : {}),
     nextSeq: data.nextSeq,
     nextConnSeq: data.nextConnSeq,
     nextBoardSeq: data.nextBoardSeq,
@@ -206,6 +217,30 @@ export function parseProjectFile(input: unknown): ProjectData {
     for (const [k, v] of Object.entries(raw.labelCounters)) if (isNum(v)) labelCounters[k] = Math.max(labelCounters[k] ?? 0, v)
   const counter = (v: unknown, min: number) => Math.max(isNum(v) ? v : 1, min)
 
+  // 핀 공유 그룹: 있는 부품 핀만 남기고, 멤버가 둘 미만이면 버린다
+  const shares: PinShare[] = []
+  if (Array.isArray(raw.shares))
+    for (const sh of raw.shares) {
+      if (!isObj(sh) || !isStr(sh.id) || !Array.isArray(sh.members)) continue
+      const members = [...new Set(sh.members.filter((k): k is string => isStr(k) && parseEndpointKey(k)?.kind === 'module' && instanceIds.has((parseEndpointKey(k) as { instanceId: string }).instanceId)))]
+      if (members.length >= 2 && !shares.some((x) => x.id === sh.id)) shares.push({ id: sh.id, members })
+    }
+
+  // 실물 배치 위치: 있는 보드·부품·브레드보드만
+  const layout: Record<string, Point> = {}
+  if (isObj(raw.layout))
+    for (const [id, pos] of Object.entries(raw.layout))
+      if ((boardIds.has(id) || instanceIds.has(id) || id === 'breadboard') && isObj(pos) && isNum(pos.x) && isNum(pos.y)) layout[id] = { x: pos.x, y: pos.y }
+
+  // 브레드보드 구멍: 있는 끝점과 올바른 구멍 ID 만 남긴다
+  const breadboardHoles: Record<string, string> = {}
+  if (isObj(raw.breadboardHoles))
+    for (const [key, hole] of Object.entries(raw.breadboardHoles)) {
+      const e = parseEndpointKey(key)
+      const exists = e && (e.kind === 'board' ? boardIds.has(e.boardInstanceId) : instanceIds.has(e.instanceId))
+      if (exists && isStr(hole) && parseHoleId(hole)) breadboardHoles[key] = hole
+    }
+
   return {
     name: isStr(raw.name) && raw.name.trim() ? raw.name : '제목 없는 프로젝트',
     boards,
@@ -213,6 +248,9 @@ export function parseProjectFile(input: unknown): ProjectData {
     connections,
     links,
     ...(isObj(raw.breadboard) && isNum(raw.breadboard.x) && isNum(raw.breadboard.y) ? { breadboard: { x: raw.breadboard.x, y: raw.breadboard.y } } : {}),
+    ...(Object.keys(breadboardHoles).length ? { breadboardHoles } : {}),
+    ...(shares.length ? { shares } : {}),
+    ...(Object.keys(layout).length ? { layout } : {}),
     nextSeq: counter(raw.nextSeq, maxSeq + 1),
     nextConnSeq: counter(raw.nextConnSeq, maxConn + 1),
     nextBoardSeq: counter(raw.nextBoardSeq, maxBoard + 1),

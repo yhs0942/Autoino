@@ -358,3 +358,14 @@
 .pin-details[open] summary {
   margin-bottom: 8px;
 }
+
+.share-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.share-row p {
+  margin: 0;
+}

@@ -5,6 +5,10 @@
     "nameEn": "LED",
     "category": "output",
     "icon": "icons/led.svg",
+    "sizeMm": {
+      "width": 6,
+      "height": 6
+    },
     "description": "일반 5 mm 발광 다이오드입니다. 전류 제한 저항과 직렬로 연결해야 합니다.",
     "pins": [
       {
@@ -127,6 +131,10 @@
     "nameEn": "Push Button",
     "category": "input",
     "icon": "icons/button.svg",
+    "sizeMm": {
+      "width": 12,
+      "height": 12
+    },
     "description": "4핀 택트 스위치입니다. 마주 보는 두 핀 쌍은 내부적으로 연결되어 있습니다.",
     "pins": [
       {
@@ -204,6 +212,10 @@
     "nameEn": "HC-SR04 Ultrasonic Sensor",
     "category": "sensor",
     "icon": "icons/hc-sr04.svg",
+    "sizeMm": {
+      "width": 45,
+      "height": 20
+    },
     "description": "초음파를 발사하고 반사되어 돌아오는 시간을 측정하여 거리를 계산하는 센서입니다.",
     "pins": [
       {
@@ -290,6 +302,10 @@
     "nameEn": "SG90 Micro Servo",
     "category": "motor",
     "icon": "icons/sg90.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 12.5
+    },
     "description": "약 180° 범위에서 각도를 제어할 수 있는 소형 서보 모터입니다.",
     "pins": [
       {
@@ -372,6 +388,10 @@
     "nameEn": "I2C LCD 1602",
     "category": "display",
     "icon": "icons/i2c-lcd.svg",
+    "sizeMm": {
+      "width": 80,
+      "height": 36
+    },
     "description": "16×2 문자 LCD 에 I²C 변환 모듈(PCF8574 계열)이 부착된 디스플레이입니다.",
     "pins": [
       {
@@ -459,6 +479,10 @@
     "nameEn": "Voltage Divider",
     "category": "interface",
     "icon": "icons/voltage-divider.svg",
+    "sizeMm": {
+      "width": 12,
+      "height": 6
+    },
     "description": "저항 두 개로 신호 전압을 낮춥니다. 5 V 센서 출력(예: HC-SR04 Echo)을 3.3 V 보드 입력에 연결할 때 사용합니다.",
     "pins": [
       {
@@ -557,6 +581,10 @@
     "nameEn": "4-channel Bidirectional Logic Level Converter (BSS138)",
     "category": "interface",
     "icon": "icons/level-shifter.svg",
+    "sizeMm": {
+      "width": 15,
+      "height": 13
+    },
     "description": "MOSFET(BSS138) 방식의 양방향 논리 레벨 변환 모듈입니다. 5 V 와 3.3 V 장치 사이의 I²C·UART 등 신호를 변환합니다.",
     "pins": [
       {
@@ -730,6 +758,10 @@
     "nameEn": "External DC Power Supply",
     "category": "power",
     "icon": "icons/external-power.svg",
+    "sizeMm": {
+      "width": 30,
+      "height": 20
+    },
     "description": "DC 어댑터·배터리 같은 외부 전원입니다. 전압과 최대 전류를 고른 뒤 + 는 부품 전원에, − 는 GND 에 연결합니다.",
     "pins": [
       {
@@ -910,6 +942,10 @@
     "nameEn": "LM2596 Buck Converter",
     "category": "power",
     "icon": "icons/buck-converter.svg",
+    "sizeMm": {
+      "width": 43,
+      "height": 21
+    },
     "description": "높은 전압을 낮은 전압으로 효율 좋게 낮춥니다. 12 V 전원 하나로 5 V 서보·보드까지 함께 구동할 때 씁니다.",
     "pins": [
       {
@@ -1043,6 +1079,10 @@
     "nameEn": "MB102 Breadboard Power Module",
     "category": "power",
     "icon": "icons/buck-converter.svg",
+    "sizeMm": {
+      "width": 53,
+      "height": 33
+    },
     "description": "브레드보드 레일에 꽂아 5 V 와 3.3 V 를 공급합니다. 소형 센서·LED 처럼 전류가 작은 회로에 적합합니다.",
     "pins": [
       {
@@ -1131,6 +1171,10 @@
     "nameEn": "130 Size DC Motor",
     "category": "motor",
     "icon": "icons/dc-motor.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 20
+    },
     "description": "장난감·교육용으로 흔한 소형 브러시 DC 모터입니다. 속도가 빠르고 토크가 작습니다.",
     "pins": [
       {
@@ -1196,6 +1240,10 @@
     "nameEn": "TT Gearbox DC Motor",
     "category": "motor",
     "icon": "icons/gear-motor.svg",
+    "sizeMm": {
+      "width": 70,
+      "height": 22.5
+    },
     "description": "2WD·4WD 로봇카에 많이 쓰는 1:48 기어드 모터입니다.",
     "pins": [
       {
@@ -1263,6 +1311,10 @@
     "nameEn": "N20 Micro Gear Motor",
     "category": "motor",
     "icon": "icons/gear-motor.svg",
+    "sizeMm": {
+      "width": 34,
+      "height": 12
+    },
     "description": "금속 기어가 달린 아주 작은 모터입니다. 소형 로봇에 알맞습니다.",
     "pins": [
       {
@@ -1330,6 +1382,10 @@
     "nameEn": "25GA-370 12 V Gear Motor",
     "category": "motor",
     "icon": "icons/gear-motor.svg",
+    "sizeMm": {
+      "width": 63,
+      "height": 25
+    },
     "description": "토크가 큰 12 V 기어드 모터입니다. 무거운 로봇이나 메커니즘 구동에 씁니다.",
     "pins": [
       {
@@ -1397,6 +1453,10 @@
     "nameEn": "Coin Vibration Motor",
     "category": "motor",
     "icon": "icons/vibration-motor.svg",
+    "sizeMm": {
+      "width": 10,
+      "height": 10
+    },
     "description": "손목밴드·게임패드 같은 촉각 피드백에 쓰는 작은 진동 모터입니다.",
     "pins": [
       {
@@ -1463,6 +1523,10 @@
     "nameEn": "Mini Submersible Water Pump",
     "category": "motor",
     "icon": "icons/water-pump.svg",
+    "sizeMm": {
+      "width": 45,
+      "height": 24
+    },
     "description": "물을 옮기는 소형 수중 펌프입니다. 자동 화분·정수 실험에 씁니다. 방향을 바꿀 필요가 없어 릴레이로도 켤 수 있습니다.",
     "pins": [
       {
@@ -1530,6 +1594,10 @@
     "nameEn": "MG90S Metal Gear Micro Servo",
     "category": "motor",
     "icon": "icons/sg90.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 12.5
+    },
     "description": "금속 기어로 SG90 보다 튼튼한 마이크로 서보입니다.",
     "pins": [
       {
@@ -1618,6 +1686,10 @@
     "nameEn": "MG996R High Torque Servo",
     "category": "motor",
     "icon": "icons/servo-large.svg",
+    "sizeMm": {
+      "width": 54,
+      "height": 20
+    },
     "description": "큰 토크를 내는 표준 크기 서보입니다. 로봇 팔 관절에 많이 씁니다.",
     "pins": [
       {
@@ -1707,6 +1779,10 @@
     "nameEn": "FS90R Continuous Rotation Servo",
     "category": "motor",
     "icon": "icons/sg90.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 12.5
+    },
     "description": "각도 대신 회전 방향과 속도를 제어하는 360° 서보입니다. 소형 바퀴 구동에 씁니다.",
     "pins": [
       {
@@ -1797,6 +1873,10 @@
     "nameEn": "28BYJ-48 5 V Unipolar Stepper",
     "category": "motor",
     "icon": "icons/stepper-motor.svg",
+    "sizeMm": {
+      "width": 42,
+      "height": 31
+    },
     "description": "기어가 달린 저렴한 5 V 유니폴라 스테퍼 모터입니다. ULN2003 드라이버 보드와 함께 씁니다.",
     "pins": [
       {
@@ -1883,6 +1963,10 @@
     "nameEn": "NEMA 17 Bipolar Stepper (17HS4401)",
     "category": "motor",
     "icon": "icons/stepper-motor.svg",
+    "sizeMm": {
+      "width": 42.3,
+      "height": 42.3
+    },
     "description": "3D 프린터·CNC 에 쓰는 강한 바이폴라 스테퍼 모터입니다. A4988·DRV8825 같은 전류 제어 드라이버가 필요합니다.",
     "pins": [
       {
@@ -1967,6 +2051,10 @@
     "nameEn": "A2212 Brushless Motor",
     "category": "motor",
     "icon": "icons/bldc-motor.svg",
+    "sizeMm": {
+      "width": 28,
+      "height": 28
+    },
     "description": "드론·RC 에 쓰는 고속 브러시리스 모터입니다. ESC 로 구동합니다.",
     "pins": [
       {
@@ -2035,6 +2123,10 @@
     "nameEn": "L298N Dual H-Bridge Motor Driver",
     "category": "driver",
     "icon": "icons/motor-driver.svg",
+    "sizeMm": {
+      "width": 43,
+      "height": 43
+    },
     "description": "DC 모터 2개를 방향·속도 제어하는 가장 흔한 드라이버 모듈입니다. 전압 강하가 커서 모터 전압이 약 2 V 낮아집니다.",
     "pins": [
       {
@@ -2257,6 +2349,10 @@
     "nameEn": "TB6612FNG Dual Motor Driver",
     "category": "driver",
     "icon": "icons/motor-driver.svg",
+    "sizeMm": {
+      "width": 20,
+      "height": 20
+    },
     "description": "효율이 좋고 전압 강하가 작은 2채널 드라이버입니다. 3.3 V 보드(ESP32)와도 잘 맞습니다.",
     "pins": [
       {
@@ -2487,6 +2583,10 @@
     "nameEn": "L9110S Dual Motor Driver",
     "category": "driver",
     "icon": "icons/motor-driver.svg",
+    "sizeMm": {
+      "width": 29,
+      "height": 23
+    },
     "description": "작고 저렴한 2채널 드라이버입니다. 소형 DC 모터에 알맞습니다.",
     "pins": [
       {
@@ -2664,6 +2764,10 @@
     "nameEn": "DRV8833 Dual Motor Driver",
     "category": "driver",
     "icon": "icons/motor-driver.svg",
+    "sizeMm": {
+      "width": 18.5,
+      "height": 16.5
+    },
     "description": "저전압 소형 모터용 2채널 드라이버입니다. 전류 제한이 있어 TT 모터에 잘 맞습니다.",
     "pins": [
       {
@@ -2851,6 +2955,10 @@
     "nameEn": "ULN2003 Stepper Driver Board",
     "category": "driver",
     "icon": "icons/motor-driver.svg",
+    "sizeMm": {
+      "width": 35,
+      "height": 32
+    },
     "description": "28BYJ-48 같은 5선 유니폴라 스테퍼 모터를 구동하는 보드입니다. 모터 커넥터를 그대로 꽂습니다.",
     "pins": [
       {
@@ -3016,6 +3124,10 @@
     "nameEn": "A4988 Stepper Driver",
     "category": "driver",
     "icon": "icons/stepper-driver.svg",
+    "sizeMm": {
+      "width": 20,
+      "height": 15
+    },
     "description": "STEP·DIR 두 신호로 바이폴라 스테퍼를 구동하는 전류 제어 드라이버입니다.",
     "pins": [
       {
@@ -3231,6 +3343,10 @@
     "nameEn": "DRV8825 Stepper Driver",
     "category": "driver",
     "icon": "icons/stepper-driver.svg",
+    "sizeMm": {
+      "width": 20,
+      "height": 15
+    },
     "description": "A4988 보다 높은 전압·전류를 쓸 수 있는 스테퍼 드라이버입니다. 내부 레귤레이터가 있어 로직 전원을 따로 넣지 않습니다.",
     "pins": [
       {
@@ -3426,6 +3542,10 @@
     "nameEn": "30 A Brushless ESC",
     "category": "driver",
     "icon": "icons/esc.svg",
+    "sizeMm": {
+      "width": 55,
+      "height": 26
+    },
     "description": "BLDC 모터를 구동하는 속도 제어기입니다. 서보와 같은 펄스 신호로 스로틀을 제어합니다.",
     "pins": [
       {
@@ -3560,11 +3680,427 @@
     "setupNote": "프로펠러를 뺀 상태에서 시험하세요. 전원을 넣기 전에 스로틀 최소 신호가 나가야 시동됩니다."
   },
   {
+    "id": "pca9685",
+    "name": "PCA9685 16채널 서보 드라이버",
+    "nameEn": "PCA9685 16-Channel Servo Driver",
+    "category": "driver",
+    "icon": "icons/servo-driver.svg",
+    "sizeMm": {
+      "width": 62.5,
+      "height": 25.4
+    },
+    "description": "I²C 두 선으로 서보 모터를 16개까지 제어합니다. 서보 전원(V+)은 외부 5–6 V 전원에서 받습니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지 (로직·서보 공통). 서보 GND(갈색)를 여러 개 연결할 수 있습니다.",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "로직 전원 (보드 5 V 또는 3.3 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 2.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 10,
+        "peakMa": 10,
+        "logicSupply": true
+      },
+      {
+        "id": "sda",
+        "name": "SDA",
+        "role": "signal",
+        "description": "I²C 데이터",
+        "requires": [
+          "i2c-sda"
+        ],
+        "direction": "inout"
+      },
+      {
+        "id": "scl",
+        "name": "SCL",
+        "role": "signal",
+        "description": "I²C 클록",
+        "requires": [
+          "i2c-scl"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "vplus",
+        "name": "V+",
+        "role": "power",
+        "description": "서보 전원 단자 (외부 5–6 V). 서보 전원선(빨강)을 여러 개 연결할 수 있습니다.",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.8,
+        "maxVoltage": 6,
+        "typicalMa": 0,
+        "peakMa": 0,
+        "external": "required",
+        "fanout": true
+      },
+      {
+        "id": "pwm0",
+        "name": "S0",
+        "role": "drive",
+        "description": "0번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm1",
+        "name": "S1",
+        "role": "drive",
+        "description": "1번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm2",
+        "name": "S2",
+        "role": "drive",
+        "description": "2번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm3",
+        "name": "S3",
+        "role": "drive",
+        "description": "3번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm4",
+        "name": "S4",
+        "role": "drive",
+        "description": "4번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm5",
+        "name": "S5",
+        "role": "drive",
+        "description": "5번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm6",
+        "name": "S6",
+        "role": "drive",
+        "description": "6번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm7",
+        "name": "S7",
+        "role": "drive",
+        "description": "7번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm8",
+        "name": "S8",
+        "role": "drive",
+        "description": "8번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm9",
+        "name": "S9",
+        "role": "drive",
+        "description": "9번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm10",
+        "name": "S10",
+        "role": "drive",
+        "description": "10번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm11",
+        "name": "S11",
+        "role": "drive",
+        "description": "11번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm12",
+        "name": "S12",
+        "role": "drive",
+        "description": "12번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm13",
+        "name": "S13",
+        "role": "drive",
+        "description": "13번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm14",
+        "name": "S14",
+        "role": "drive",
+        "description": "14번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      },
+      {
+        "id": "pwm15",
+        "name": "S15",
+        "role": "drive",
+        "description": "15번 채널 서보 신호선(주황·노랑)",
+        "requires": []
+      }
+    ],
+    "driver": {
+      "supplyPin": "vplus",
+      "dropVoltage": 0,
+      "channelMa": 25,
+      "channelPeakMa": 25,
+      "channels": [
+        {
+          "id": "ch0",
+          "label": "서보 0",
+          "outputs": [
+            "pwm0"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch1",
+          "label": "서보 1",
+          "outputs": [
+            "pwm1"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch2",
+          "label": "서보 2",
+          "outputs": [
+            "pwm2"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch3",
+          "label": "서보 3",
+          "outputs": [
+            "pwm3"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch4",
+          "label": "서보 4",
+          "outputs": [
+            "pwm4"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch5",
+          "label": "서보 5",
+          "outputs": [
+            "pwm5"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch6",
+          "label": "서보 6",
+          "outputs": [
+            "pwm6"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch7",
+          "label": "서보 7",
+          "outputs": [
+            "pwm7"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch8",
+          "label": "서보 8",
+          "outputs": [
+            "pwm8"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch9",
+          "label": "서보 9",
+          "outputs": [
+            "pwm9"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch10",
+          "label": "서보 10",
+          "outputs": [
+            "pwm10"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch11",
+          "label": "서보 11",
+          "outputs": [
+            "pwm11"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch12",
+          "label": "서보 12",
+          "outputs": [
+            "pwm12"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch13",
+          "label": "서보 13",
+          "outputs": [
+            "pwm13"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch14",
+          "label": "서보 14",
+          "outputs": [
+            "pwm14"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        },
+        {
+          "id": "ch15",
+          "label": "서보 15",
+          "outputs": [
+            "pwm15"
+          ],
+          "inputs": [],
+          "accepts": [
+            "servo"
+          ]
+        }
+      ]
+    },
+    "electrical": [
+      {
+        "label": "로직 전압 (VCC)",
+        "value": "2.3–5.5 V",
+        "confidence": "official"
+      },
+      {
+        "label": "서보 전원 (V+)",
+        "value": "보통 5–6 V (서보 정격에 맞춤)",
+        "confidence": "typical",
+        "note": "V+ 는 서보로 그대로 전달됩니다. 서보 정격 전압을 넘기지 마세요."
+      },
+      {
+        "label": "PWM",
+        "value": "12비트, 서보는 50 Hz",
+        "confidence": "official"
+      },
+      {
+        "label": "I²C 주소",
+        "value": "0x40 (A0–A5 점퍼로 0x40–0x7F)",
+        "confidence": "official"
+      }
+    ],
+    "i2cAddress": "0x40",
+    "tags": [
+      "pca9685",
+      "서보",
+      "servo",
+      "드라이버",
+      "driver",
+      "16채널",
+      "i2c",
+      "pwm"
+    ],
+    "library": "Adafruit_PWMServoDriver",
+    "notes": [
+      "서보 전원(V+)은 보드 5V 가 아니라 외부 전원에서 받으세요. 서보 여러 개가 동시에 움직이면 큰 전류가 흐릅니다.",
+      "서보 카드를 이 카드 위로 끌어다 놓으면 빈 채널에 신호·전원·GND 가 함께 연결됩니다."
+    ],
+    "code": {
+      "template": "pca9685",
+      "base": "servos",
+      "pins": {
+        "sda": "sda",
+        "scl": "scl"
+      }
+    }
+  },
+  {
     "id": "relay-1ch",
     "name": "릴레이 모듈 (1채널)",
     "nameEn": "1-Channel Relay Module",
     "category": "actuator",
     "icon": "icons/relay.svg",
+    "sizeMm": {
+      "width": 50,
+      "height": 26
+    },
     "description": "작은 신호로 큰 전원을 켜고 끕니다. 펌프·조명·팬처럼 방향 제어가 필요 없는 부하에 씁니다.",
     "pins": [
       {
@@ -3659,6 +4195,10 @@
     "nameEn": "Active Buzzer Module",
     "category": "output",
     "icon": "icons/buzzer.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 13
+    },
     "description": "전원을 주면 일정한 음을 내는 부저입니다. 알림음에 씁니다.",
     "pins": [
       {
@@ -3726,6 +4266,10 @@
     "nameEn": "WS2812B Addressable LED Strip",
     "category": "output",
     "icon": "icons/neopixel.svg",
+    "sizeMm": {
+      "width": 100,
+      "height": 10
+    },
     "description": "LED 마다 색을 따로 정할 수 있는 스트립입니다. LED 개수에 비례해 전류가 커지므로 외부 5 V 전원이 필요합니다.",
     "pins": [
       {
@@ -3842,6 +4386,10 @@
     "nameEn": "10 kΩ Potentiometer",
     "category": "input",
     "icon": "icons/potentiometer.svg",
+    "sizeMm": {
+      "width": 17,
+      "height": 20
+    },
     "description": "손잡이를 돌려 아날로그 값을 입력합니다. 속도·밝기 조절에 씁니다.",
     "pins": [
       {
@@ -3906,6 +4454,10 @@
     "nameEn": "KY-023 Joystick Module",
     "category": "input",
     "icon": "icons/joystick.svg",
+    "sizeMm": {
+      "width": 34,
+      "height": 26
+    },
     "description": "X·Y 두 축의 아날로그 값과 누름 버튼을 입력합니다.",
     "pins": [
       {
@@ -3993,6 +4545,10 @@
     "nameEn": "KY-040 Rotary Encoder",
     "category": "input",
     "icon": "icons/rotary-encoder.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 19
+    },
     "description": "돌린 방향과 양을 입력합니다. 메뉴 선택이나 값 조절에 씁니다.",
     "pins": [
       {
@@ -4080,6 +4636,10 @@
     "nameEn": "DHT11 / DHT22 Temperature Humidity Sensor",
     "category": "sensor",
     "icon": "icons/dht.svg",
+    "sizeMm": {
+      "width": 28,
+      "height": 13
+    },
     "description": "온도와 습도를 디지털로 읽습니다. 3핀 모듈 기준이며 풀업 저항이 달려 있습니다.",
     "pins": [
       {
@@ -4169,6 +4729,10 @@
     "nameEn": "HC-SR501 PIR Motion Sensor",
     "category": "sensor",
     "icon": "icons/pir.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 24
+    },
     "description": "사람의 움직임을 감지하면 HIGH 를 냅니다. 출력은 3.3 V 라 3.3 V·5 V 보드에 모두 연결할 수 있습니다.",
     "pins": [
       {
@@ -4241,6 +4805,10 @@
     "nameEn": "Photoresistor (LDR) Module",
     "category": "sensor",
     "icon": "icons/ldr.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 14
+    },
     "description": "주변 밝기를 아날로그 값으로 읽습니다.",
     "pins": [
       {
@@ -4312,6 +4880,10 @@
     "nameEn": "Soil Moisture Sensor",
     "category": "sensor",
     "icon": "icons/soil.svg",
+    "sizeMm": {
+      "width": 60,
+      "height": 20
+    },
     "description": "흙의 수분을 아날로그 값으로 읽습니다. 자동 화분에 씁니다.",
     "pins": [
       {
@@ -4389,6 +4961,10 @@
     "nameEn": "MQ-2 Gas Sensor",
     "category": "sensor",
     "icon": "icons/gas.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 22
+    },
     "description": "가연성 가스와 연기를 감지합니다. 히터가 있어 전류가 큽니다.",
     "pins": [
       {
@@ -4466,6 +5042,10 @@
     "nameEn": "MPU-6050 IMU Module (GY-521)",
     "category": "sensor",
     "icon": "icons/imu.svg",
+    "sizeMm": {
+      "width": 21,
+      "height": 16
+    },
     "description": "3축 가속도와 3축 자이로를 I²C 로 읽습니다. 균형 로봇과 자세 측정에 씁니다.",
     "pins": [
       {
@@ -4547,6 +5127,10 @@
     "nameEn": "TCRT5000 Line Tracking Sensor",
     "category": "sensor",
     "icon": "icons/line-sensor.svg",
+    "sizeMm": {
+      "width": 32,
+      "height": 14
+    },
     "description": "바닥의 검은 선을 적외선 반사로 감지합니다. 로봇카에 씁니다.",
     "pins": [
       {
@@ -4623,6 +5207,10 @@
     "nameEn": "0.96 inch I2C OLED SSD1306",
     "category": "display",
     "icon": "icons/oled.svg",
+    "sizeMm": {
+      "width": 27,
+      "height": 27
+    },
     "description": "128×64 그래픽 OLED 입니다. I²C 두 선으로 연결합니다.",
     "pins": [
       {
@@ -4704,6 +5292,10 @@
     "nameEn": "TM1637 4-Digit Display",
     "category": "display",
     "icon": "icons/seven-segment.svg",
+    "sizeMm": {
+      "width": 42,
+      "height": 24
+    },
     "description": "숫자 네 자리를 두 선으로 표시합니다.",
     "pins": [
       {
@@ -4784,6 +5376,10 @@
     "nameEn": "HC-05 Bluetooth Module",
     "category": "comm",
     "icon": "icons/bluetooth.svg",
+    "sizeMm": {
+      "width": 37,
+      "height": 16
+    },
     "description": "스마트폰과 시리얼로 통신하는 블루투스 모듈입니다.",
     "pins": [
       {
@@ -4880,6 +5476,10 @@
     "nameEn": "MFRC522 RFID Reader",
     "category": "comm",
     "icon": "icons/rfid.svg",
+    "sizeMm": {
+      "width": 60,
+      "height": 40
+    },
     "description": "13.56 MHz RFID 카드의 UID 를 읽습니다. SPI 로 연결하며 3.3 V 전용입니다.",
     "pins": [
       {

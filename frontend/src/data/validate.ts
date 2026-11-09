@@ -28,7 +28,7 @@ const CONFIDENCES: readonly SpecConfidence[] = ['official', 'typical', 'varies']
 const CATEGORIES: readonly ModuleCategory[] = ['output', 'input', 'sensor', 'motor', 'driver', 'power', 'actuator', 'display', 'comm', 'interface']
 const CORES = ['arduino-avr', 'arduino-esp32'] as const
 const ROLES: readonly ModulePinRole[] = ['power', 'ground', 'signal', 'passive', 'source', 'load', 'drive']
-const MOTOR_KINDS: readonly MotorKind[] = ['dc', 'stepper-bipolar', 'stepper-unipolar', 'bldc']
+const MOTOR_KINDS: readonly MotorKind[] = ['dc', 'stepper-bipolar', 'stepper-unipolar', 'bldc', 'servo']
 const SUPPLY_KINDS: readonly SupplyKind[] = ['adapter', 'battery', 'usb']
 
 class DataError extends Error {}
@@ -156,10 +156,18 @@ export function validateBoards(data: unknown): Board[] {
     }
     checkElectrical(o.electrical, `${p}.electrical`)
     obj(o.footprint, `${p}.footprint`)
+    sizeMm(o.sizeMm, `${p}.sizeMm`)
     arr(o.notes, `${p}.notes`)
   })
   unique(boards.map((b) => (b as Board).id), 'boards')
   return boards as Board[]
+}
+
+/** 대표 실물 크기 (mm): 없어도 되지만 있으면 양수여야 한다 */
+function sizeMm(v: unknown, path: string) {
+  if (v === undefined) return
+  const o = obj(v, path)
+  for (const k of ['width', 'height']) if (typeof o[k] !== 'number' || !((o[k] as number) > 0)) fail(`${path}.${k}`, '양수여야 합니다')
 }
 
 export function validateModules(data: unknown): Module[] {
@@ -168,6 +176,7 @@ export function validateModules(data: unknown): Module[] {
     const p = `modules[${mi}]`
     const o = obj(m, p)
     for (const key of ['id', 'name', 'nameEn', 'icon', 'description']) str(o[key], `${p}.${key}`)
+    sizeMm(o.sizeMm, `${p}.sizeMm`)
     oneOf(o.category, CATEGORIES, `${p}.category`)
     const pins = arr(o.pins, `${p}.pins`).map((pin, i) => {
       const po = obj(pin, `${p}.pins[${i}]`)

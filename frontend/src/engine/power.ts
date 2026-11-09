@@ -335,9 +335,13 @@ function pinDemand(circuit: Circuit, netlist: Netlist, sources: PowerSource[], i
   }
 }
 
+const isServoModule = (module: Module) => module.code?.template === 'servo' || module.code?.template === 'servo-continuous'
+
 function collectDemands(circuit: Circuit, netlist: Netlist, sources: PowerSource[]): Demand[] {
   const demands: Demand[] = []
   const driven = new Set<string>()
+  /** 서보 드라이버 수요에 이미 넣은 서보 전원 핀 */
+  const covered = new Set<string>()
   for (const item of circuit.placed) {
     const module = findModule(item.moduleId)
     const driver = module?.driver
@@ -362,6 +366,23 @@ function collectDemands(circuit: Circuit, netlist: Netlist, sources: PowerSource
       demand.targetVoltage = round1(Math.min(demand.maxVoltage, Math.max(demand.minVoltage, target)))
       for (const m of motors) driven.add(m.item.instanceId)
     }
+    // 서보 드라이버: V+ 에 함께 물린 서보 전원 핀의 전류와 전압 범위를 더한다
+    if (driver.channels.some((ch) => ch.accepts.includes('servo'))) {
+      for (const k of netMembers(netlist, endpointKey(moduleEndpoint(item.instanceId, pin.id)))) {
+        const e = parseEndpointKey(k)
+        const r = e?.kind === 'module' ? resolveModulePin(circuit.placed, e) : null
+        if (!r || r.placed.instanceId === item.instanceId || r.pin.role !== 'power' || !isServoModule(r.module)) continue
+        const load = loadOfPin(circuit, netlist, r.placed, r.module, r.pin)
+        demand.consumers.push({ instanceId: r.placed.instanceId, label: r.placed.label, typicalMa: load.typicalMa ?? 0, peakMa: load.peakMa ?? 0 })
+        demand.typicalMa += load.typicalMa ?? 0
+        demand.peakMa += load.peakMa ?? 0
+        if (r.pin.minVoltage !== undefined) demand.minVoltage = Math.max(demand.minVoltage, r.pin.minVoltage)
+        if (r.pin.maxVoltage !== undefined) demand.maxVoltage = Math.min(demand.maxVoltage, r.pin.maxVoltage)
+        covered.add(k)
+      }
+      demand.conflict = demand.minVoltage > demand.maxVoltage
+      if (!demand.conflict) demand.targetVoltage = round1(Math.min(demand.maxVoltage, Math.max(demand.minVoltage, demand.targetVoltage)))
+    }
     demands.push(demand)
   }
   for (const item of circuit.placed) {
@@ -385,6 +406,7 @@ function collectDemands(circuit: Circuit, netlist: Netlist, sources: PowerSource
     for (const pin of module.pins) {
       if (pin.role !== 'power' || !pin.external) continue
       const key = endpointKey(moduleEndpoint(item.instanceId, pin.id))
+      if (covered.has(key)) continue
       // 레귤레이터 출력에 달린 부품은 레귤레이터 입력의 수요로 계산한다
       if (sourceOnNet(sources, netlist, key)?.kind === 'regulator') continue
       demands.push(pinDemand(circuit, netlist, sources, item, module, pin))
@@ -444,6 +466,17 @@ function mergeDemands(demands: Demand[]): PowerNeed[] {
 export function analyzePower(circuit: Circuit, netlist: Netlist = buildNetlist(circuit)): PowerReport {
   const sources = collectSources(circuit, netlist)
   return { sources, needs: mergeDemands(collectDemands(circuit, netlist, sources)) }
+}
+
+/** 전압이 같아 하나로 합칠 수 있는 외부 전원 묶음 */
+export function findMergeableSupplies(circuit: Circuit): { voltage: number; items: PlacedModule[] }[] {
+  const byVoltage = new Map<string, PlacedModule[]>()
+  for (const item of circuit.placed) {
+    if (item.moduleId !== 'external-power') continue
+    const v = item.params.voltage
+    byVoltage.set(v, [...(byVoltage.get(v) ?? []), item])
+  }
+  return [...byVoltage].filter(([, items]) => items.length > 1).map(([v, items]) => ({ voltage: Number(v), items }))
 }
 
 /** 전원 핀을 가진 부품의 첫 GND 핀 (전원 전류가 돌아가는 핀) */

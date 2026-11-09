@@ -7,10 +7,12 @@ from .electrical import CAPABILITY_LABELS, ROLE_LABELS
 from .netlist import build_netlist
 from .paths import route_to_board
 from .resistor import compute_series_resistors, format_ohms
+from .shares import compute_ladder_resistors, share_board_pin, share_of
 
 
 def build_pin_table(c: Circuit) -> list[dict]:
     resistors = compute_series_resistors(c)
+    ladder = compute_ladder_resistors(c)
     traced = build_netlist(c, pass_through=True)
     rows: list[dict] = []
     for item in c.placed:
@@ -24,6 +26,14 @@ def build_pin_table(c: Circuit) -> list[dict]:
             notes: list[str] = []
             if res and res["status"] == "ok":
                 notes.append(f"직렬 저항 {format_ohms(res['choice']['standardOhms'])}")
+            rung = next((r for r in ladder if r["instanceId"] == item.instance_id and r["pinId"] == pin.id), None)
+            if rung:
+                notes.append(f"사다리 저항 {format_ohms(rung['ohms'])}" if rung["ohms"] else "사다리 (저항 없이)")
+            share = share_of(c, f"module:{item.instance_id}:{pin.id}")
+            if share and route:
+                share_pin = share_board_pin(c, share)
+                if share_pin and share_pin[1] == route.pin_id:
+                    notes.append(f"핀 공유 ({len(share.members)}개)")
             if route and route.via:
                 notes.append(f"{', '.join(route.via)} 경유")
             optional = pin not in required
@@ -81,6 +91,13 @@ def build_bom(c: Circuit) -> list[dict]:
     for key, entry in by_resistor.items():
         value, rating = key.split("|")
         rows.append({"item": "저항", "spec": f"{value} {rating} (E12)", "quantity": entry["quantity"], "note": f"{', '.join(entry['labels'])} 직렬 저항"})
+    by_rung: dict[float, list[str]] = {}
+    for r in compute_ladder_resistors(c):
+        if not r["ohms"]:
+            continue
+        by_rung.setdefault(r["ohms"], []).append(c.placed_module(r["instanceId"]).label)
+    for ohms, labels in by_rung.items():
+        rows.append({"item": "저항", "spec": f"{format_ohms(ohms)} 1/4 W (E12)", "quantity": len(labels), "note": f"{', '.join(labels)} 버튼 사다리"})
     if c.connections:
         rows.append({"item": "점퍼 와이어", "spec": "", "quantity": len(c.connections), "note": "브레드보드 배선에 따라 달라질 수 있음"})
     return rows

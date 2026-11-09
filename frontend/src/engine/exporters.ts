@@ -7,6 +7,7 @@ import { isInternalPin, isPinConnected, requiredPins } from './connections'
 import { buildNetlist } from './netlist'
 import { routeToBoard } from './paths'
 import { computeSeriesResistors, formatOhms } from './resistor'
+import { computeLadderResistors, shareBoardPin, shareOf } from './shares'
 
 // 부품 목록(BOM)과 핀 배정표 생성. 화면 표시와 CSV 내보내기가 같은 데이터를 사용한다.
 
@@ -26,6 +27,7 @@ export interface PinTableRow {
 
 export function buildPinTable(circuit: Circuit): PinTableRow[] {
   const resistors = computeSeriesResistors(circuit)
+  const ladder = computeLadderResistors(circuit)
   const traced = buildNetlist(circuit, { passThrough: true })
   const rows: PinTableRow[] = []
   for (const item of circuit.placed) {
@@ -40,6 +42,11 @@ export function buildPinTable(circuit: Circuit): PinTableRow[] {
       const res = resistors.find((r) => r.instanceId === item.instanceId && r.pinId === pin.id)
       const notes: string[] = []
       if (res?.status === 'ok') notes.push(`직렬 저항 ${formatOhms(res.choice.standardOhms)}`)
+      const rung = ladder.find((r) => r.instanceId === item.instanceId && r.pinId === pin.id)
+      if (rung) notes.push(rung.ohms ? `사다리 저항 ${formatOhms(rung.ohms)}` : '사다리 (저항 없이)')
+      const share = shareOf(circuit, `module:${item.instanceId}:${pin.id}`)
+      const shared = share && route && shareBoardPin(circuit, share)?.pinId === route.pinId
+      if (shared) notes.push(`핀 공유 (${share.members.length}개)`)
       if (route?.via.length) notes.push(`${route.via.join(', ')} 경유`)
       const optional = !required.includes(pin)
       if (!connected && optional) notes.push(isInternalPin(module, pin.id) ? '연결 불필요 (내부 연결)' : '연결 불필요')
@@ -105,6 +112,12 @@ export function buildBom(circuit: Circuit, breadboard?: BreadboardRouting): BomR
     const [value, rating] = key.split('|')
     rows.push({ item: '저항', spec: `${value} ${rating} (E12)`, quantity: entry.quantity, note: `${entry.labels.join(', ')} 직렬 저항` })
   }
+  const byRung = new Map<number, string[]>()
+  for (const r of computeLadderResistors(circuit)) {
+    if (!r.ohms) continue
+    byRung.set(r.ohms, [...(byRung.get(r.ohms) ?? []), circuit.placed.find((p) => p.instanceId === r.instanceId)!.label])
+  }
+  for (const [ohms, labels] of byRung) rows.push({ item: '저항', spec: `${formatOhms(ohms)} 1/4 W (E12)`, quantity: labels.length, note: `${labels.join(', ')} 버튼 사다리` })
   if (breadboard?.leads.length) {
     const direct = circuit.connections.filter((c) => c.via !== 'breadboard').length
     rows.push({ item: '브레드보드', spec: '830홀 (63열)', quantity: 1, note: 'Autoino 자동 배치 기준' })

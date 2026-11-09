@@ -44,6 +44,7 @@ LIBRARIES = [
     "Adafruit NeoPixel",
     "TM1637",
     "MFRC522",
+    "Adafruit PWM Servo Driver Library",
 ]
 
 

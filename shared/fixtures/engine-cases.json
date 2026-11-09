@@ -1673,7 +1673,7 @@
      "code": "pin-conflict",
      "severity": "error",
      "message": "핀 충돌: D0 에 신호 2개가 연결되어 있습니다 (LED 1 · 애노드 (+), LED 2 · 애노드 (+)).",
-     "hint": "[자동 핀 배정]을 누르면 나중에 연결된 신호를 빈 핀으로 재배치합니다.",
+     "hint": "같은 핀을 일부러 함께 쓰려면 한 부품의 핀을 다른 부품의 핀에 끌어 놓아 핀 공유 그룹으로 묶으세요. 아니면 [자동 핀 배정]으로 빈 핀에 다시 배치합니다.",
      "connectionId": "w6",
      "boardInstanceId": "board-1"
     },
@@ -28778,6 +28778,5396 @@
         "note": "방전율 20C 기준. 과방전하면 망가지므로 전압 경보기를 쓰세요.",
         "level": "recommended",
         "runtimeHours": 11
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "share-leds",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "led-5mm#1",
+      "moduleId": "led-5mm",
+      "label": "LED 1",
+      "x": 408,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "15"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#2",
+      "moduleId": "led-5mm",
+      "label": "LED 2",
+      "x": 592,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "15"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#3",
+      "moduleId": "led-5mm",
+      "label": "LED 3",
+      "x": 776,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "10"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#1",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#2",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:led-5mm#1:anode",
+       "module:led-5mm#2:anode",
+       "module:led-5mm#3:anode"
+      ]
+     }
+    ],
+    "nextSeq": 4,
+    "nextConnSeq": 4,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "led-5mm": 3
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#1",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#2",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#1",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#2",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "added": [
+     "w4",
+     "w5",
+     "w6",
+     "w7"
+    ],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 8
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "led-5mm#1",
+      "moduleId": "led-5mm",
+      "label": "LED 1",
+      "x": 408,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "15"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#2",
+      "moduleId": "led-5mm",
+      "label": "LED 2",
+      "x": 592,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "15"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#3",
+      "moduleId": "led-5mm",
+      "label": "LED 3",
+      "x": 776,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "10"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#1",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#2",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#1",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#2",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:led-5mm#1:anode",
+       "module:led-5mm#2:anode",
+       "module:led-5mm#3:anode"
+      ]
+     }
+    ],
+    "nextSeq": 4,
+    "nextConnSeq": 8,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "led-5mm": 3
+    }
+   },
+   "issues": [
+    {
+     "code": "pin-shared-current",
+     "severity": "warning",
+     "message": "핀 공유: D5 에 함께 연결한 LED 전류 합계 약 36.4 mA 가 핀 권장 한계(20 mA)를 넘습니다.",
+     "hint": "LED 목표 전류를 낮추거나 트랜지스터로 구동하세요.",
+     "boardInstanceId": "board-1"
+    },
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D5 을(를) LED 1 · 애노드 (+), LED 2 · 애노드 (+), LED 3 · 애노드 (+) 이(가) 함께 씁니다. 같이 켜지고 꺼집니다.",
+     "connectionId": "w4",
+     "boardInstanceId": "board-1"
+    }
+   ],
+   "resistors": [
+    {
+     "status": "ok",
+     "instanceId": "led-5mm#1",
+     "pinId": "anode",
+     "boardInstanceId": "board-1",
+     "boardPinId": "D5",
+     "choice": {
+      "supplyVoltage": 5,
+      "forwardVoltage": 2,
+      "targetMa": 15,
+      "calculatedOhms": 200,
+      "standardOhms": 220,
+      "actualMa": 13.636363636363635,
+      "powerMw": 40.90909090909091,
+      "ratingLabel": "1/4 W"
+     }
+    },
+    {
+     "status": "ok",
+     "instanceId": "led-5mm#2",
+     "pinId": "anode",
+     "boardInstanceId": "board-1",
+     "boardPinId": "D5",
+     "choice": {
+      "supplyVoltage": 5,
+      "forwardVoltage": 2,
+      "targetMa": 15,
+      "calculatedOhms": 200,
+      "standardOhms": 220,
+      "actualMa": 13.636363636363635,
+      "powerMw": 40.90909090909091,
+      "ratingLabel": "1/4 W"
+     }
+    },
+    {
+     "status": "ok",
+     "instanceId": "led-5mm#3",
+     "pinId": "anode",
+     "boardInstanceId": "board-1",
+     "boardPinId": "D5",
+     "choice": {
+      "supplyVoltage": 5,
+      "forwardVoltage": 2,
+      "targetMa": 10,
+      "calculatedOhms": 300,
+      "standardOhms": 330,
+      "actualMa": 9.09090909090909,
+      "powerMw": 27.27272727272727,
+      "ratingLabel": "1/4 W"
+     }
+    }
+   ],
+   "pinTable": [
+    {
+     "instanceId": "led-5mm#1",
+     "moduleLabel": "LED 1",
+     "pinName": "애노드 (+)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "직렬 저항 220 Ω · 핀 공유 (3개)"
+    },
+    {
+     "instanceId": "led-5mm#1",
+     "moduleLabel": "LED 1",
+     "pinName": "캐소드 (−)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "led-5mm#2",
+     "moduleLabel": "LED 2",
+     "pinName": "애노드 (+)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "직렬 저항 220 Ω · 핀 공유 (3개)"
+    },
+    {
+     "instanceId": "led-5mm#2",
+     "moduleLabel": "LED 2",
+     "pinName": "캐소드 (−)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "led-5mm#3",
+     "moduleLabel": "LED 3",
+     "pinName": "애노드 (+)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "직렬 저항 330 Ω · 핀 공유 (3개)"
+    },
+    {
+     "instanceId": "led-5mm#3",
+     "moduleLabel": "LED 3",
+     "pinName": "캐소드 (−)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "LED",
+     "spec": "LED",
+     "quantity": 3,
+     "note": "LED 1, LED 2, LED 3"
+    },
+    {
+     "item": "저항",
+     "spec": "220 Ω 1/4 W (E12)",
+     "quantity": 2,
+     "note": "LED 1, LED 2 직렬 저항"
+    },
+    {
+     "item": "저항",
+     "spec": "330 Ω 1/4 W (E12)",
+     "quantity": 1,
+     "note": "LED 3 직렬 저항"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 6,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [],
+    "needs": []
+   }
+  },
+  {
+   "name": "share-button-ladder",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "push-button#1",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#2",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#3",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 3",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#4",
+      "moduleId": "led-5mm",
+      "label": "LED 1",
+      "x": 960,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "10"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#3",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:push-button#1:pin2a",
+       "module:push-button#2:pin2a",
+       "module:push-button#3:pin2a"
+      ]
+     }
+    ],
+    "nextSeq": 5,
+    "nextConnSeq": 4,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "push-button": 3,
+     "led-5mm": 1
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#3",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#4",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#3",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#4",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "added": [
+     "w4",
+     "w5",
+     "w6",
+     "w7",
+     "w8"
+    ],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 9
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "push-button#1",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#2",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#3",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 3",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#4",
+      "moduleId": "led-5mm",
+      "label": "LED 1",
+      "x": 960,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "10"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#3",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#4",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#3",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#4",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:push-button#1:pin2a",
+       "module:push-button#2:pin2a",
+       "module:push-button#3:pin2a"
+      ]
+     }
+    ],
+    "nextSeq": 5,
+    "nextConnSeq": 9,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "push-button": 3,
+     "led-5mm": 1
+    }
+   },
+   "issues": [
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: A0 을(를) 버튼 3개가 저항 사다리로 함께 씁니다 (푸시 버튼 1: 저항 없이, 푸시 버튼 2: 4.7 kΩ, 푸시 버튼 3: 22 kΩ).",
+     "hint": "버튼과 핀 사이에 직렬 저항을 넣고, 한 번에 버튼 하나만 누르세요. 코드는 analogRead 값으로 어느 버튼인지 구분합니다.",
+     "connectionId": "w3",
+     "boardInstanceId": "board-1"
+    }
+   ],
+   "resistors": [
+    {
+     "status": "ok",
+     "instanceId": "led-5mm#4",
+     "pinId": "anode",
+     "boardInstanceId": "board-1",
+     "boardPinId": "D5",
+     "choice": {
+      "supplyVoltage": 5,
+      "forwardVoltage": 2,
+      "targetMa": 10,
+      "calculatedOhms": 300,
+      "standardOhms": 330,
+      "actualMa": 9.09090909090909,
+      "powerMw": 27.27272727272727,
+      "ratingLabel": "1/4 W"
+     }
+    }
+   ],
+   "pinTable": [
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1A",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A0",
+     "boardPinFeatures": "아날로그, 디지털",
+     "note": "사다리 (저항 없이) · 핀 공유 (3개)"
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "1A",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A0",
+     "boardPinFeatures": "아날로그, 디지털",
+     "note": "사다리 저항 4.7 kΩ · 핀 공유 (3개)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#3",
+     "moduleLabel": "푸시 버튼 3",
+     "pinName": "1A",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#3",
+     "moduleLabel": "푸시 버튼 3",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#3",
+     "moduleLabel": "푸시 버튼 3",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A0",
+     "boardPinFeatures": "아날로그, 디지털",
+     "note": "사다리 저항 22 kΩ · 핀 공유 (3개)"
+    },
+    {
+     "instanceId": "push-button#3",
+     "moduleLabel": "푸시 버튼 3",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "led-5mm#4",
+     "moduleLabel": "LED 1",
+     "pinName": "애노드 (+)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "직렬 저항 330 Ω"
+    },
+    {
+     "instanceId": "led-5mm#4",
+     "moduleLabel": "LED 1",
+     "pinName": "캐소드 (−)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "푸시 버튼",
+     "spec": "Push Button",
+     "quantity": 3,
+     "note": "푸시 버튼 1, 푸시 버튼 2, 푸시 버튼 3"
+    },
+    {
+     "item": "LED",
+     "spec": "LED",
+     "quantity": 1,
+     "note": "LED 1"
+    },
+    {
+     "item": "저항",
+     "spec": "330 Ω 1/4 W (E12)",
+     "quantity": 1,
+     "note": "LED 1 직렬 저항"
+    },
+    {
+     "item": "저항",
+     "spec": "4.7 kΩ 1/4 W (E12)",
+     "quantity": 1,
+     "note": "푸시 버튼 2 버튼 사다리"
+    },
+    {
+     "item": "저항",
+     "spec": "22 kΩ 1/4 W (E12)",
+     "quantity": 1,
+     "note": "푸시 버튼 3 버튼 사다리"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 8,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [],
+    "needs": []
+   }
+  },
+  {
+   "name": "share-button-digital",
+   "route": "breadboard",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "push-button#1",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#2",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:push-button#1:pin2a",
+       "module:push-button#2:pin2a"
+      ]
+     }
+    ],
+    "nextSeq": 3,
+    "nextConnSeq": 3,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "push-button": 2
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     }
+    ],
+    "added": [
+     "w3",
+     "w4"
+    ],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 5
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "push-button#1",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#2",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:push-button#1:pin2a",
+       "module:push-button#2:pin2a"
+      ]
+     }
+    ],
+    "nextSeq": 3,
+    "nextConnSeq": 5,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "push-button": 2
+    }
+   },
+   "issues": [
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D4 을(를) 푸시 버튼 1 · 2A, 푸시 버튼 2 · 2A 이(가) 함께 씁니다. 어느 것을 눌러도 같은 신호가 되어 서로 구분할 수 없습니다.",
+     "hint": "Uno·Nano·Mega 의 아날로그 핀(A0 등)에 묶으면 저항 사다리로 어느 버튼인지 구분합니다.",
+     "connectionId": "w2",
+     "boardInstanceId": "board-1"
+    }
+   ],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1A",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "1A",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "푸시 버튼",
+     "spec": "Push Button",
+     "quantity": 2,
+     "note": "푸시 버튼 1, 푸시 버튼 2"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 4,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [],
+    "needs": []
+   }
+  },
+  {
+   "name": "share-esp32-buttons",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "esp32-devkit-v1",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "esp32-devkit-v1",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "push-button#1",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
+      "x": 488,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#2",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 2",
+      "x": 672,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:push-button#1:pin2a",
+       "module:push-button#2:pin2a"
+      ]
+     }
+    ],
+    "nextSeq": 3,
+    "nextConnSeq": 3,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "push-button": 2
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "added": [
+     "w3",
+     "w4"
+    ],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 5
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "esp32-devkit-v1",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "esp32-devkit-v1",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "push-button#1",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
+      "x": 488,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "push-button#2",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 2",
+      "x": 672,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#1",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#2",
+       "pinId": "pin1a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:push-button#1:pin2a",
+       "module:push-button#2:pin2a"
+      ]
+     }
+    ],
+    "nextSeq": 3,
+    "nextConnSeq": 5,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "push-button": 2
+    }
+   },
+   "issues": [
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: GPIO32 을(를) 푸시 버튼 1 · 2A, 푸시 버튼 2 · 2A 이(가) 함께 씁니다. 어느 것을 눌러도 같은 신호가 되어 서로 구분할 수 없습니다.",
+     "hint": "Uno·Nano·Mega 의 아날로그 핀(A0 등)에 묶으면 저항 사다리로 어느 버튼인지 구분합니다.",
+     "connectionId": "w2",
+     "boardInstanceId": "board-1"
+    }
+   ],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1A",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO32",
+     "boardPinFeatures": "디지털, PWM, 인터럽트, 아날로그, 터치",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "push-button#1",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "1A",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO32",
+     "boardPinFeatures": "디지털, PWM, 인터럽트, 아날로그, 터치",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "push-button#2",
+     "moduleLabel": "푸시 버튼 2",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    }
+   ],
+   "bom": [
+    {
+     "item": "ESP32 DevKit V1",
+     "spec": "ESP32-WROOM-32 (ESP32-D0WD, Xtensa LX6 듀얼코어)",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "푸시 버튼",
+     "spec": "Push Button",
+     "quantity": 2,
+     "note": "푸시 버튼 1, 푸시 버튼 2"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 4,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [],
+    "needs": []
+   }
+  },
+  {
+   "name": "pca9685-servos",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "pca9685#1",
+      "moduleId": "pca9685",
+      "label": "PCA9685 16채널 서보 드라이버 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "sg90#2",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 1",
+      "x": 608,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "mg996r#3",
+      "moduleId": "mg996r",
+      "label": "MG996R 서보 모터 1",
+      "x": 608,
+      "y": 160,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "fs90r#4",
+      "moduleId": "fs90r",
+      "label": "FS90R 연속 회전 서보 1",
+      "x": 608,
+      "y": 280,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "external-power#5",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 960,
+      "y": 40,
+      "params": {
+       "voltage": "5",
+       "current": "10000"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "minus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "plus"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 6,
+    "nextConnSeq": 17,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "pca9685": 1,
+     "sg90": 1,
+     "mg996r": 1,
+     "fs90r": 1,
+     "external-power": 1
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "minus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "plus"
+      },
+      "auto": false
+     }
+    ],
+    "added": [],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 17
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "pca9685#1",
+      "moduleId": "pca9685",
+      "label": "PCA9685 16채널 서보 드라이버 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "sg90#2",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 1",
+      "x": 608,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "mg996r#3",
+      "moduleId": "mg996r",
+      "label": "MG996R 서보 모터 1",
+      "x": 608,
+      "y": 160,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "fs90r#4",
+      "moduleId": "fs90r",
+      "label": "FS90R 연속 회전 서보 1",
+      "x": 608,
+      "y": 280,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "external-power#5",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 960,
+      "y": 40,
+      "params": {
+       "voltage": "5",
+       "current": "10000"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "fs90r#4",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "minus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#5",
+       "pinId": "plus"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 6,
+    "nextConnSeq": 17,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "pca9685": 1,
+     "sg90": 1,
+     "mg996r": 1,
+     "fs90r": 1,
+     "external-power": 1
+    }
+   },
+   "issues": [],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "SDA",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A4",
+     "boardPinFeatures": "아날로그, 디지털, I²C SDA",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "SCL",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A5",
+     "boardPinFeatures": "아날로그, 디지털, I²C SCL",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "V+",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S0",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S1",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S2",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S3",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S4",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S5",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S6",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S7",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S8",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S9",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S10",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S11",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S12",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S13",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S14",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S15",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "GND (갈색)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "VCC (빨강)",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "Signal (주황)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "mg996r#3",
+     "moduleLabel": "MG996R 서보 모터 1",
+     "pinName": "GND (갈색)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "mg996r#3",
+     "moduleLabel": "MG996R 서보 모터 1",
+     "pinName": "VCC (빨강)",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "mg996r#3",
+     "moduleLabel": "MG996R 서보 모터 1",
+     "pinName": "Signal (주황)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "fs90r#4",
+     "moduleLabel": "FS90R 연속 회전 서보 1",
+     "pinName": "GND (갈색)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "fs90r#4",
+     "moduleLabel": "FS90R 연속 회전 서보 1",
+     "pinName": "VCC (빨강)",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "fs90r#4",
+     "moduleLabel": "FS90R 연속 회전 서보 1",
+     "pinName": "Signal (주황)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "external-power#5",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "+ 출력",
+     "role": "전원 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "external-power#5",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "− GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "PCA9685 16채널 서보 드라이버",
+     "spec": "PCA9685 16-Channel Servo Driver",
+     "quantity": 1,
+     "note": "PCA9685 16채널 서보 드라이버 1"
+    },
+    {
+     "item": "SG90 서보 모터",
+     "spec": "SG90 Micro Servo",
+     "quantity": 1,
+     "note": "SG90 서보 모터 1"
+    },
+    {
+     "item": "MG996R 서보 모터",
+     "spec": "MG996R High Torque Servo",
+     "quantity": 1,
+     "note": "MG996R 서보 모터 1"
+    },
+    {
+     "item": "FS90R 연속 회전 서보",
+     "spec": "FS90R Continuous Rotation Servo",
+     "quantity": 1,
+     "note": "FS90R 연속 회전 서보 1"
+    },
+    {
+     "item": "외부 전원",
+     "spec": "External DC Power Supply · 5 V 10 A",
+     "quantity": 1,
+     "note": "외부 전원 1"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 15,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:5V",
+      "kind": "board",
+      "label": "보드 5V",
+      "voltage": 5,
+      "limitMa": 400,
+      "loads": [
+       {
+        "key": "module:pca9685#1:vcc",
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "pinName": "VCC",
+        "typicalMa": 10,
+        "peakMa": 10,
+        "minVoltage": 2.3,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 10,
+      "peakMa": 10,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     },
+     {
+      "key": "module:external-power#5:plus",
+      "kind": "external",
+      "label": "외부 전원 1",
+      "voltage": 5,
+      "limitMa": 10000,
+      "loads": [
+       {
+        "key": "module:fs90r#4:vcc",
+        "instanceId": "fs90r#4",
+        "label": "FS90R 연속 회전 서보 1",
+        "pinName": "VCC (빨강)",
+        "typicalMa": 200,
+        "peakMa": 800,
+        "minVoltage": 4.8,
+        "maxVoltage": 6
+       },
+       {
+        "key": "module:mg996r#3:vcc",
+        "instanceId": "mg996r#3",
+        "label": "MG996R 서보 모터 1",
+        "pinName": "VCC (빨강)",
+        "typicalMa": 700,
+        "peakMa": 2500,
+        "minVoltage": 4.8,
+        "maxVoltage": 7.2
+       },
+       {
+        "key": "module:pca9685#1:vplus",
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "pinName": "V+",
+        "typicalMa": 0,
+        "peakMa": 0,
+        "minVoltage": 4.8,
+        "maxVoltage": 6
+       },
+       {
+        "key": "module:sg90#2:vcc",
+        "instanceId": "sg90#2",
+        "label": "SG90 서보 모터 1",
+        "pinName": "VCC (빨강)",
+        "typicalMa": 250,
+        "peakMa": 650,
+        "minVoltage": 4.8,
+        "maxVoltage": 6
+       }
+      ],
+      "typicalMa": 1150,
+      "peakMa": 3950,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": [
+     {
+      "pins": [
+       "module:pca9685#1:vplus"
+      ],
+      "consumers": [
+       {
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "typicalMa": 0,
+        "peakMa": 0
+       },
+       {
+        "instanceId": "fs90r#4",
+        "label": "FS90R 연속 회전 서보 1",
+        "typicalMa": 200,
+        "peakMa": 800
+       },
+       {
+        "instanceId": "mg996r#3",
+        "label": "MG996R 서보 모터 1",
+        "typicalMa": 700,
+        "peakMa": 2500
+       },
+       {
+        "instanceId": "sg90#2",
+        "label": "SG90 서보 모터 1",
+        "typicalMa": 250,
+        "peakMa": 650
+       }
+      ],
+      "minVoltage": 4.8,
+      "maxVoltage": 6,
+      "targetVoltage": 5,
+      "typicalMa": 1150,
+      "peakMa": 3950,
+      "conflict": false,
+      "servedBy": "외부 전원 1",
+      "id": "need-1",
+      "minimumMa": 1500,
+      "recommendedMa": 4000,
+      "examples": [
+       {
+        "id": "smps-5v10a",
+        "name": "SMPS 5 V 10 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 10000,
+        "note": "서보 여러 개나 LED 스트립에 알맞습니다. AC 쪽 배선은 감전에 주의하세요.",
+        "level": "recommended"
+       },
+       {
+        "id": "usb-charger-5v2a",
+        "name": "USB 충전기 5 V 2 A",
+        "kind": "usb",
+        "voltage": 5,
+        "maxCurrentMa": 2000,
+        "note": "USB 전원 분기 모듈이나 브레드보드 전원 모듈로 + · − 를 꺼내 씁니다.",
+        "level": "minimum"
+       },
+       {
+        "id": "powerbank-5v2a",
+        "name": "보조배터리 5 V 2.4 A",
+        "kind": "battery",
+        "voltage": 5,
+        "maxCurrentMa": 2400,
+        "capacityMah": 6000,
+        "note": "10000 mAh 제품 기준. 부하가 작으면 자동으로 꺼지는 제품이 있습니다.",
+        "level": "minimum",
+        "runtimeHours": 5.2
+       },
+       {
+        "id": "adapter-5v3a",
+        "name": "DC 어댑터 5 V 3 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 3000,
+        "note": "5.5×2.1 mm 배럴잭 + 터미널 어댑터로 연결합니다.",
+        "level": "minimum"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "pca9685-no-power",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "pca9685#1",
+      "moduleId": "pca9685",
+      "label": "PCA9685 16채널 서보 드라이버 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "mg996r#2",
+      "moduleId": "mg996r",
+      "label": "MG996R 서보 모터 1",
+      "x": 608,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 3,
+    "nextConnSeq": 8,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "pca9685": 1,
+     "mg996r": 1
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     }
+    ],
+    "added": [],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 8
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "pca9685#1",
+      "moduleId": "pca9685",
+      "label": "PCA9685 16채널 서보 드라이버 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "mg996r#2",
+      "moduleId": "mg996r",
+      "label": "MG996R 서보 모터 1",
+      "x": 608,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "mg996r#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 3,
+    "nextConnSeq": 8,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "pca9685": 1,
+     "mg996r": 1
+    }
+   },
+   "issues": [
+    {
+     "code": "supply-missing",
+     "severity": "error",
+     "message": "PCA9685 16채널 서보 드라이버 1 · V+: 전원이 연결되어 있지 않습니다. 외부 전원 + 를 이 핀에 연결하세요.",
+     "hint": "카드의 ⚡ 전원 필요 표시나 [전원] 탭에서 맞는 전원을 바로 연결할 수 있습니다.",
+     "instanceId": "pca9685#1"
+    }
+   ],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "SDA",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A4",
+     "boardPinFeatures": "아날로그, 디지털, I²C SDA",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "SCL",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A5",
+     "boardPinFeatures": "아날로그, 디지털, I²C SCL",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "V+",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S0",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S1",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S2",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S3",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S4",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S5",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S6",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S7",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S8",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S9",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S10",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S11",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S12",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S13",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S14",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S15",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "mg996r#2",
+     "moduleLabel": "MG996R 서보 모터 1",
+     "pinName": "GND (갈색)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "mg996r#2",
+     "moduleLabel": "MG996R 서보 모터 1",
+     "pinName": "VCC (빨강)",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "mg996r#2",
+     "moduleLabel": "MG996R 서보 모터 1",
+     "pinName": "Signal (주황)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "PCA9685 16채널 서보 드라이버",
+     "spec": "PCA9685 16-Channel Servo Driver",
+     "quantity": 1,
+     "note": "PCA9685 16채널 서보 드라이버 1"
+    },
+    {
+     "item": "MG996R 서보 모터",
+     "spec": "MG996R High Torque Servo",
+     "quantity": 1,
+     "note": "MG996R 서보 모터 1"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 7,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:5V",
+      "kind": "board",
+      "label": "보드 5V",
+      "voltage": 5,
+      "limitMa": 400,
+      "loads": [
+       {
+        "key": "module:pca9685#1:vcc",
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "pinName": "VCC",
+        "typicalMa": 10,
+        "peakMa": 10,
+        "minVoltage": 2.3,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 10,
+      "peakMa": 10,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": [
+     {
+      "pins": [
+       "module:pca9685#1:vplus"
+      ],
+      "consumers": [
+       {
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "typicalMa": 0,
+        "peakMa": 0
+       },
+       {
+        "instanceId": "mg996r#2",
+        "label": "MG996R 서보 모터 1",
+        "typicalMa": 700,
+        "peakMa": 2500
+       }
+      ],
+      "minVoltage": 4.8,
+      "maxVoltage": 6,
+      "targetVoltage": 5,
+      "typicalMa": 700,
+      "peakMa": 2500,
+      "conflict": false,
+      "servedBy": null,
+      "id": "need-1",
+      "minimumMa": 900,
+      "recommendedMa": 2500,
+      "examples": [
+       {
+        "id": "adapter-5v3a",
+        "name": "DC 어댑터 5 V 3 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 3000,
+        "note": "5.5×2.1 mm 배럴잭 + 터미널 어댑터로 연결합니다.",
+        "level": "recommended"
+       },
+       {
+        "id": "smps-5v10a",
+        "name": "SMPS 5 V 10 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 10000,
+        "note": "서보 여러 개나 LED 스트립에 알맞습니다. AC 쪽 배선은 감전에 주의하세요.",
+        "level": "recommended"
+       },
+       {
+        "id": "adapter-6v3a",
+        "name": "DC 어댑터 6 V 3 A",
+        "kind": "adapter",
+        "voltage": 6,
+        "maxCurrentMa": 3000,
+        "note": "서보용으로 알맞습니다.",
+        "level": "recommended"
+       },
+       {
+        "id": "usb-charger-5v2a",
+        "name": "USB 충전기 5 V 2 A",
+        "kind": "usb",
+        "voltage": 5,
+        "maxCurrentMa": 2000,
+        "note": "USB 전원 분기 모듈이나 브레드보드 전원 모듈로 + · − 를 꺼내 씁니다.",
+        "level": "minimum"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "pca9685-esp32",
+   "route": "breadboard",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "esp32-devkit-v1",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "esp32-devkit-v1",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "pca9685#1",
+      "moduleId": "pca9685",
+      "label": "PCA9685 16채널 서보 드라이버 1",
+      "x": 488,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "sg90#2",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 1",
+      "x": 688,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "oled-ssd1306#3",
+      "moduleId": "oled-ssd1306",
+      "label": "OLED 0.96인치 (SSD1306) 1",
+      "x": 856,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "external-power#4",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 1040,
+      "y": 40,
+      "params": {
+       "voltage": "5",
+       "current": "2000"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO21"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO22"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "minus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "plus"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 5,
+    "nextConnSeq": 11,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "pca9685": 1,
+     "sg90": 1,
+     "oled-ssd1306": 1,
+     "external-power": 1
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO21"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO22"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "minus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "plus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO22"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO21"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     }
+    ],
+    "added": [
+     "w11",
+     "w12",
+     "w13",
+     "w14"
+    ],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 15
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "esp32-devkit-v1",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "esp32-devkit-v1",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "pca9685#1",
+      "moduleId": "pca9685",
+      "label": "PCA9685 16채널 서보 드라이버 1",
+      "x": 488,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "sg90#2",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 1",
+      "x": 688,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "oled-ssd1306#3",
+      "moduleId": "oled-ssd1306",
+      "label": "OLED 0.96인치 (SSD1306) 1",
+      "x": 856,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "external-power#4",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 1040,
+      "y": 40,
+      "params": {
+       "voltage": "5",
+       "current": "2000"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "pwm0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO21"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO22"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "auto": false
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "minus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "pca9685#1",
+       "pinId": "vplus"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#4",
+       "pinId": "plus"
+      },
+      "auto": false
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "scl"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO22"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "sda"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO21"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "oled-ssd1306#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 5,
+    "nextConnSeq": 15,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "pca9685": 1,
+     "sg90": 1,
+     "oled-ssd1306": 1,
+     "external-power": 1
+    }
+   },
+   "issues": [],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "3V3",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "SDA",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO21",
+     "boardPinFeatures": "디지털, PWM, 인터럽트, I²C SDA",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "SCL",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO22",
+     "boardPinFeatures": "디지털, PWM, 인터럽트, I²C SCL",
+     "note": ""
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "V+",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S0",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S1",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S2",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S3",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S4",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S5",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S6",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S7",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S8",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S9",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S10",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S11",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S12",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S13",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S14",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "pca9685#1",
+     "moduleLabel": "PCA9685 16채널 서보 드라이버 1",
+     "pinName": "S15",
+     "role": "모터 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "GND (갈색)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "VCC (빨강)",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "Signal (주황)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "oled-ssd1306#3",
+     "moduleLabel": "OLED 0.96인치 (SSD1306) 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "oled-ssd1306#3",
+     "moduleLabel": "OLED 0.96인치 (SSD1306) 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "3V3",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "oled-ssd1306#3",
+     "moduleLabel": "OLED 0.96인치 (SSD1306) 1",
+     "pinName": "SCL",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO22",
+     "boardPinFeatures": "디지털, PWM, 인터럽트, I²C SCL",
+     "note": ""
+    },
+    {
+     "instanceId": "oled-ssd1306#3",
+     "moduleLabel": "OLED 0.96인치 (SSD1306) 1",
+     "pinName": "SDA",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO21",
+     "boardPinFeatures": "디지털, PWM, 인터럽트, I²C SDA",
+     "note": ""
+    },
+    {
+     "instanceId": "external-power#4",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "+ 출력",
+     "role": "전원 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "external-power#4",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "− GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    }
+   ],
+   "bom": [
+    {
+     "item": "ESP32 DevKit V1",
+     "spec": "ESP32-WROOM-32 (ESP32-D0WD, Xtensa LX6 듀얼코어)",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "PCA9685 16채널 서보 드라이버",
+     "spec": "PCA9685 16-Channel Servo Driver",
+     "quantity": 1,
+     "note": "PCA9685 16채널 서보 드라이버 1"
+    },
+    {
+     "item": "SG90 서보 모터",
+     "spec": "SG90 Micro Servo",
+     "quantity": 1,
+     "note": "SG90 서보 모터 1"
+    },
+    {
+     "item": "OLED 0.96인치 (SSD1306)",
+     "spec": "0.96 inch I2C OLED SSD1306",
+     "quantity": 1,
+     "note": "OLED 0.96인치 (SSD1306) 1"
+    },
+    {
+     "item": "외부 전원",
+     "spec": "External DC Power Supply · 5 V 2 A",
+     "quantity": 1,
+     "note": "외부 전원 1"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 13,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:3V3",
+      "kind": "board",
+      "label": "보드 3V3",
+      "voltage": 3.3,
+      "limitMa": null,
+      "loads": [
+       {
+        "key": "module:oled-ssd1306#3:vcc",
+        "instanceId": "oled-ssd1306#3",
+        "label": "OLED 0.96인치 (SSD1306) 1",
+        "pinName": "VCC",
+        "typicalMa": 20,
+        "peakMa": 30,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5
+       },
+       {
+        "key": "module:pca9685#1:vcc",
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "pinName": "VCC",
+        "typicalMa": 10,
+        "peakMa": 10,
+        "minVoltage": 2.3,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 30,
+      "peakMa": 40,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     },
+     {
+      "key": "module:external-power#4:plus",
+      "kind": "external",
+      "label": "외부 전원 1",
+      "voltage": 5,
+      "limitMa": 2000,
+      "loads": [
+       {
+        "key": "module:pca9685#1:vplus",
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "pinName": "V+",
+        "typicalMa": 0,
+        "peakMa": 0,
+        "minVoltage": 4.8,
+        "maxVoltage": 6
+       },
+       {
+        "key": "module:sg90#2:vcc",
+        "instanceId": "sg90#2",
+        "label": "SG90 서보 모터 1",
+        "pinName": "VCC (빨강)",
+        "typicalMa": 250,
+        "peakMa": 650,
+        "minVoltage": 4.8,
+        "maxVoltage": 6
+       }
+      ],
+      "typicalMa": 250,
+      "peakMa": 650,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": [
+     {
+      "pins": [
+       "module:pca9685#1:vplus"
+      ],
+      "consumers": [
+       {
+        "instanceId": "pca9685#1",
+        "label": "PCA9685 16채널 서보 드라이버 1",
+        "typicalMa": 0,
+        "peakMa": 0
+       },
+       {
+        "instanceId": "sg90#2",
+        "label": "SG90 서보 모터 1",
+        "typicalMa": 250,
+        "peakMa": 650
+       }
+      ],
+      "minVoltage": 4.8,
+      "maxVoltage": 6,
+      "targetVoltage": 5,
+      "typicalMa": 250,
+      "peakMa": 650,
+      "conflict": false,
+      "servedBy": "외부 전원 1",
+      "id": "need-1",
+      "minimumMa": 400,
+      "recommendedMa": 700,
+      "examples": [
+       {
+        "id": "usb-charger-5v2a",
+        "name": "USB 충전기 5 V 2 A",
+        "kind": "usb",
+        "voltage": 5,
+        "maxCurrentMa": 2000,
+        "note": "USB 전원 분기 모듈이나 브레드보드 전원 모듈로 + · − 를 꺼내 씁니다.",
+        "level": "recommended"
+       },
+       {
+        "id": "powerbank-5v2a",
+        "name": "보조배터리 5 V 2.4 A",
+        "kind": "battery",
+        "voltage": 5,
+        "maxCurrentMa": 2400,
+        "capacityMah": 6000,
+        "note": "10000 mAh 제품 기준. 부하가 작으면 자동으로 꺼지는 제품이 있습니다.",
+        "level": "recommended",
+        "runtimeHours": 24
+       },
+       {
+        "id": "adapter-5v3a",
+        "name": "DC 어댑터 5 V 3 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 3000,
+        "note": "5.5×2.1 mm 배럴잭 + 터미널 어댑터로 연결합니다.",
+        "level": "recommended"
+       },
+       {
+        "id": "smps-5v10a",
+        "name": "SMPS 5 V 10 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 10000,
+        "note": "서보 여러 개나 LED 스트립에 알맞습니다. AC 쪽 배선은 감전에 주의하세요.",
+        "level": "recommended"
        }
       ]
      }

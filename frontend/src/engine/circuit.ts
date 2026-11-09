@@ -1,5 +1,5 @@
 import { findBoard } from '../data/boards'
-import type { Board, BoardLink, BoardPin, Connection, PlacedBoard, PlacedModule, Point } from '../types'
+import type { Board, BoardLink, BoardPin, Connection, PinShare, PlacedBoard, PlacedModule, Point } from '../types'
 
 // 회로 문서(보드 인스턴스·부품·전선·보드 간 통신)를 엔진 함수에 넘기기 위한 묶음
 
@@ -10,6 +10,10 @@ export interface Circuit {
   links: BoardLink[]
   /** 배선도 위 브레드보드 위치 (부품 자동 배치가 피해 간다) */
   breadboard?: Point
+  /** 사람이 브레드보드에서 옮긴 전선의 구멍: 끝점 키 → 구멍 ID (예: 12c, top-4) */
+  breadboardHoles?: Record<string, string>
+  /** 핀 공유 그룹 */
+  shares?: PinShare[]
 }
 
 export interface ResolvedBoardPin {

@@ -12,7 +12,7 @@ describe('filterModules', () => {
 
   it('한글·영문·태그로 검색한다', () => {
     expect(ids('초음파')).toEqual(['hc-sr04'])
-    expect(ids('servo')).toEqual(['sg90', 'mg90s', 'mg996r', 'fs90r'])
+    expect(ids('servo')).toEqual(['sg90', 'mg90s', 'mg996r', 'fs90r', 'pca9685']) // 서보 드라이버도 함께 찾는다
     expect(ids('HC SR04')).toContain('hc-sr04') // 전압 분배기 설명에도 HC-SR04 가 나온다
     expect(ids('l298')).toEqual(['l298n'])
     expect(ids('스테퍼')).toEqual(expect.arrayContaining(['stepper-nema17', 'stepper-28byj48', 'a4988']))

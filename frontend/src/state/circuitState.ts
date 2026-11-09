@@ -4,12 +4,15 @@ import { findSupply } from '../data/supplies'
 import { arrangeModules } from '../engine/arrange'
 import { autoAssign } from '../engine/autoAssign'
 import { planBoardLink, type LinkRequest } from '../engine/boardLinks'
+import { BB_COLUMNS, checkLeadMove, holeId, holeLabel, holeNode, nodeLabel, routeBreadboard, type Hole, type MainRow } from '../engine/breadboard'
 import { resolveBoardPin, type Circuit } from '../engine/circuit'
 import {
+  asModuleBoardLink,
   boardHasPin,
   describeEndpoint,
   endpointKey,
   moduleEndpoint,
+  parseEndpointKey,
   resolveModulePin,
   sameEndpoint,
   touches,
@@ -18,15 +21,19 @@ import {
 } from '../engine/connections'
 import { boardToBoardError, linkError } from '../engine/electrical'
 import { insertLevelShifters } from '../engine/levelShift'
-import { primaryGrounds, supplyScope } from '../engine/power'
+import { buildNetlist } from '../engine/netlist'
+import { motorPins, planMotorAttach, recommendDriver } from '../engine/motorAttach'
+import { analyzePower, formatCurrent, primaryGrounds, supplyScope } from '../engine/power'
 import type { ProjectData } from '../engine/project'
-import type { Connection, Endpoint, PlacedBoard, PlacedModule, Point, RouteMode, Selection } from '../types'
+import { roleOfKey, shareBoardPin, shareOf, shareRefusal } from '../engine/shares'
+import type { Connection, Endpoint, PinShare, PlacedBoard, PlacedModule, Point, RouteMode, Selection } from '../types'
 import {
   BOARD_POSITION,
   BREADBOARD_POSITION,
   BREADBOARD_SIZE,
   breadboardRect,
   clampToCanvas,
+  MODULE_SIZE,
   findBoardPosition,
   findBreadboardPosition,
   findFreePosition,
@@ -50,6 +57,12 @@ export interface CircuitDocument {
   links: Circuit['links']
   /** 배선도 위 브레드보드 위치 */
   breadboard: Point
+  /** 사람이 브레드보드에서 옮긴 전선의 구멍 (끝점 키 → 구멍 ID). 비어 있으면 모두 자동 배치 */
+  breadboardHoles: Record<string, string>
+  /** 핀 공유 그룹 */
+  shares: PinShare[]
+  /** 실물 배치 모드의 위치 (보드·부품 인스턴스 ID 또는 'breadboard' → 좌표). 없으면 배선도 위치를 쓴다 */
+  layout: Record<string, Point>
   /** 인스턴스 ID 생성용 증가 카운터 */
   nextSeq: number
   /** 연결 ID 생성용 증가 카운터 */
@@ -74,13 +87,20 @@ export type CircuitAction =
   | { type: 'addBoard'; boardId: string }
   | { type: 'removeBoard'; boardInstanceId: string }
   | { type: 'moveBoard'; boardInstanceId: string; position: Point }
-  | { type: 'addModule'; moduleId: string; position?: Point; hostBoardId?: string }
+  /**
+   * 부품을 놓는다. autoConnect 이면 외부 전원은 전원이 필요한 부품(near 카드가 있으면 그 부품)에
+   * 맞춰 전압·전류를 정하고 바로 연결한다.
+   */
+  | { type: 'addModule'; moduleId: string; position?: Point; hostBoardId?: string; autoConnect?: boolean; near?: string; route?: RouteMode }
   | { type: 'moveModule'; instanceId: string; position: Point }
   | { type: 'setHostBoard'; instanceId: string; boardInstanceId: string }
   | { type: 'select'; selection: Selection }
   | { type: 'removeModule'; instanceId: string }
   | { type: 'setParam'; instanceId: string; paramId: string; value: string }
+  /** 부품 신호 핀을 다른 부품 신호 핀에 놓으면 핀 공유 그룹을 만든다 */
   | { type: 'connect'; from: Endpoint; to: Endpoint; via?: 'breadboard' }
+  /** 핀 공유 그룹에서 이 부품 핀을 빼고 공유 핀 전선을 뗀다 */
+  | { type: 'unsharePin'; key: string }
   /** 끌어 놓은 핀에 맞는 상대 핀을 자동으로 골라 연결한다 (브레드보드에 놓았을 때) */
   | { type: 'connectAuto'; endpoint: Endpoint; route: RouteMode }
   | { type: 'setConnectionRoute'; connectionId: string; via: RouteMode }
@@ -90,6 +110,25 @@ export type CircuitAction =
   /** 전원 예시를 외부 전원 부품으로 놓고 지정한 전원 핀에 연결한다 */
   | { type: 'applySupply'; supplyId: string; pins: string[]; route: RouteMode }
   | { type: 'moveBreadboard'; position: Point }
+  /** 실물 배치 모드에서 보드·부품·브레드보드('breadboard')를 옮긴다 */
+  | { type: 'moveLayout'; id: string; position: Point }
+  /** 전압이 같은 외부 전원(otherIds)을 keepId 하나로 합친다 */
+  | { type: 'mergeSupplies'; keepId: string; otherIds: string[] }
+  /** 브레드보드에 꽂힌 전선 끝(끝점 키)을 다른 구멍으로 옮긴다 */
+  | { type: 'moveLead'; key: string; hole: Hole }
+  | { type: 'resetBreadboardLayout' }
+  /** 부품 핀에서 끈 전선을 브레드보드 구멍에 놓았을 때: 그 줄의 전선과 잇고 그 구멍에 꽂는다 */
+  | { type: 'connectToHole'; endpoint: Endpoint; hole: Hole; route: RouteMode }
+  /** 한 부품의 전선만 모두 지운다 */
+  | { type: 'resetModuleWiring'; instanceId: string }
+  /** 한 부품의 핀만 자동 배정한다 */
+  | { type: 'autoAssignModule'; instanceId: string; route: RouteMode }
+  /** 전선의 한쪽 끝(from)을 다른 핀(to)으로 옮긴다. 보드 핀 하나를 여러 전선이 나눠 쓰면 함께 옮긴다 */
+  | { type: 'retargetWire'; connectionIds: string[]; from: Endpoint; to: Endpoint }
+  /** 모터 카드를 드라이버 카드에 놓았을 때: 빈 채널에 모터를 잇고 그 채널의 제어 핀을 배정한다 */
+  | { type: 'attachMotor'; motorId: string; driverId: string; route: RouteMode }
+  /** 모터에 맞는 드라이버를 새로 놓고 연결한다 */
+  | { type: 'addDriverFor'; motorId: string; route: RouteMode }
   | { type: 'addBoardLink'; request: LinkRequest }
   | { type: 'removeBoardLink'; linkId: string }
   | { type: 'insertLevelShifters' }
@@ -105,7 +144,7 @@ export type CircuitAction =
 
 /** 기록하지 않는 동작 */
 const NOT_RECORDED = new Set<CircuitAction['type']>([
-  'select', 'setStatus', 'moveModule', 'moveBoard', 'moveBreadboard', 'setProjectName', 'loadProject', 'checkpoint', 'undo', 'redo',
+  'select', 'setStatus', 'moveModule', 'moveBoard', 'moveBreadboard', 'moveLayout', 'setProjectName', 'loadProject', 'checkpoint', 'undo', 'redo',
 ])
 
 export function createBoardInstance(boardId: string = DEFAULT_BOARD_ID, seq = 1, position: Point = BOARD_POSITION): PlacedBoard {
@@ -121,6 +160,9 @@ export function createInitialState(board: string | PlacedBoard = DEFAULT_BOARD_I
     connections: [],
     links: [],
     breadboard: { ...BREADBOARD_POSITION },
+    breadboardHoles: {},
+    shares: [],
+    layout: {},
     selection: { kind: 'none' },
     nextSeq: 1,
     nextConnSeq: 1,
@@ -134,8 +176,8 @@ export function createInitialState(board: string | PlacedBoard = DEFAULT_BOARD_I
 }
 
 export function documentOf(state: CircuitDocument): CircuitDocument {
-  const { projectName, boards, placed, connections, links, breadboard, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters } = state
-  return { projectName, boards, placed, connections, links, breadboard, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters }
+  const { projectName, boards, placed, connections, links, breadboard, breadboardHoles, shares, layout, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters } = state
+  return { projectName, boards, placed, connections, links, breadboard, breadboardHoles, shares, layout, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters }
 }
 
 function sameDocument(a: CircuitDocument, b: CircuitDocument): boolean {
@@ -151,6 +193,9 @@ export function toProjectData(state: CircuitDocument): ProjectData {
     connections: d.connections,
     links: d.links,
     breadboard: d.breadboard,
+    ...(Object.keys(d.breadboardHoles).length ? { breadboardHoles: d.breadboardHoles } : {}),
+    ...(d.shares.length ? { shares: d.shares } : {}),
+    ...(Object.keys(d.layout).length ? { layout: d.layout } : {}),
     nextSeq: d.nextSeq,
     nextConnSeq: d.nextConnSeq,
     nextBoardSeq: d.nextBoardSeq,
@@ -160,7 +205,7 @@ export function toProjectData(state: CircuitDocument): ProjectData {
 }
 
 export function circuitOf(state: CircuitDocument): Circuit {
-  return { boards: state.boards, placed: state.placed, connections: state.connections, links: state.links, breadboard: state.breadboard }
+  return { boards: state.boards, placed: state.placed, connections: state.connections, links: state.links, breadboard: state.breadboard, breadboardHoles: state.breadboardHoles, shares: state.shares }
 }
 
 /** 툴바·보드 선택기가 다루는 보드: 선택된 보드가 있으면 그 보드, 없으면 첫 번째 보드 */
@@ -201,7 +246,8 @@ function keepSelection(next: CircuitState, previous: Selection): CircuitState {
   return { ...next, selection: selectionExists(next, previous) ? previous : { kind: 'none' } }
 }
 
-function connect(state: CircuitState, from: Endpoint, to: Endpoint, via?: 'breadboard'): CircuitState {
+/** 두 끝점을 잇는다. id 를 주면 그 ID 로 만든다 (전선 끝을 옮길 때) */
+function connect(state: CircuitState, from: Endpoint, to: Endpoint, via?: 'breadboard', id?: string): CircuitState {
   const reject = (message: string) => ({ ...state, statusMessage: message })
   const circuit = circuitOf(state)
   if (from.kind === 'board' && to.kind === 'board' && from.boardInstanceId === to.boardInstanceId)
@@ -221,7 +267,7 @@ function connect(state: CircuitState, from: Endpoint, to: Endpoint, via?: 'bread
   // 모듈 핀 하나에는 전선 하나만 둔다: 기존 연결을 대체한다. 단, 단자대처럼 여러 가닥을 받는 핀은 그대로 둔다.
   const single = (e: Endpoint) => e.kind === 'module' && !resolveModulePin(state.placed, e)?.pin.fanout
   const replaced = state.connections.filter((c) => [a, b].some((e) => single(e) && touches(c, e)))
-  const connection: Connection = { id: `w${state.nextConnSeq}`, from: a, to: b, auto: false, ...(via ? { via } : {}) }
+  const connection: Connection = { id: id ?? `w${state.nextConnSeq}`, from: a, to: b, auto: false, ...(via ? { via } : {}) }
   const connections = [...state.connections.filter((c) => !replaced.includes(c)), connection]
 
   let message = `${describeEndpoint(a, circuit)} → ${describeEndpoint(b, circuit)} 연결했습니다.`
@@ -240,9 +286,166 @@ function connect(state: CircuitState, from: Endpoint, to: Endpoint, via?: 'bread
   return {
     ...state,
     connections,
-    nextConnSeq: state.nextConnSeq + 1,
+    nextConnSeq: id ? state.nextConnSeq : state.nextConnSeq + 1,
     selection: { kind: 'connection', connectionId: connection.id },
     statusMessage: message,
+  }
+}
+
+/** 부품 핀에서 끈 전선을 브레드보드 구멍에 놓는다: 그 줄에 꽂힌 전선의 핀과 잇고, 빈 줄이면 맞는 보드 핀을 고른다 */
+function connectToHole(state: CircuitState, endpoint: Endpoint, hole: Hole): CircuitState {
+  const reject = (message: string) => ({ ...state, statusMessage: message })
+  const circuit = circuitOf(state)
+  const routing = routeBreadboard(circuit)
+  const key = endpointKey(endpoint)
+  const node = holeNode(hole)
+  const here = routing.leads.filter((l) => holeNode(l.hole) === node && l.key !== key && !l.resistor)
+  let next: CircuitState
+  if (here.length) {
+    // 그 줄의 전선과 잇는다 (보드 핀이 있으면 보드 핀과)
+    const anchor = here.find((l) => l.key.startsWith('board:')) ?? here[0]
+    const to = parseEndpointKey(anchor.key)!
+    const r = resolveModulePin(state.placed, endpoint)
+    if (r && to.kind === 'board') {
+      const target = resolveBoardPin(circuit, to.boardInstanceId, to.pinId)
+      const error = target && linkError(target.board, r.module, r.pin, target.pin, r.placed)
+      if (error) return reject(`${nodeLabel(hole)} 줄은 ${anchor.net} 줄이라 ${r.placed.label} · ${r.pin.name} 을(를) 꽂을 수 없습니다. ${error}`)
+    }
+    next = connect(state, endpoint, to, 'breadboard')
+  } else {
+    if (endpoint.kind !== 'module') return reject('보드 핀은 부품 핀이나 전선이 꽂힌 줄에 놓으세요.')
+    next = reduce(state, { type: 'connectAuto', endpoint, route: 'breadboard' })
+  }
+  if (next.connections === state.connections) return next
+  const connected = next.statusMessage
+  // 놓은 구멍이 차 있으면 같은 줄의 빈 구멍에 꽂는다
+  const after = routeBreadboard(circuitOf(next))
+  const taken = new Set([...after.leads.filter((l) => l.key !== key).map((l) => holeId(l.hole)), ...after.resistors.flatMap((x) => x.legs.map(holeId))])
+  let spot: Hole | undefined = taken.has(holeId(hole)) ? undefined : hole
+  if (!spot && hole.kind === 'main') {
+    const rows: MainRow[] = ['a', 'b', 'c', 'd', 'e'].includes(hole.row) ? ['a', 'b', 'c', 'd', 'e'] : ['f', 'g', 'h', 'i', 'j']
+    spot = rows.map((row): Hole => ({ kind: 'main', col: hole.col, row })).find((h) => !taken.has(holeId(h)))
+  } else if (!spot && hole.kind === 'rail') {
+    const cols = Array.from({ length: BB_COLUMNS }, (_, i) => i + 1).sort((a, b) => Math.abs(a - hole.col) - Math.abs(b - hole.col))
+    spot = cols.map((col): Hole => ({ kind: 'rail', rail: hole.rail, col })).find((h) => !taken.has(holeId(h)))
+  }
+  if (!spot) return { ...next, statusMessage: `${connected} 그 줄에 빈 구멍이 없어 자동으로 꽂았습니다.` }
+  const placed = reduce(next, { type: 'moveLead', key, hole: spot })
+  if (placed.breadboardHoles === next.breadboardHoles && leadAt(next, key) !== holeId(spot))
+    return { ...next, statusMessage: `${connected} ${holeLabel(spot)}에는 꽂을 수 없어 자동으로 꽂았습니다 (${placed.statusMessage})` }
+  return { ...placed, statusMessage: `${connected} 전선을 ${holeLabel(spot)}에 꽂았습니다.` }
+}
+
+function leadAt(state: CircuitState, key: string): string | null {
+  const lead = routeBreadboard(circuitOf(state)).leads.find((l) => l.key === key)
+  return lead ? holeId(lead.hole) : null
+}
+
+/** 외부 전원 부품(itemId)의 전압·전류를 정하고 지정한 전원 핀(pins)과 GND 에 잇는다 */
+function connectSupply(state: CircuitState, itemId: string, pins: string[], route: RouteMode, voltage: number, currentMa: number, message: string): CircuitState {
+  const item = state.placed.find((p) => p.instanceId === itemId)!
+  const param = (id: string, wanted: number) => getModule(item.moduleId).parameters!.find((p) => p.id === id)!.options.find((o) => o.number === wanted)?.value
+  const params = { ...item.params, voltage: param('voltage', voltage) ?? item.params.voltage, current: param('current', currentMa) ?? item.params.current }
+  const placed = state.placed.map((p) => (p === item ? { ...p, params } : p))
+  // 보드 전원·다른 전원에 물려 있던 전원 핀은 새 전원으로 옮기고, 전류가 보드를 지나지 않도록 GND 전선도 전원 − 로 옮긴다.
+  // 그 전원 핀에 함께 물린 부하(서보 드라이버 V+ 의 서보 전원선 등)는 그대로 둔다.
+  const moved = new Set(pins)
+  const grounds = new Set(primaryGrounds(pins, placed))
+  const isSupplySide = (e: Endpoint) => e.kind === 'board' || resolveModulePin(placed, e)?.pin.role === 'source'
+  const connections = state.connections.filter((c) => {
+    const keys = [endpointKey(c.from), endpointKey(c.to)]
+    if (keys.some((k) => moved.has(k))) return !(isSupplySide(c.from) || isSupplySide(c.to))
+    return !(keys.some((k) => grounds.has(k)) && (c.from.kind === 'board' || c.to.kind === 'board'))
+  })
+  const circuit = { ...circuitOf(state), placed, connections }
+  const scope = supplyScope(circuit, pins)
+  scope.add(endpointKey(moduleEndpoint(item.instanceId, 'minus')))
+  const result = autoAssign(circuit, state.nextConnSeq, { route, only: scope })
+  // 보드에서 뗀 GND 가 다른 부품(서보 등)에 이미 물려 있으면 자동 배정이 건너뛰므로, 전원 − 와 이어졌는지 확인해 잇는다
+  const minus = endpointKey(moduleEndpoint(item.instanceId, 'minus'))
+  const after = buildNetlist({ ...circuit, connections: result.connections })
+  const extra: Connection[] = []
+  let seq = result.nextConnSeq
+  for (const g of grounds) {
+    if (after.netOf(g) === after.netOf(minus)) continue
+    extra.push({ id: `w${seq++}`, from: parseEndpointKey(g)!, to: moduleEndpoint(item.instanceId, 'minus'), auto: false })
+  }
+  // 전원 핀이 이미 다른 부하(서보 전원선 등)에 물려 있으면 자동 배정이 건너뛰므로 + 에 직접 잇는다
+  const plusPin = getModule(item.moduleId).pins.find((p) => p.role === 'source')
+  if (plusPin) {
+    const plus = endpointKey(moduleEndpoint(item.instanceId, plusPin.id))
+    for (const key of pins) {
+      if (after.netOf(key) === after.netOf(plus)) continue
+      extra.push({ id: `w${seq++}`, from: parseEndpointKey(key)!, to: moduleEndpoint(item.instanceId, plusPin.id), auto: false })
+    }
+  }
+  return {
+    ...state,
+    placed,
+    connections: [...result.connections, ...extra],
+    nextConnSeq: seq,
+    selection: { kind: 'module', instanceId: item.instanceId },
+    statusMessage: message.replace('{n}', String(result.added.length + extra.length)),
+  }
+}
+
+/** 방금 놓은 외부 전원을 전원이 필요한 부품에 맞춰 연결한다 */
+function autoConnectSupply(state: CircuitState, itemId: string, near: string | undefined, route: RouteMode): CircuitState {
+  const item = state.placed.find((p) => p.instanceId === itemId)!
+  const open = analyzePower(circuitOf(state)).needs.filter((n) => !n.servedBy && n.pins.length && n.examples.length)
+  const touchesNear = (n: (typeof open)[number]) => !!near && (n.consumers.some((c) => c.instanceId === near) || n.pins.some((k) => k.startsWith(`module:${near}:`)))
+  const need = open.find(touchesNear) ?? open[0]
+  if (!need)
+    return { ...state, statusMessage: `${item.label}을(를) 배치했습니다. 외부 전원이 필요한 부품이 아직 없어 연결하지 않았습니다 — 모터 드라이버나 큰 서보를 놓은 뒤 카드의 ⚡ 표시로 연결할 수 있습니다.` }
+  const example = need.examples[0]
+  const names = [...new Set(need.consumers.map((c) => c.label))].join(', ')
+  return connectSupply(state, itemId, need.pins, route, example.voltage, example.maxCurrentMa, `${item.label}을(를) ${example.voltage} V · ${formatCurrent(example.maxCurrentMa)}로 맞춰 ${names} 전원에 연결했습니다 (전선 {n}개).`)
+}
+
+/** 모터를 드라이버의 빈 채널에 잇고, 그 채널의 제어·전원 핀을 배정하고, 모터 카드를 드라이버 옆으로 옮긴다 */
+function attachMotor(state: CircuitState, motorId: string, driverId: string, route: RouteMode): CircuitState {
+  const plan = planMotorAttach(circuitOf(state), motorId, driverId)
+  if (!plan.ok) return { ...state, statusMessage: plan.reason }
+  const motor = state.placed.find((p) => p.instanceId === motorId)!
+  const driver = state.placed.find((p) => p.instanceId === driverId)!
+  const motorModule = getModule(motor.moduleId)
+  const driverModule = getModule(driver.moduleId)
+  const loads = motorPins(motorModule)
+  // 서보 드라이버면 서보 전원은 드라이버 V+ 에, GND 는 드라이버 GND 에 잇는다
+  const servoRail = plan.channel.accepts.includes('servo')
+  const servoPower = servoRail ? motorModule.pins.filter((p) => p.role === 'power' || p.role === 'ground') : []
+  const loadKeys = new Set([...loads, ...servoPower].map((p) => endpointKey(moduleEndpoint(motor.instanceId, p.id))))
+  // 다른 드라이버(또는 보드)에 물려 있던 전선은 뗀다
+  const kept = state.connections.filter((c) => ![c.from, c.to].some((e) => loadKeys.has(endpointKey(e))))
+  let seq = state.nextConnSeq
+  const wires: Connection[] = loads.map((p, i) => ({
+    id: `w${seq++}`,
+    from: moduleEndpoint(motor.instanceId, p.id),
+    to: moduleEndpoint(driver.instanceId, plan.channel.outputs[i]),
+    auto: false,
+  }))
+  const spot = clampToCanvas({ x: driver.x + MODULE_SIZE.width + 40, y: driver.y + (plan.used - 1) * (MODULE_SIZE.height + 16) })
+  const placed = state.placed.map((p) => (p === motor ? { ...p, x: spot.x, y: spot.y, hostBoardId: driver.hostBoardId } : p))
+  const driverPins = new Set(driverModule.pins.filter((p) => p.role !== 'drive').map((p) => endpointKey(moduleEndpoint(driver.instanceId, p.id))))
+  const result = autoAssign({ ...circuitOf(state), placed, connections: [...kept, ...wires] }, seq, { route, only: driverPins })
+  // 서보 전원·GND 는 드라이버 핀이 보드·전원에 배정된 뒤에 잇는다 (드라이버 GND 가 서보에만 물려 보드와 떨어지지 않게)
+  const rail: Connection[] = []
+  let next = result.nextConnSeq
+  if (servoRail) {
+    const driverGround = driverModule.pins.find((p) => p.role === 'ground')
+    for (const p of servoPower) {
+      const target = p.role === 'power' ? driverModule.driver!.supplyPin : driverGround?.id
+      if (target) rail.push({ id: `w${next++}`, from: moduleEndpoint(motor.instanceId, p.id), to: moduleEndpoint(driver.instanceId, target), auto: false })
+    }
+  }
+  const pending = result.failed.length ? ` · 남은 핀: ${result.failed.join(', ')}` : ''
+  return {
+    ...state,
+    placed,
+    connections: [...result.connections, ...rail],
+    nextConnSeq: next,
+    selection: { kind: 'module', instanceId: driver.instanceId },
+    statusMessage: `${motor.label} → ${driver.label} ${plan.channel.label}에 연결했습니다 (${plan.used}/${plan.max}). ${servoRail ? '서보 전원·GND 를 드라이버에 잇고 ' : ''}제어 핀 ${result.added.length}개 배정${pending}`,
   }
 }
 
@@ -326,7 +529,7 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
         params: Object.fromEntries((module.parameters ?? []).map((p) => [p.id, p.defaultValue])),
         hostBoardId: host.instanceId,
       }
-      return {
+      const next: CircuitState = {
         ...state,
         placed: [...state.placed, instance],
         selection: { kind: 'module', instanceId: instance.instanceId },
@@ -334,6 +537,7 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
         labelCounters: { ...state.labelCounters, [module.id]: labelNo },
         statusMessage: `${instance.label}을(를) 배치했습니다.` + (state.boards.length > 1 ? ` (제어 보드: ${host.label})` : ''),
       }
+      return action.autoConnect && module.id === 'external-power' ? autoConnectSupply(next, instance.instanceId, action.near, action.route ?? 'direct') : next
     }
     case 'moveModule': {
       const position = clampToCanvas(action.position)
@@ -386,8 +590,28 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
     }
     case 'moveBreadboard':
       return { ...state, breadboard: clampToCanvas(action.position, BREADBOARD_SIZE) }
-    case 'connect':
+    case 'moveLayout': {
+      const known = action.id === 'breadboard' || state.boards.some((b) => b.instanceId === action.id) || state.placed.some((p) => p.instanceId === action.id)
+      if (!known) return state
+      return { ...state, layout: { ...state.layout, [action.id]: { x: Math.round(action.position.x), y: Math.round(action.position.y) } } }
+    }
+    case 'connect': {
+      const keys = [endpointKey(action.from), endpointKey(action.to)]
+      const bothModules = action.from.kind === 'module' && action.to.kind === 'module' && action.from.instanceId !== action.to.instanceId
+      if (bothModules && keys.some((k) => roleOfKey(circuitOf(state), k)) ) return sharePins(state, action.to, action.from, action.via)
       return connect(state, action.from, action.to, action.via)
+    }
+    case 'unsharePin': {
+      const share = shareOf(circuitOf(state), action.key)
+      if (!share) return state
+      const target = shareBoardPin(circuitOf(state), share)
+      const connections = state.connections.filter(
+        (c) => !(target && [c.from, c.to].some((e) => endpointKey(e) === action.key) && [c.from, c.to].some((e) => e.kind === 'board' && e.boardInstanceId === target.boardInstanceId && e.pinId === target.pinId)),
+      )
+      const shares = state.shares.map((s) => (s === share ? { ...s, members: s.members.filter((k) => k !== action.key) } : s)).filter((s) => s.members.length >= 2)
+      const e = parseEndpointKey(action.key)
+      return { ...state, connections, shares, statusMessage: `${e ? describeEndpoint(e, circuitOf(state)) : action.key}의 핀 공유를 풀었습니다.` }
+    }
     case 'connectAuto': {
       if (action.endpoint.kind !== 'module') return { ...state, statusMessage: '보드 핀은 부품 핀까지 끌어다 놓으세요.' }
       const target = resolveModulePin(state.placed, action.endpoint)
@@ -414,6 +638,97 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       })
       return { ...state, connections, statusMessage: action.via === 'breadboard' ? '이 전선을 브레드보드 경유로 바꿨습니다.' : '이 전선을 보드 직결로 바꿨습니다.' }
     }
+    case 'moveLead': {
+      const routing = routeBreadboard(circuitOf(state))
+      const lead = routing.leads.find((l) => l.key === action.key)
+      if (!lead || holeId(lead.hole) === holeId(action.hole)) return state
+      const check = checkLeadMove(routing, action.key, action.hole)
+      if (!check.ok) return { ...state, statusMessage: check.reason }
+      // 처음 옮길 때 지금 배치를 모두 기록해 두어, 손대지 않은 전선이 따라 움직이지 않게 한다
+      const breadboardHoles = Object.fromEntries(routing.leads.map((l) => [l.key, holeId(l.hole)]))
+      breadboardHoles[action.key] = holeId(action.hole)
+      const e = parseEndpointKey(action.key)
+      const who = e ? describeEndpoint(e, circuitOf(state)) : action.key
+      const h = action.hole
+      const polarity =
+        h.kind === 'rail' && ((lead.kind === 'ground' && h.rail.endsWith('+')) || (lead.kind === 'power' && h.rail.endsWith('-')))
+          ? ` 레일 표시(${h.rail.endsWith('+') ? '+' : '−'})와 반대인 ${lead.kind === 'ground' ? 'GND' : '전원'}이라 헷갈릴 수 있습니다.`
+          : ''
+      return { ...state, breadboardHoles, statusMessage: `${who} 전선을 ${holeLabel(h)}(으)로 옮겼습니다.${polarity}` }
+    }
+    case 'connectToHole':
+      return connectToHole(state, action.endpoint, action.hole)
+    case 'resetModuleWiring': {
+      const target = state.placed.find((p) => p.instanceId === action.instanceId)
+      if (!target) return state
+      const connections = state.connections.filter((c) => !touchesInstance(c, action.instanceId))
+      if (connections.length === state.connections.length) return { ...state, statusMessage: `${target.label}에는 지울 전선이 없습니다.` }
+      return keepSelection(
+        { ...state, connections, statusMessage: `${target.label}의 전선 ${state.connections.length - connections.length}개를 지웠습니다. 다시 연결하려면 [이 부품만 자동 배정]을 누르거나 핀을 끌어 연결하세요.` },
+        state.selection,
+      )
+    }
+    case 'autoAssignModule': {
+      const target = state.placed.find((p) => p.instanceId === action.instanceId)
+      if (!target) return state
+      const only = new Set(getModule(target.moduleId).pins.map((p) => endpointKey(moduleEndpoint(target.instanceId, p.id))))
+      const result = autoAssign(circuitOf(state), state.nextConnSeq, { route: action.route, only })
+      return {
+        ...state,
+        connections: result.connections,
+        nextConnSeq: result.nextConnSeq,
+        statusMessage: `${target.label}: ${statusOfAssign(result)}`,
+      }
+    }
+    case 'resetBreadboardLayout':
+      if (!Object.keys(state.breadboardHoles).length) return { ...state, statusMessage: '이미 자동 배치입니다.' }
+      return { ...state, breadboardHoles: {}, statusMessage: '브레드보드 배치를 자동 배치로 되돌렸습니다.' }
+    case 'retargetWire': {
+      const targets = state.connections.filter((c) => action.connectionIds.includes(c.id) && touches(c, action.from))
+      if (!targets.length || sameEndpoint(action.from, action.to)) return state
+      let next: CircuitState = { ...state, connections: state.connections.filter((c) => !targets.includes(c)) }
+      let note = ''
+      for (const c of targets) {
+        const [a, b] = sameEndpoint(c.from, action.from) ? [action.to, c.to] : [c.from, action.to]
+        // 같은 두 핀을 잇는 전선이 이미 있으면 그 전선으로 합친다
+        if (next.connections.some((x) => (sameEndpoint(x.from, a) && sameEndpoint(x.to, b)) || (sameEndpoint(x.from, b) && sameEndpoint(x.to, a)))) continue
+        const joined = connect(next, a, b, c.via, c.id)
+        if (joined.connections === next.connections)
+          return { ...state, statusMessage: joined.statusMessage !== next.statusMessage ? joined.statusMessage : `${describeEndpoint(action.to, circuitOf(state))}(으)로는 옮길 수 없습니다.` }
+        const rest = joined.statusMessage.split('연결했습니다.')[1]?.trim()
+        if (rest) note = ` ${rest}`
+        next = joined
+      }
+      // 브레드보드에 꽂힌 자리는 새 핀의 전선이 이어받는다
+      const fromKey = endpointKey(action.from)
+      const toKey = endpointKey(action.to)
+      const holes = { ...state.breadboardHoles }
+      const stillUsed = next.connections.some((c) => c.via === 'breadboard' && touches(c, action.from))
+      if (holes[fromKey] && !stillUsed) {
+        if (!holes[toKey]) holes[toKey] = holes[fromKey]
+        delete holes[fromKey]
+      }
+      const circuit = circuitOf(state)
+      const kept = next.connections.find((c) => targets.some((t) => t.id === c.id))
+      return {
+        ...next,
+        breadboardHoles: holes,
+        selection: kept ? { kind: 'connection', connectionId: kept.id } : { kind: 'none' },
+        statusMessage: `전선 끝을 ${describeEndpoint(action.from, circuit)} → ${describeEndpoint(action.to, circuit)}(으)로 옮겼습니다.${note}`,
+      }
+    }
+    case 'attachMotor':
+      return attachMotor(state, action.motorId, action.driverId, action.route)
+    case 'addDriverFor': {
+      const motor = state.placed.find((p) => p.instanceId === action.motorId)
+      const def = motor && recommendDriver(getModule(motor.moduleId))
+      if (!motor || !def) return { ...state, statusMessage: '이 부품에 맞는 모터 드라이버가 없습니다.' }
+      const position = clampToCanvas({ x: motor.x - MODULE_SIZE.width - 40, y: motor.y })
+      const added = reduce(state, { type: 'addModule', moduleId: def.id, position, hostBoardId: motor.hostBoardId })
+      const driver = added.placed.at(-1)!
+      const next = attachMotor(added, motor.instanceId, driver.instanceId, action.route)
+      return { ...next, statusMessage: `${driver.label}을(를) 추가했습니다. ${next.statusMessage}` }
+    }
     case 'removeConnection': {
       if (!state.connections.some((c) => c.id === action.connectionId)) return state
       const connections = state.connections.filter((c) => c.id !== action.connectionId)
@@ -434,29 +749,39 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       if (!supply) return state
       const placedState = reduce(state, { type: 'addModule', moduleId: 'external-power' })
       const item = placedState.placed.at(-1)!
-      const param = (id: string, wanted: number) => getModule(item.moduleId).parameters!.find((p) => p.id === id)!.options.find((o) => o.number === wanted)?.value
-      const params = { ...item.params, voltage: param('voltage', supply.voltage) ?? item.params.voltage, current: param('current', supply.maxCurrentMa) ?? item.params.current }
-      const placed = placedState.placed.map((p) => (p === item ? { ...p, params } : p))
-      // 보드 전원에 물려 있던 전원 핀은 새 전원으로 옮기고, 전류가 보드를 지나지 않도록 GND 전선도 전원 − 로 옮긴다
-      const moved = new Set(action.pins)
-      const grounds = new Set(primaryGrounds(action.pins, placed))
-      const connections = state.connections.filter((c) => {
-        const keys = [endpointKey(c.from), endpointKey(c.to)]
-        if (keys.some((k) => moved.has(k))) return false
-        return !(keys.some((k) => grounds.has(k)) && (c.from.kind === 'board' || c.to.kind === 'board'))
-      })
-      const circuit = { ...circuitOf(placedState), placed, connections }
-      const scope = supplyScope(circuit, action.pins)
-      scope.add(endpointKey(moduleEndpoint(item.instanceId, 'minus')))
-      const result = autoAssign(circuit, state.nextConnSeq, { route: action.route, only: scope })
-      return {
-        ...placedState,
-        placed,
-        connections: result.connections,
-        nextConnSeq: result.nextConnSeq,
-        selection: { kind: 'module', instanceId: item.instanceId },
-        statusMessage: `${supply.name}를 외부 전원으로 놓고 연결 ${result.added.length}개를 만들었습니다.`,
+      return connectSupply(placedState, item.instanceId, action.pins, action.route, supply.voltage, supply.maxCurrentMa, `${supply.name}를 외부 전원으로 놓고 연결 {n}개를 만들었습니다.`)
+    }
+    case 'mergeSupplies': {
+      const keep = state.placed.find((p) => p.instanceId === action.keepId)
+      const others = state.placed.filter((p) => action.otherIds.includes(p.instanceId) && p !== keep)
+      if (!keep || !others.length) return state
+      if (others.some((o) => o.moduleId !== keep.moduleId || o.params.voltage !== keep.params.voltage))
+        return { ...state, statusMessage: '전압이 같은 외부 전원끼리만 합칠 수 있습니다.' }
+      const gone = new Set(others.map((o) => o.instanceId))
+      const swap = (e: Endpoint): Endpoint => (e.kind === 'module' && gone.has(e.instanceId) ? moduleEndpoint(keep.instanceId, e.pinId) : e)
+      const connections: Connection[] = []
+      for (const c of state.connections) {
+        const next = { ...c, from: swap(c.from), to: swap(c.to) }
+        if (sameEndpoint(next.from, next.to)) continue
+        const dup = connections.some((x) => (sameEndpoint(x.from, next.from) && sameEndpoint(x.to, next.to)) || (sameEndpoint(x.from, next.to) && sameEndpoint(x.to, next.from)))
+        if (!dup) connections.push(next)
       }
+      // 두 전원이 내던 전류를 합한 만큼 낼 수 있는 용량을 고른다
+      const options = getModule(keep.moduleId).parameters!.find((p) => p.id === 'current')!.options
+      const total = [keep, ...others].reduce((sum, p) => sum + Number(p.params.current), 0)
+      const option = options.find((o) => (o.number ?? 0) >= total) ?? options.at(-1)!
+      const placed = state.placed.filter((p) => !gone.has(p.instanceId)).map((p) => (p === keep ? { ...p, params: { ...p.params, current: option.value } } : p))
+      const short = (option.number ?? 0) < total ? ` 필요한 ${formatCurrent(total)}를 낼 수 있는 선택지가 없어 ${option.label}로 정했습니다.` : ''
+      return keepSelection(
+        {
+          ...state,
+          placed,
+          connections,
+          selection: { kind: 'module', instanceId: keep.instanceId },
+          statusMessage: `${others.map((o) => o.label).join(', ')}을(를) ${keep.label}에 합쳤습니다 (${keep.params.voltage} V · ${option.label}).${short}`,
+        },
+        { kind: 'module', instanceId: keep.instanceId },
+      )
     }
     case 'addBoardLink': {
       const linkId = `link-${state.nextLinkSeq}`
@@ -530,6 +855,9 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
         nextBoardSeq: action.data.nextBoardSeq,
         nextLinkSeq: action.data.nextLinkSeq,
         labelCounters: action.data.labelCounters,
+        breadboardHoles: action.data.breadboardHoles ?? {},
+        shares: action.data.shares ?? [],
+        layout: action.data.layout ?? {},
         statusMessage: action.message ?? `프로젝트 "${action.data.name}"을(를) 불러왔습니다.`,
       }
     case 'reset':
@@ -547,6 +875,85 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
     case 'redo':
       return state
   }
+}
+
+/**
+ * 핀 공유: from 핀을 onto 핀과 같은 보드 핀에 잇고 한 그룹으로 묶는다.
+ * 둘 다 보드에 연결되어 있지 않으면 onto 핀부터 맞는 보드 핀을 고른다.
+ */
+function sharePins(state: CircuitState, onto: Endpoint, from: Endpoint, via?: 'breadboard'): CircuitState {
+  const circuit = circuitOf(state)
+  const ka = endpointKey(onto)
+  const kb = endpointKey(from)
+  const groups = state.shares.filter((s) => s.members.includes(ka) || s.members.includes(kb))
+  const members = [...new Set([ka, ...groups.flatMap((g) => g.members), kb])]
+  const refusal = shareRefusal(circuit, members)
+  if (refusal) return { ...state, statusMessage: refusal }
+  const linkOf = (key: string, connections: Connection[]) => {
+    const e = parseEndpointKey(key)
+    return e?.kind === 'module' ? connections.map(asModuleBoardLink).find((l) => l && l.instanceId === e.instanceId && l.modulePinId === e.pinId) ?? null : null
+  }
+  let connections = state.connections
+  let nextConnSeq = state.nextConnSeq
+  let target = members.map((k) => linkOf(k, connections)).find(Boolean) ?? null
+  if (!target) {
+    // 아무도 연결되어 있지 않으면 끌어 놓은 대상 핀부터 자동 배정한다
+    const result = autoAssign(circuit, nextConnSeq, { route: via ? 'breadboard' : 'direct', only: new Set([ka]) })
+    connections = result.connections
+    nextConnSeq = result.nextConnSeq
+    target = linkOf(ka, connections)
+    if (!target) return { ...state, statusMessage: `${describeEndpoint(onto, circuit)}: 함께 쓸 보드 핀을 찾지 못했습니다. 먼저 한 핀을 보드에 연결하세요.` }
+  }
+  const pin = { kind: 'board' as const, boardInstanceId: target.boardInstanceId, pinId: target.pinId }
+  for (const key of members) {
+    const link = linkOf(key, connections)
+    if (link && link.boardInstanceId === target.boardInstanceId && link.pinId === target.pinId) continue
+    const e = parseEndpointKey(key)!
+    // 다른 보드 핀에 물려 있던 전선은 떼고 공유 핀에 잇는다
+    connections = connections.filter((c) => !([c.from, c.to].some((x) => endpointKey(x) === key) && [c.from, c.to].some((x) => x.kind === 'board')))
+    connections = [...connections, { id: `w${nextConnSeq++}`, from: e, to: pin, auto: false, ...(via ? { via } : {}) }]
+  }
+  const existing = groups[0]
+  const id = existing?.id ?? `share-${Math.max(0, ...state.shares.map((s) => Number(s.id.match(/(\d+)$/)?.[1] ?? 0))) + 1}`
+  const shares = [...state.shares.filter((s) => !groups.includes(s)), { id, members }]
+  const labels = members.map((k) => describeEndpoint(parseEndpointKey(k)!, circuit)).join(', ')
+  return {
+    ...state,
+    connections,
+    nextConnSeq,
+    shares,
+    selection: { kind: 'module', instanceId: (from as { instanceId: string }).instanceId },
+    statusMessage: `핀 공유: ${labels} 이(가) ${target.pinId} 를 함께 씁니다.`,
+  }
+}
+
+/** 지워진 보드·부품의 실물 배치 위치를 지운다 */
+function pruneLayout(state: CircuitState): CircuitState {
+  const ids = Object.keys(state.layout)
+  if (!ids.length) return state
+  const live = (id: string) => id === 'breadboard' || state.boards.some((b) => b.instanceId === id) || state.placed.some((p) => p.instanceId === id)
+  if (ids.every(live)) return state
+  return { ...state, layout: Object.fromEntries(Object.entries(state.layout).filter(([id]) => live(id))) }
+}
+
+/** 지워진 부품의 핀을 공유 그룹에서 뺀다 */
+function pruneShares(state: CircuitState): CircuitState {
+  if (!state.shares.length) return state
+  const ids = new Set(state.placed.map((p) => p.instanceId))
+  const shares = state.shares
+    .map((s) => ({ ...s, members: s.members.filter((k) => ids.has((parseEndpointKey(k) as { instanceId?: string } | null)?.instanceId ?? '')) }))
+    .filter((s) => s.members.length >= 2)
+  const same = shares.length === state.shares.length && shares.every((s, i) => s.members.length === state.shares[i].members.length)
+  return same ? state : { ...state, shares }
+}
+
+/** 브레드보드를 거치지 않게 된 끝점의 구멍 기록을 지운다 */
+function pruneHoles(state: CircuitState): CircuitState {
+  const keys = Object.keys(state.breadboardHoles)
+  if (!keys.length) return state
+  const live = new Set(state.connections.filter((c) => c.via === 'breadboard').flatMap((c) => [endpointKey(c.from), endpointKey(c.to)]))
+  if (keys.every((k) => live.has(k))) return state
+  return { ...state, breadboardHoles: Object.fromEntries(Object.entries(state.breadboardHoles).filter(([k]) => live.has(k))) }
 }
 
 /** 기록을 건너뛸 수 있도록 현재 문서와 같은 스냅샷은 버린다 */
@@ -578,7 +985,7 @@ export function circuitReducer(state: CircuitState, action: CircuitAction): Circ
       state.selection,
     )
   }
-  const next = reduce(state, action)
+  const next = pruneLayout(pruneShares(pruneHoles(reduce(state, action))))
   if (next === state || NOT_RECORDED.has(action.type) || sameDocument(next, state)) return next
   return { ...next, past: [...state.past, documentOf(state)].slice(-HISTORY_LIMIT), future: [] }
 }

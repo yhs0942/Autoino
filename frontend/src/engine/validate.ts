@@ -29,6 +29,8 @@ import { analyzeLevels } from './levels'
 import { buildNetlist } from './netlist'
 import { analyzePower, BREADBOARD_CURRENT_LIMIT_MA, formatCurrent, loadOfPin, motorsOnChannel, netVoltage, USB_5V_BUDGET_MA, wirePeakMa } from './power'
 import { computeSeriesResistors, formatOhms } from './resistor'
+import { computeLadderResistors, ladderLabel, roleOfKey, shareKind, shareOf } from './shares'
+import { isServoChannelLink } from './motorAttach'
 
 // 전기적 검증. 결과는 화면의 [검사] 탭과 상태 표시줄에 표시된다.
 // 이 검사는 데이터에 정의된 규칙과 대표값을 기준으로 한 것이며 실제 회로의 안전을 보장하지 않는다.
@@ -51,7 +53,10 @@ export type IssueCode =
   | 'pin-restriction'
   | 'servo-pwm'
   | 'pin-conflict'
+  | 'pin-shared'
+  | 'pin-shared-current'
   | 'unconnected'
+  | 'supply-missing'
   | 'level-overvoltage'
   | 'level-low-high'
   | 'level-margin'
@@ -107,8 +112,8 @@ export function validateCircuit(circuit: Circuit): Issue[] {
 
   // ---------- 연결별 검사 ----------
   /** 보드 인스턴스:GPIO → 그 핀을 쓰는 신호들 */
-  const gpioUsers = new Map<string, { connectionId: string; label: string; bus: string | null; pinId: string; boardInstanceId: string }[]>()
-  const addUser = (boardInstanceId: string, pinId: string, user: { connectionId: string; label: string; bus: string | null }) => {
+  const gpioUsers = new Map<string, { connectionId: string; label: string; bus: string | null; key: string; pinId: string; boardInstanceId: string }[]>()
+  const addUser = (boardInstanceId: string, pinId: string, user: { connectionId: string; label: string; bus: string | null; key: string }) => {
     const key = `${boardInstanceId}:${pinId}`
     gpioUsers.set(key, [...(gpioUsers.get(key) ?? []), { ...user, pinId, boardInstanceId }])
   }
@@ -148,7 +153,7 @@ export function validateCircuit(circuit: Circuit): Issue[] {
         if (r.pin && isGpio(r.pin)) {
           const link = c.linkId ? circuit.links.find((l) => l.id === c.linkId) : undefined
           const bus = link?.protocol === 'I2C' ? (r.pin.capabilities.find((x) => x === 'i2c-sda' || x === 'i2c-scl') ?? null) : null
-          addUser(r.instance.instanceId, r.pin.id, { connectionId: c.id, label, bus })
+          addUser(r.instance.instanceId, r.pin.id, { connectionId: c.id, label, bus, key: '' })
         }
       continue
     }
@@ -161,7 +166,7 @@ export function validateCircuit(circuit: Circuit): Issue[] {
         push({ code: 'module-short', severity: 'error', message: `전원과 GND 가 연결되어 단락(쇼트)됩니다: ${label}`, connectionId: c.id })
       else if (roles.has('source') && roles.has('signal'))
         push({ code: 'source-on-signal', severity: 'error', message: `외부 전원을 신호 핀에 직접 연결했습니다: ${label}`, connectionId: c.id })
-      else if (roles.has('drive') && !roles.has('load') && !roles.has('passive'))
+      else if (roles.has('drive') && !roles.has('load') && !roles.has('passive') && !isServoChannelLink(ends[0]!, ends[1]!))
         push({ code: 'driver-output', severity: 'error', message: `모터 드라이버 출력은 모터 단자에 연결합니다: ${label}`, connectionId: c.id })
       continue
     }
@@ -234,7 +239,7 @@ export function validateCircuit(circuit: Circuit): Issue[] {
     }
 
     if (r.pin.role === 'signal' && isGpio(boardPin)) {
-      addUser(link.boardInstanceId, boardPin.id, { connectionId: c.id, label: `${r.placed.label} · ${r.pin.name}`, bus: sharedBusCapability(r.pin) })
+      addUser(link.boardInstanceId, boardPin.id, { connectionId: c.id, label: `${r.placed.label} · ${r.pin.name}`, bus: sharedBusCapability(r.pin), key: endpointKey(moduleEndpoint(link.instanceId, link.modulePinId)) })
 
       if (r.pin.maxInputVoltage && board.logicVoltage > r.pin.maxInputVoltage + 0.01)
         push({
@@ -283,16 +288,51 @@ export function validateCircuit(circuit: Circuit): Issue[] {
   }
 
   // ---------- 핀 충돌 ----------
+  /** 핀 공유로 함께 쓰는 GPIO (보드 인스턴스:핀) */
+  const sharedPins = new Set<string>()
+  const ladder = computeLadderResistors(circuit)
   for (const users of gpioUsers.values()) {
     if (users.length < 2) continue
     const bus = users[0].bus
     if (bus && users.every((u) => u.bus === bus)) continue // I²C 등 공유 버스
     const prefix = circuit.boards.length > 1 ? `${boardLabel(circuit, users[0].boardInstanceId)} ` : ''
+    const at = `${prefix}${users[0].pinId}`
+    const labels = users.map((u) => u.label).join(', ')
+    const share = shareOf(circuit, users[0].key)
+    const target = resolveBoardPin(circuit, users[0].boardInstanceId, users[0].pinId)
+    const kind = share && users.every((u) => share.members.includes(u.key)) ? shareKind(circuit, users.map((u) => u.key), target?.board, target?.pin) : null
+    if (kind) {
+      sharedPins.add(`${users[0].boardInstanceId}:${users[0].pinId}`)
+      const rungs = ladder.filter((r) => r.boardInstanceId === users[0].boardInstanceId && r.boardPinId === users[0].pinId)
+      push({
+        code: 'pin-shared',
+        severity: 'info',
+        message:
+          kind === 'output'
+            ? `핀 공유: ${at} 을(를) ${labels} 이(가) 함께 씁니다. 같이 켜지고 꺼집니다.`
+            : kind === 'input'
+              ? `핀 공유: ${at} 을(를) ${labels} 이(가) 함께 씁니다. 어느 것을 눌러도 같은 신호가 되어 서로 구분할 수 없습니다.`
+              : `핀 공유: ${at} 을(를) 버튼 ${users.length}개가 저항 사다리로 함께 씁니다 (${ladderLabel(circuit, rungs)}).`,
+        hint:
+          kind === 'input'
+            ? 'Uno·Nano·Mega 의 아날로그 핀(A0 등)에 묶으면 저항 사다리로 어느 버튼인지 구분합니다.'
+            : kind === 'ladder'
+              ? '버튼과 핀 사이에 직렬 저항을 넣고, 한 번에 버튼 하나만 누르세요. 코드는 analogRead 값으로 어느 버튼인지 구분합니다.'
+              : undefined,
+        connectionId: users[users.length - 1].connectionId,
+        boardInstanceId: users[0].boardInstanceId,
+      })
+      continue
+    }
+    const roles = users.map((u) => roleOfKey(circuit, u.key))
+    const sharable = roles.every((r) => r !== null && r === roles[0])
     push({
       code: 'pin-conflict',
       severity: 'error',
-      message: `핀 충돌: ${prefix}${users[0].pinId} 에 신호 ${users.length}개가 연결되어 있습니다 (${users.map((u) => u.label).join(', ')}).`,
-      hint: '[자동 핀 배정]을 누르면 나중에 연결된 신호를 빈 핀으로 재배치합니다.',
+      message: `핀 충돌: ${at} 에 신호 ${users.length}개가 연결되어 있습니다 (${labels}).`,
+      hint: sharable
+        ? '같은 핀을 일부러 함께 쓰려면 한 부품의 핀을 다른 부품의 핀에 끌어 놓아 핀 공유 그룹으로 묶으세요. 아니면 [자동 핀 배정]으로 빈 핀에 다시 배치합니다.'
+        : '[자동 핀 배정]을 누르면 나중에 연결된 신호를 빈 핀으로 재배치합니다.',
       connectionId: users[users.length - 1].connectionId,
       boardInstanceId: users[0].boardInstanceId,
     })
@@ -312,6 +352,23 @@ export function validateCircuit(circuit: Circuit): Issue[] {
           : '핀을 끌어 보드 핀에 연결하거나 [자동 핀 배정]을 사용하세요.',
         instanceId: item.instanceId,
       })
+    // 외부 전원이 꼭 필요한 전원 핀이 다른 부하(서보 등)에만 물려 있고 전원이 없으면
+    for (const pin of module.pins) {
+      if (pin.role !== 'power' || pin.external !== 'required' || !isPinConnected(connections, item.instanceId, pin.id)) continue
+      const key = endpointKey(moduleEndpoint(item.instanceId, pin.id))
+      const fed = (netlist.members.get(netlist.netOf(key)) ?? []).some((k) => {
+        const e = parseEndpointKey(k)
+        return e?.kind === 'board' || (e?.kind === 'module' && resolveModulePin(placed, e)?.pin.role === 'source')
+      })
+      if (!fed)
+        push({
+          code: 'supply-missing',
+          severity: 'error',
+          message: `${item.label} · ${pin.name}: 전원이 연결되어 있지 않습니다. 외부 전원 + 를 이 핀에 연결하세요.`,
+          hint: '카드의 ⚡ 전원 필요 표시나 [전원] 탭에서 맞는 전원을 바로 연결할 수 있습니다.',
+          instanceId: item.instanceId,
+        })
+    }
   }
 
   // ---------- 전압 레벨 (넷 단위) ----------
@@ -378,6 +435,8 @@ export function validateCircuit(circuit: Circuit): Issue[] {
   // ---------- 직렬 저항 · 전류 ----------
   const gpioCurrentMa = new Map<string, number>()
   const fiveVoltMa = new Map<string, number>()
+  /** 공유 핀별 LED 전류 합계 */
+  const sharedMa = new Map<string, { ma: number; limit: number; boardInstanceId: string; pinId: string }>()
   const addMa = (map: Map<string, number>, id: string, ma: number) => map.set(id, (map.get(id) ?? 0) + ma)
   for (const res of computeSeriesResistors(circuit)) {
     const item = placed.find((p) => p.instanceId === res.instanceId)!
@@ -403,6 +462,12 @@ export function validateCircuit(circuit: Circuit): Issue[] {
       })
     if (target.pin && isGpio(target.pin)) {
       addMa(gpioCurrentMa, res.boardInstanceId, choice.actualMa)
+      const pinKey = `${res.boardInstanceId}:${res.boardPinId}`
+      if (sharedPins.has(pinKey)) {
+        const entry = sharedMa.get(pinKey) ?? { ma: 0, limit: target.board.ioPinCurrentLimitMa, boardInstanceId: res.boardInstanceId, pinId: res.boardPinId }
+        entry.ma += choice.actualMa
+        sharedMa.set(pinKey, entry)
+      }
       if (choice.actualMa > target.board.ioPinCurrentLimitMa * 0.9)
         push({
           code: 'led-near-limit',
@@ -420,6 +485,17 @@ export function validateCircuit(circuit: Circuit): Issue[] {
         instanceId: item.instanceId,
       })
     }
+  }
+  for (const entry of sharedMa.values()) {
+    if (entry.ma <= entry.limit) continue
+    const prefix = circuit.boards.length > 1 ? `${boardLabel(circuit, entry.boardInstanceId)} ` : ''
+    push({
+      code: 'pin-shared-current',
+      severity: 'warning',
+      message: `핀 공유: ${prefix}${entry.pinId} 에 함께 연결한 LED 전류 합계 약 ${entry.ma.toFixed(1)} mA 가 핀 권장 한계(${entry.limit} mA)를 넘습니다.`,
+      hint: 'LED 목표 전류를 낮추거나 트랜지스터로 구동하세요.',
+      boardInstanceId: entry.boardInstanceId,
+    })
   }
   for (const [boardInstanceId, ma] of gpioCurrentMa) {
     const board = boardDefOf(circuit, boardInstanceId)!

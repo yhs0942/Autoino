@@ -333,6 +333,10 @@
       "width": 320,
       "height": 220
     },
+    "sizeMm": {
+      "width": 68.6,
+      "height": 53.4
+    },
     "notes": [
       "A0–A5 는 디지털 핀(D14–D19)으로도 사용할 수 있습니다.",
       "AREF 옆의 SDA/SCL 헤더는 A4/A5 와 같은 신호입니다."
@@ -1159,6 +1163,10 @@
       "width": 460,
       "height": 220
     },
+    "sizeMm": {
+      "width": 101.6,
+      "height": 53.3
+    },
     "notes": [
       "A0–A15 는 디지털 핀(D54–D69)으로도 사용할 수 있습니다.",
       "하드웨어 시리얼 포트가 4개(Serial, Serial1–3) 있습니다."
@@ -1516,6 +1524,10 @@
     "footprint": {
       "width": 280,
       "height": 130
+    },
+    "sizeMm": {
+      "width": 43.2,
+      "height": 18
     },
     "notes": [
       "A6, A7 은 아날로그 입력 전용이며 디지털 I/O 로 사용할 수 없습니다.",
@@ -2338,6 +2350,10 @@
     "footprint": {
       "width": 400,
       "height": 150
+    },
+    "sizeMm": {
+      "width": 51.5,
+      "height": 28.3
     },
     "notes": [
       "I/O 논리 전압이 3.3 V 입니다. 5 V 로 동작하는 부품의 출력(예: HC-SR04 Echo, 5 V 풀업된 I²C)을 직접 연결하면 안 됩니다.",

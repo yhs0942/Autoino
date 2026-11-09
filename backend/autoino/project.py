@@ -13,7 +13,25 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .catalog import Catalog, get_catalog
-from .models import ProjectData
+from .models import BoardEndpoint, ModuleEndpoint, ProjectData
+
+_HOLE_MAIN = re.compile(r"^([1-9]\d?)([a-j])$")
+_HOLE_RAIL = re.compile(r"^(top|bot)([+-])([1-9]\d?)$")
+
+
+def _valid_hole(hole: str) -> bool:
+    """브레드보드 구멍 ID (예: 12c, top-4). 63열까지"""
+    m = _HOLE_MAIN.match(hole)
+    if m:
+        return int(m.group(1)) <= 63
+    m = _HOLE_RAIL.match(hole)
+    return bool(m) and int(m.group(3)) <= 63
+
+
+def parse_endpoint_key(key: str):
+    from .engine.circuit import parse_endpoint_key as parse
+
+    return parse(key)
 
 PROJECT_FORMAT = "autoino-project"
 PROJECT_VERSION = 2
@@ -197,6 +215,35 @@ def parse_project(data: Any, catalog: Catalog | None = None) -> ProjectData:
     def counter(v: Any, minimum: int) -> int:
         return max(int(v) if _is_num(v) else 1, minimum)
 
+    # 핀 공유 그룹: 있는 부품 핀만 남기고, 멤버가 둘 미만이면 버린다
+    shares: list[dict] = []
+    for sh in raw.get("shares") if isinstance(raw.get("shares"), list) else []:
+        if not (_is_obj(sh) and _is_str(sh.get("id")) and isinstance(sh.get("members"), list)):
+            continue
+        members: list[str] = []
+        for k in sh["members"]:
+            e = parse_endpoint_key(k) if _is_str(k) else None
+            if isinstance(e, ModuleEndpoint) and e.instance_id in instance_ids and k not in members:
+                members.append(k)
+        if len(members) >= 2 and not any(x["id"] == sh["id"] for x in shares):
+            shares.append({"id": sh["id"], "members": members})
+
+    # 브레드보드 구멍: 있는 끝점과 올바른 구멍 ID 만 남긴다
+    holes: dict[str, str] = {}
+    if _is_obj(raw.get("breadboardHoles")):
+        for key, hole in raw["breadboardHoles"].items():
+            e = parse_endpoint_key(key)
+            exists = e is not None and (e.board_instance_id in board_ids if isinstance(e, BoardEndpoint) else e.instance_id in instance_ids)
+            if exists and _is_str(hole) and _valid_hole(hole):
+                holes[key] = hole
+
+    # 실물 배치 위치: 있는 보드·부품·브레드보드만
+    layout: dict[str, dict] = {}
+    if _is_obj(raw.get("layout")):
+        for key, pos in raw["layout"].items():
+            if (key in board_ids or key in instance_ids or key == "breadboard") and _is_obj(pos) and _is_num(pos.get("x")) and _is_num(pos.get("y")):
+                layout[key] = {"x": pos["x"], "y": pos["y"]}
+
     name = raw.get("name")
     breadboard = raw.get("breadboard")
     position = {"breadboard": {"x": breadboard["x"], "y": breadboard["y"]}} if _is_obj(breadboard) and _is_num(breadboard.get("x")) and _is_num(breadboard.get("y")) else {}
@@ -208,6 +255,9 @@ def parse_project(data: Any, catalog: Catalog | None = None) -> ProjectData:
             "connections": connections,
             "links": links,
             **position,
+            **({"breadboardHoles": holes} if holes else {}),
+            **({"shares": shares} if shares else {}),
+            **({"layout": layout} if layout else {}),
             "nextSeq": counter(raw.get("nextSeq"), max_seq + 1),
             "nextConnSeq": counter(raw.get("nextConnSeq"), max_conn + 1),
             "nextBoardSeq": counter(raw.get("nextBoardSeq"), max_board + 1),
@@ -222,6 +272,12 @@ def to_project_file(project: ProjectData, now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     d = project.dump()
     breadboard = {"breadboard": d["breadboard"]} if "breadboard" in d else {}
+    if d.get("breadboardHoles"):
+        breadboard["breadboardHoles"] = d["breadboardHoles"]
+    if d.get("shares"):
+        breadboard["shares"] = d["shares"]
+    if d.get("layout"):
+        breadboard["layout"] = d["layout"]
     return {
         "format": PROJECT_FORMAT,
         "version": PROJECT_VERSION,

@@ -22,7 +22,7 @@ PinRestrictionKind = Literal[
 SpecConfidence = Literal["official", "typical", "varies"]
 ModuleCategory = Literal["output", "input", "sensor", "motor", "driver", "power", "actuator", "display", "comm", "interface"]
 ModulePinRole = Literal["power", "ground", "signal", "passive", "source", "load", "drive"]
-MotorKind = Literal["dc", "stepper-bipolar", "stepper-unipolar", "bldc"]
+MotorKind = Literal["dc", "stepper-bipolar", "stepper-unipolar", "bldc", "servo"]
 BoardCore = Literal["arduino-avr", "arduino-esp32"]
 BusProtocol = Literal["UART", "I2C", "SPI"]
 
@@ -131,6 +131,8 @@ class Board(Model):
     buses: list[CommunicationBus]
     pins: list[BoardPin]
     footprint: Footprint
+    #: 대표 실물 크기 (mm). 실물 배치 모드에 쓴다
+    size_mm: Footprint | None = None
     notes: list[str]
     source_url: str
 
@@ -251,6 +253,8 @@ class Module(Model):
     name_en: str
     category: ModuleCategory
     icon: str
+    #: 대표 실물 크기 (mm). 실물 배치 모드에 쓴다
+    size_mm: Footprint | None = None
     description: str
     pins: list[ModulePin]
     parameters: list[ModuleParameter] | None = None
@@ -356,6 +360,13 @@ class Position(Lenient):
     y: float
 
 
+class PinShare(Lenient):
+    """한 보드 핀을 함께 쓰는 부품 핀 묶음 (핀 공유). members 는 부품 핀 끝점 키"""
+
+    id: str
+    members: list[str]
+
+
 class ProjectData(Lenient):
     name: str
     boards: list[PlacedBoard]
@@ -363,6 +374,10 @@ class ProjectData(Lenient):
     connections: list[Connection]
     links: list[BoardLink]
     breadboard: Position | None = None
+    breadboard_holes: dict[str, str] | None = None
+    shares: list[PinShare] | None = None
+    #: 실물 배치 모드의 위치 (보드·부품 인스턴스 ID 또는 'breadboard' → 좌표)
+    layout: dict[str, Position] | None = None
     next_seq: int
     next_conn_seq: int
     next_board_seq: int

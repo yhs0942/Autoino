@@ -164,6 +164,64 @@ const SCENARIOS: Scenario[] = [
     ],
   },
   {
+    // 핀 공유: LED 세 개가 D5 를 함께 쓴다 (세 번째는 전선을 지워 자동 배정이 다시 잇는지 본다)
+    name: 'share-leds',
+    setup: [
+      add('led-5mm'), add('led-5mm'), add('led-5mm'),
+      param('led-5mm#1', 'current', '15'), param('led-5mm#2', 'current', '15'),
+      connect(mod('led-5mm#1', 'anode'), bp('D5')),
+      connect(mod('led-5mm#2', 'anode'), mod('led-5mm#1', 'anode')),
+      connect(mod('led-5mm#3', 'anode'), mod('led-5mm#1', 'anode')),
+      { type: 'removeConnection', connectionId: 'w3' },
+    ],
+  },
+  {
+    name: 'share-button-ladder',
+    setup: [
+      add('push-button'), add('push-button'), add('push-button'), add('led-5mm'),
+      connect(mod('push-button#1', 'pin2a'), bp('A0')),
+      connect(mod('push-button#2', 'pin2a'), mod('push-button#1', 'pin2a')),
+      connect(mod('push-button#3', 'pin2a'), mod('push-button#1', 'pin2a')),
+    ],
+  },
+  {
+    name: 'share-button-digital',
+    route: 'breadboard',
+    setup: [add('push-button'), add('push-button'), connect(mod('push-button#1', 'pin2a'), bp('D4')), connect(mod('push-button#2', 'pin2a'), mod('push-button#1', 'pin2a'))],
+  },
+  {
+    name: 'share-esp32-buttons',
+    start: () => createInitialState('esp32-devkit-v1'),
+    setup: [add('push-button'), add('push-button'), connect(mod('push-button#1', 'pin2a'), bp('GPIO32')), connect(mod('push-button#2', 'pin2a'), mod('push-button#1', 'pin2a'))],
+  },
+  {
+    // 서보 드라이버: 서보 세 개를 PCA9685 에 놓고 외부 전원을 드라이버에 놓는다
+    name: 'pca9685-servos',
+    setup: [
+      add('pca9685'), add('sg90'), add('mg996r'), add('fs90r'),
+      { type: 'attachMotor', motorId: 'sg90#2', driverId: 'pca9685#1', route: 'direct' },
+      { type: 'attachMotor', motorId: 'mg996r#3', driverId: 'pca9685#1', route: 'direct' },
+      { type: 'attachMotor', motorId: 'fs90r#4', driverId: 'pca9685#1', route: 'direct' },
+      { type: 'addModule', moduleId: 'external-power', autoConnect: true, near: 'pca9685#1', route: 'direct' },
+    ],
+  },
+  {
+    // 서보만 V+ 에 물리고 외부 전원을 잇지 않은 상태 (supply-missing)
+    name: 'pca9685-no-power',
+    manualOnly: true,
+    setup: [add('pca9685'), add('mg996r'), { type: 'attachMotor', motorId: 'mg996r#2', driverId: 'pca9685#1', route: 'direct' }],
+  },
+  {
+    name: 'pca9685-esp32',
+    start: () => createInitialState('esp32-devkit-v1'),
+    route: 'breadboard',
+    setup: [
+      add('pca9685'), add('sg90'), add('oled-ssd1306'),
+      { type: 'attachMotor', motorId: 'sg90#2', driverId: 'pca9685#1', route: 'breadboard' },
+      { type: 'addModule', moduleId: 'external-power', autoConnect: true, near: 'pca9685#1', route: 'breadboard' },
+    ],
+  },
+  {
     name: 'ground-not-common',
     manualOnly: true,
     setup: [

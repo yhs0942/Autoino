@@ -1,6 +1,6 @@
 import { findModule } from '../data/modules'
 import { BREADBOARD_SIZE } from '../utils/placement'
-import { BB_COLUMNS, holeName, type BbLead, type BreadboardRouting, type Hole, type MainRow, type RailId } from './breadboard'
+import { BB_COLUMNS, holeLabel, type BbLead, type BreadboardRouting, type Hole, type MainRow, type RailId } from './breadboard'
 import type { Circuit } from './circuit'
 import { describeEndpoint, parseEndpointKey } from './connections'
 import { esc, SIGNAL_COLORS, svgDocument } from './svgUtil'
@@ -20,6 +20,25 @@ const colX = (col: number) => 12 + col * P
 /** 브레드보드 왼쪽 위를 원점으로 한 구멍 위치 */
 export function holeXY(h: Hole): { x: number; y: number } {
   return { x: colX(h.col), y: h.kind === 'rail' ? RAIL_Y[h.rail] : ROW_Y[h.row] }
+}
+
+/** 그림 좌표(브레드보드 왼쪽 위 기준)에서 가장 가까운 구멍. 구멍에서 6px 넘게 떨어져 있으면 null */
+export function holeAt(x: number, y: number): Hole | null {
+  const col = Math.round((x - 12) / P)
+  if (col < 1 || col > BB_COLUMNS || Math.abs(x - colX(col)) > 6) return null
+  const candidates: [Hole, number][] = [
+    ...(Object.keys(ROW_Y) as MainRow[]).map((row): [Hole, number] => [{ kind: 'main', col, row }, ROW_Y[row]]),
+    ...(Object.keys(RAIL_Y) as RailId[]).map((rail): [Hole, number] => [{ kind: 'rail', rail, col }, RAIL_Y[rail]]),
+  ]
+  const [best, by] = candidates.reduce((a, b) => (Math.abs(b[1] - y) < Math.abs(a[1] - y) ? b : a))
+  return Math.abs(by - y) > 6 ? null : best
+}
+
+/** 구멍이 속한 줄(스트립 또는 레일)의 영역 */
+export function nodeBox(h: Hole): { x: number; y: number; width: number; height: number } {
+  if (h.kind === 'rail') return { x: 6, y: RAIL_Y[h.rail] - 5, width: BODY_W - 12, height: 10 }
+  const [first, last] = ['a', 'b', 'c', 'd', 'e'].includes(h.row) ? [ROW_Y.a, ROW_Y.e] : [ROW_Y.f, ROW_Y.j]
+  return { x: colX(h.col) - 5, y: first - 5, width: 10, height: last - first + 10 }
 }
 
 /** 전선이 구멍으로 들어오는 방향 (위: -1, 아래: 1) */
@@ -51,6 +70,7 @@ export function renderBreadboardBody(routing: BreadboardRouting): string {
   const used = new Map<string, string>()
   for (const l of routing.leads) used.set(key(l.hole), colors.get(l.key) ?? '#475569')
   for (const j of routing.jumpers) for (const h of [j.from, j.to]) used.set(key(h), '#475569')
+  for (const r of routing.resistors) for (const h of r.legs) used.set(key(h), '#92400e')
 
   parts.push(`<rect x="0.5" y="0.5" width="${BODY_W - 1}" height="${BODY_H - 1}" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>`)
   parts.push(`<rect x="6" y="${ROW_Y.e + 6}" width="${BODY_W - 12}" height="${ROW_Y.f - ROW_Y.e - 12}" fill="#e2e8f0"/>`)
@@ -80,8 +100,7 @@ export function renderBreadboardBody(routing: BreadboardRouting): string {
     parts.push(`<path d="M ${a.x} ${a.y} Q ${(a.x + b.x) / 2} ${lift} ${b.x} ${b.y}" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round"><title>${esc(j.net)}</title></path>`)
   }
   for (const r of routing.resistors) {
-    const a = holeXY({ kind: 'main', col: r.col, row: 'e' })
-    const b = holeXY({ kind: 'main', col: r.col, row: 'f' })
+    const [a, b] = [holeXY(r.legs[0]), holeXY(r.legs[1])].sort((p, q) => p.y - q.y)
     parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#78716c" stroke-width="1.8"/>`)
     parts.push(`<rect x="${a.x - 4}" y="${a.y + 2.5}" width="8" height="${b.y - a.y - 5}" rx="2" fill="#e7c98f" stroke="#92400e" stroke-width="0.7"><title>${esc(`직렬 저항 ${r.label}`)}</title></rect>`)
     parts.push(`<text x="${a.x + 6}" y="${(a.y + b.y) / 2 + 2.5}" font-size="6.5" font-weight="700" fill="#78350f">${esc(r.label.replace(' ', ''))}</text>`)
@@ -109,15 +128,15 @@ export function renderBreadboardSvg(routing: BreadboardRouting, circuit: Circuit
 
   parts.push(`<text x="${MARGIN}" y="${MARGIN + 14}" font-size="15" font-weight="700" fill="#0f172a">${esc(title)} · 브레드보드 배치</text>`)
   parts.push(
-    `<text x="${MARGIN}" y="${MARGIN + 30}" font-size="10" fill="#64748b">830홀 브레드보드 기준 · 각 열의 a–e, f–j 는 내부 연결 · 레일이 가운데에서 끊어진 제품은 점퍼로 이으세요 · Autoino 자동 배치</text>`,
+    `<text x="${MARGIN}" y="${MARGIN + 30}" font-size="10" fill="#64748b">830홀 브레드보드 기준 · 각 열의 a–e, f–j 는 내부 연결 · 레일이 가운데에서 끊어진 제품은 점퍼로 이으세요 · ${routing.leads.some((l) => l.pinned) ? '직접 옮긴 배치 포함' : 'Autoino 자동 배치'}</text>`,
   )
   parts.push(`<g transform="translate(${MARGIN} ${MARGIN + 44}) scale(${SCALE})">${renderBreadboardBody(routing)}</g>`)
 
   parts.push(`<text x="${MARGIN}" y="${tableTop}" font-size="12" font-weight="700" fill="#0f172a">구멍별 배선표</text>`)
   const colors = leadColors(routing)
-  const rows = routing.leads.map((l) => ({ hole: holeName(l.hole), label: leadLabel(l, circuit), color: colors.get(l.key) ?? '#475569' }))
-  rows.push(...routing.jumpers.map((j) => ({ hole: `${holeName(j.from)} ↔ ${holeName(j.to)}`, label: `점퍼 (${j.net})`, color: '#64748b' })))
-  rows.push(...routing.resistors.map((r) => ({ hole: `${r.col}e ↔ ${r.col}f`, label: `직렬 저항 ${r.label}`, color: '#92400e' })))
+  const rows = routing.leads.map((l) => ({ hole: holeLabel(l.hole), label: leadLabel(l, circuit), color: colors.get(l.key) ?? '#475569' }))
+  rows.push(...routing.jumpers.map((j) => ({ hole: `${holeLabel(j.from)} ↔ ${holeLabel(j.to)}`, label: `점퍼 (${j.net})`, color: '#64748b' })))
+  rows.push(...routing.resistors.map((r) => ({ hole: `${holeLabel(r.legs[0])} ↔ ${holeLabel(r.legs[1])}`, label: `직렬 저항 ${r.label}`, color: '#92400e' })))
   rows.forEach((row, i) => {
     const col = Math.floor(i / perColumn)
     const x = MARGIN + (col % columns) * colW

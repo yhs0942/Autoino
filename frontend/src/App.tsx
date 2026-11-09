@@ -11,6 +11,7 @@ import { ModuleLibrary } from './components/ModuleLibrary/ModuleLibrary'
 import { PropertyPanel, type PanelTab } from './components/PropertyPanel/PropertyPanel'
 import type { WireStyle } from './components/CircuitCanvas/wireGeometry'
 import { WorkspaceToolbar } from './components/WorkspaceToolbar/WorkspaceToolbar'
+import { LayoutView } from './components/LayoutView/LayoutView'
 import { BOARDS, getBoard } from './data/boards'
 import { MODULES } from './data/modules'
 import { bomCsv, buildBom, buildPinTable, pinTableCsv } from './engine/exporters'
@@ -18,7 +19,7 @@ import { parseProjectFile, ProjectFileError, toProjectFile, type ProjectFile } f
 import { routeBreadboard } from './engine/breadboard'
 import { renderBreadboardSvg } from './engine/breadboardSvg'
 import type { Circuit } from './engine/circuit'
-import { analyzePower, type PowerNeed, type SupplyExample } from './engine/power'
+import { analyzePower, findMergeableSupplies, type PowerNeed, type SupplyExample } from './engine/power'
 import { renderSchematicSvg } from './engine/schematicSvg'
 import { computeSeriesResistors } from './engine/resistor'
 import { countIssues, validateCircuit } from './engine/validate'
@@ -69,6 +70,11 @@ function App() {
   const [wireStyle, setWireStyle] = useState<WireStyle>(() => (loadPreference('wireStyle') === 'orthogonal' ? 'orthogonal' : 'curved'))
   /** 새 전선의 경로: 전선을 끌기 전에 고른다 */
   const [route, setRoute] = useState<RouteMode>(() => (loadPreference('route') === 'breadboard' ? 'breadboard' : 'direct'))
+  const [view, setView] = useState<'wiring' | 'layout'>(() => (loadPreference('view') === 'layout' ? 'layout' : 'wiring'))
+  const changeView = (next: 'wiring' | 'layout') => {
+    setView(next)
+    savePreference('view', next)
+  }
   const [backend, recheckBackend] = useBackend()
   /** 지금 작업이 서버에 저장된 어느 프로젝트에서 왔는지 (덮어쓰기용) */
   const [serverProjectId, setServerProjectId] = useState<string | null>(null)
@@ -77,20 +83,32 @@ function App() {
   const firstBoard = getBoard(state.boards[0].boardId)
   const closeDialog = useCallback(() => setDialog({ kind: 'none' }), [])
 
-  const { projectName, boards, placed, connections, links, breadboard: breadboardPosition, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters } = state
-  const circuit: Circuit = useMemo(() => ({ boards, placed, connections, links, breadboard: breadboardPosition }), [boards, placed, connections, links, breadboardPosition])
+  const { projectName, boards, placed, connections, links, breadboard: breadboardPosition, breadboardHoles, shares, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters } = state
+  const circuit: Circuit = useMemo(
+    () => ({ boards, placed, connections, links, breadboard: breadboardPosition, breadboardHoles, shares }),
+    [boards, placed, connections, links, breadboardPosition, breadboardHoles, shares],
+  )
   const canvasBoards = useMemo(() => boards.map((instance) => ({ instance, def: getBoard(instance.boardId) })), [boards])
   const issues = useMemo(() => validateCircuit(circuit), [circuit])
   const resistors = useMemo(() => computeSeriesResistors(circuit), [circuit])
   const pinRows = useMemo(() => buildPinTable(circuit), [circuit])
   const routing = useMemo(() => routeBreadboard(circuit), [circuit])
   const power = useMemo(() => analyzePower(circuit), [circuit])
+  const merges = useMemo(
+    () => findMergeableSupplies(circuit).map((m) => ({ voltage: m.voltage, items: m.items.map((i) => ({ instanceId: i.instanceId, label: i.label })) })),
+    [circuit],
+  )
   const counts = countIssues(issues)
 
   // 브라우저 자동 저장 (선택 상태와 상태 메시지는 저장하지 않는다)
   useEffect(() => {
-    saveAutosave({ name: projectName, boards, placed, connections, links, breadboard: breadboardPosition, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters })
-  }, [projectName, boards, placed, connections, links, breadboardPosition, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters])
+    saveAutosave({
+      name: projectName, boards, placed, connections, links, breadboard: breadboardPosition,
+      ...(Object.keys(breadboardHoles).length ? { breadboardHoles } : {}),
+      ...(shares.length ? { shares } : {}),
+      nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters,
+    })
+  }, [projectName, boards, placed, connections, links, breadboardPosition, breadboardHoles, shares, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters])
 
   const changeWireStyle = (style: WireStyle) => {
     setWireStyle(style)
@@ -111,9 +129,10 @@ function App() {
     dispatch({ type: 'select', selection })
     if (selection.kind !== 'none') setTab('properties')
   }, [])
+  // 화면에서 놓은 부품: 외부 전원이면 필요한 부품에 맞춰 바로 연결한다
   const addModule = useCallback(
-    (moduleId: string, position?: Point) => dispatch({ type: 'addModule', moduleId, position }),
-    [],
+    (moduleId: string, position?: Point, near?: string) => dispatch({ type: 'addModule', moduleId, position, autoConnect: true, near, route }),
+    [route],
   )
   const removeModule = useCallback((instanceId: string) => dispatch({ type: 'removeModule', instanceId }), [])
   const removeConnection = useCallback((connectionId: string) => dispatch({ type: 'removeConnection', connectionId }), [])
@@ -303,6 +322,8 @@ function App() {
             canRedo={state.future.length > 0}
             wireStyle={wireStyle}
             route={route}
+            view={view}
+            onViewChange={changeView}
             onBoardChange={(boardId) => dispatch({ type: 'setBoard', boardInstanceId: activeBoard.instanceId, boardId })}
             onAddBoard={() => dispatch({ type: 'addBoard', boardId: activeBoard.boardId })}
             onAutoAssign={() => dispatch({ type: 'autoAssign', route })}
@@ -316,10 +337,20 @@ function App() {
             onRedo={() => dispatch({ type: 'redo' })}
             onReset={requestReset}
           />
+          {view === 'layout' ? (
+            <LayoutView
+              doc={state}
+              selection={state.selection}
+              onSelect={select}
+              onMove={(id, position) => dispatch({ type: 'moveLayout', id, position })}
+              onCheckpoint={() => dispatch({ type: 'checkpoint' })}
+            />
+          ) : (
           <CircuitCanvas
             boards={canvasBoards}
             placed={state.placed}
             connections={state.connections}
+            shares={state.shares}
             selection={state.selection}
             issues={issues}
             resistors={resistors}
@@ -335,7 +366,17 @@ function App() {
             onCheckpoint={() => dispatch({ type: 'checkpoint' })}
             onConnect={(from, to) => dispatch({ type: 'connect', from, to, ...(route === 'breadboard' ? { via: 'breadboard' as const } : {}) })}
             onConnectAuto={(endpoint: Endpoint) => dispatch({ type: 'connectAuto', endpoint, route: 'breadboard' })}
+            onMoveLead={(key, hole) => dispatch({ type: 'moveLead', key, hole })}
+            onRetarget={(connectionIds, from, to) => dispatch({ type: 'retargetWire', connectionIds, from, to })}
+            power={power}
+            onAttachMotor={(motorId, driverId) => dispatch({ type: 'attachMotor', motorId, driverId, route })}
+            onAddDriver={(motorId) => dispatch({ type: 'addDriverFor', motorId, route })}
+            onApplySupply={applySupply}
+            onShowPower={() => setTab('power')}
+            onConnectToHole={(endpoint, hole) => dispatch({ type: 'connectToHole', endpoint, hole, route })}
+            onDeleteWire={removeConnection}
           />
+          )}
         </div>
 
         <PropertyPanel
@@ -358,6 +399,15 @@ function App() {
           onSetRoute={(connectionId, via) => dispatch({ type: 'setConnectionRoute', connectionId, via })}
           onApplySupply={applySupply}
           onExportBreadboard={(format) => void exportImage('breadboard', format)}
+          onRetarget={(connectionIds, from, to) => dispatch({ type: 'retargetWire', connectionIds, from, to })}
+          onResetBreadboard={() => dispatch({ type: 'resetBreadboardLayout' })}
+          merges={merges}
+          onMerge={(keepId, otherIds) => dispatch({ type: 'mergeSupplies', keepId, otherIds })}
+          onAttachMotor={(motorId, driverId) => dispatch({ type: 'attachMotor', motorId, driverId, route })}
+          onAddDriver={(motorId) => dispatch({ type: 'addDriverFor', motorId, route })}
+          onResetModuleWiring={(instanceId) => dispatch({ type: 'resetModuleWiring', instanceId })}
+          onAutoAssignModule={(instanceId) => dispatch({ type: 'autoAssignModule', instanceId, route })}
+          onUnshare={(key) => dispatch({ type: 'unsharePin', key })}
         />
       </main>
 

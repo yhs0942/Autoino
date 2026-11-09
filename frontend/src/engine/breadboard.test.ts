@@ -20,7 +20,7 @@ const hk = (h: Hole) => JSON.stringify(h)
 const allHoles = (r: BreadboardRouting): string[] => [
   ...r.leads.map((l) => hk(l.hole)),
   ...r.jumpers.flatMap((j) => [hk(j.from), hk(j.to)]),
-  ...r.resistors.flatMap((x) => (['e', 'f'] as const).map((row) => hk({ kind: 'main', col: x.col, row }))),
+  ...r.resistors.flatMap((x) => x.legs.map(hk)),
 ]
 
 const scenarios: [string, () => CircuitState][] = [

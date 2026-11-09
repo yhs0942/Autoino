@@ -285,9 +285,14 @@ def _pin_demand(c: Circuit, netlist: Netlist, sources: list[dict], item: PlacedM
     }
 
 
+def _is_servo_module(module: Module) -> bool:
+    return bool(module.code and module.code.template in ("servo", "servo-continuous"))
+
+
 def _collect_demands(c: Circuit, netlist: Netlist, sources: list[dict]) -> list[dict]:
     demands: list[dict] = []
     driven: set[str] = set()
+    covered: set[str] = set()  # 서보 드라이버 수요에 이미 넣은 서보 전원 핀
     for item in c.placed:
         module = c.module_def(item.module_id)
         driver = module.driver if module else None
@@ -311,6 +316,25 @@ def _collect_demands(c: Circuit, netlist: Netlist, sources: list[dict]) -> list[
             target = max(m.motor.nominal_voltage + driver.drop_voltage for _, m in motors)
             demand["targetVoltage"] = _round1(min(demand["maxVoltage"], max(demand["minVoltage"], target)))
             driven.update(p.instance_id for p, _ in motors)
+        # 서보 드라이버: V+ 에 함께 물린 서보 전원 핀의 전류와 전압 범위를 더한다
+        if any("servo" in ch.accepts for ch in driver.channels):
+            for k in _members(netlist, endpoint_key(module_ep(item.instance_id, pin.id))):
+                e = parse_endpoint_key(k)
+                r = resolve_module_pin(c, e) if isinstance(e, ModuleEndpoint) else None
+                if not r or r.placed.instance_id == item.instance_id or r.pin.role != "power" or not _is_servo_module(r.module):
+                    continue
+                load = load_of_pin(c, netlist, r.placed, r.module, r.pin)
+                demand["consumers"].append({"instanceId": r.placed.instance_id, "label": r.placed.label, "typicalMa": load["typicalMa"] or 0, "peakMa": load["peakMa"] or 0})
+                demand["typicalMa"] += load["typicalMa"] or 0
+                demand["peakMa"] += load["peakMa"] or 0
+                if r.pin.min_voltage is not None:
+                    demand["minVoltage"] = max(demand["minVoltage"], r.pin.min_voltage)
+                if r.pin.max_voltage is not None:
+                    demand["maxVoltage"] = min(demand["maxVoltage"], r.pin.max_voltage)
+                covered.add(k)
+            demand["conflict"] = demand["minVoltage"] > demand["maxVoltage"]
+            if not demand["conflict"]:
+                demand["targetVoltage"] = _round1(min(demand["maxVoltage"], max(demand["minVoltage"], demand["targetVoltage"])))
         demands.append(demand)
     for item in c.placed:
         module = c.module_def(item.module_id)
@@ -337,6 +361,8 @@ def _collect_demands(c: Circuit, netlist: Netlist, sources: list[dict]) -> list[
             if pin.role != "power" or not pin.external:
                 continue
             key = endpoint_key(module_ep(item.instance_id, pin.id))
+            if key in covered:
+                continue
             served = _source_on_net(sources, netlist, key)
             if served and served["kind"] == "regulator":
                 continue

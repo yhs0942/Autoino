@@ -1,4 +1,5 @@
 import { getModule } from '../data/modules'
+import { shareOf, shareToken } from './shares'
 import type { Board, BoardPin, Connection, DriverChannel, Endpoint, Module, ModulePin, MotorKind, PinCapability, PlacedModule, RouteMode } from '../types'
 import { boardDefOf, hostBoardOf, resolveBoardPin, type Circuit } from './circuit'
 import {
@@ -11,6 +12,7 @@ import {
   moduleEndpoint,
   resolveModulePin,
   sameEndpoint,
+  parseEndpointKey,
 } from './connections'
 import {
   boardToBoardError,
@@ -207,9 +209,9 @@ export function autoAssign(circuit: Circuit, nextConnSeq: number, options: AutoA
   const inScope = (instanceId: string, pinId: string) => !options.only || options.only.has(endpointKey(moduleEndpoint(instanceId, pinId)))
   let removed: Connection[] = []
   let kept: Connection[] = []
-  /** GPIO 보드 핀 → 사용 중인 신호 (공유 버스면 그 기능, 아니면 null) */
-  const usedGpio = new Map<string, PinCapability | null>()
-  const claim = (boardInstanceId: string, pinId: string, bus: PinCapability | null): boolean => {
+  /** GPIO 보드 핀 → 사용 중인 신호 (공유 버스면 그 기능, 핀 공유 그룹이면 share:ID, 아니면 null) */
+  const usedGpio = new Map<string, string | null>()
+  const claim = (boardInstanceId: string, pinId: string, bus: string | null): boolean => {
     const key = usedKey(boardInstanceId, pinId)
     if (usedGpio.has(key) && !(bus && usedGpio.get(key) === bus)) return false
     usedGpio.set(key, bus)
@@ -246,7 +248,8 @@ export function autoAssign(circuit: Circuit, nextConnSeq: number, options: AutoA
       removed.push(c)
       continue
     }
-    if (target.pin && isGpio(target.pin) && !claim(link.boardInstanceId, target.pin.id, sharedBusCapability(r.pin))) {
+    const token = shareToken(circuit, endpointKey(moduleEndpoint(link.instanceId, link.modulePinId))) ?? sharedBusCapability(r.pin)
+    if (target.pin && isGpio(target.pin) && !claim(link.boardInstanceId, target.pin.id, token)) {
       removed.push(c) // 충돌: 먼저 연결된 신호를 유지하고 나중 것을 재배치
       continue
     }
@@ -366,7 +369,23 @@ export function autoAssign(circuit: Circuit, nextConnSeq: number, options: AutoA
       else failed.push(`${item.label} · ${pin.name}`)
       continue
     }
-    const bus = sharedBusCapability(pin)
+    // 핀 공유 그룹: 다른 멤버가 이미 보드 핀에 연결되어 있으면 같은 핀에 잇는다
+    const shareKey = endpointKey(moduleEndpoint(item.instanceId, pin.id))
+    const token = shareToken(circuit, shareKey)
+    const share = token ? shareOf(circuit, shareKey) : undefined
+    const mate = share
+      ? share.members
+          .filter((k) => k !== shareKey)
+          .map((k) => parseEndpointKey(k))
+          .map((e) => (e?.kind === 'module' ? result.map(asModuleBoardLink).find((l) => l && l.instanceId === e.instanceId && l.modulePinId === e.pinId) : null))
+          .find((l) => l && l.boardInstanceId === host.instanceId)
+      : null
+    if (mate) {
+      usedGpio.set(usedKey(host.instanceId, mate.pinId), token)
+      connect(item.instanceId, pin.id, host.instanceId, mate.pinId)
+      continue
+    }
+    const bus = token ?? sharedBusCapability(pin)
     const candidates = board.pins
       .filter(isGpio)
       .map((bp, index) => ({ bp, index }))

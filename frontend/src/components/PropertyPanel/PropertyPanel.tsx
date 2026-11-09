@@ -1,19 +1,21 @@
 import { CAPABILITY_LABELS, CONFIDENCE_LABELS, RESTRICTION_LABELS, ROLE_LABELS } from '../../data/labels'
 import { CATEGORY_LABELS, getModule } from '../../data/modules'
 import { findBoard } from '../../data/boards'
-import { holeName, verifyRouting, type BreadboardRouting } from '../../engine/breadboard'
+import { holeLabel, holeName, verifyRouting, type BreadboardRouting } from '../../engine/breadboard'
 import { leadLabel } from '../../engine/breadboardSvg'
-import { boardLabel, type Circuit } from '../../engine/circuit'
-import { asModuleBoardLink, boardPinFor, describeEndpoint, moduleEndpoint, requiredPins, touches } from '../../engine/connections'
-import { isGpio, supplyPinsOf } from '../../engine/electrical'
+import { boardDefOf, boardLabel, type Circuit } from '../../engine/circuit'
+import { asModuleBoardLink, boardPinFor, describeEndpoint, moduleEndpoint, requiredPins, resolveModulePin, touches } from '../../engine/connections'
+import { compatiblePins, isGpio, pinDisplayName, supplyPinsOf } from '../../engine/electrical'
 import type { PinTableRow } from '../../engine/exporters'
 import type { PowerNeed, PowerReport, SupplyExample } from '../../engine/power'
 import { formatOhms, type SeriesResistorResult } from '../../engine/resistor'
 import { countIssues, type Issue } from '../../engine/validate'
-import type { Board, Connection, ElectricalSpec, PlacedBoard, PlacedModule, RouteMode, Selection } from '../../types'
+import type { Board, Connection, ElectricalSpec, Endpoint, PlacedBoard, PlacedModule, RouteMode, Selection } from '../../types'
 import { assetUrl } from '../../utils/assetUrl'
 import { PinTable } from '../PinTable/PinTable'
-import { PowerPanel } from '../PowerPanel/PowerPanel'
+import { NeedQuick, PowerPanel } from '../PowerPanel/PowerPanel'
+import { capacityLabel, MOTOR_KIND_LABELS, motorDriverOf, planMotorAttach, recommendDriver } from '../../engine/motorAttach'
+import { shareBoardPin, shareRole } from '../../engine/shares'
 import { IssueList, ValidationPanel } from '../ValidationPanel/ValidationPanel'
 import './PropertyPanel.css'
 
@@ -40,6 +42,124 @@ interface PropertyPanelProps {
   onSetRoute: (connectionId: string, via: RouteMode) => void
   onApplySupply: (need: PowerNeed, example: SupplyExample) => void
   onExportBreadboard: (format: 'svg' | 'png') => void
+  onRetarget: (connectionIds: string[], from: Endpoint, to: Endpoint) => void
+  onResetBreadboard: () => void
+  merges: { voltage: number; items: { instanceId: string; label: string }[] }[]
+  onMerge: (keepId: string, otherIds: string[]) => void
+  onAttachMotor: (motorId: string, driverId: string) => void
+  onAddDriver: (motorId: string) => void
+  onResetModuleWiring: (instanceId: string) => void
+  onAutoAssignModule: (instanceId: string) => void
+  onUnshare: (key: string) => void
+}
+
+/** 부품 속성에서 바로 하는 외부 전원·모터 드라이버 연결 */
+function ModuleHookups({ item, circuit, props }: { item: PlacedModule; circuit: Circuit; props: PropertyPanelProps }) {
+  const module = getModule(item.moduleId)
+  const need = props.power.needs.find((n) => n.pins.some((k) => k.startsWith(`module:${item.instanceId}:`)) || n.consumers.some((c) => c.instanceId === item.instanceId))
+  const attached = module.motor ? motorDriverOf(circuit, item) : null
+  const merge = props.merges.find((m) => m.items.some((i) => i.instanceId === item.instanceId))
+  const drivers = module.motor
+    ? circuit.placed.filter((d) => d !== item && getModule(d.moduleId).driver).map((d) => ({ d, plan: planMotorAttach(circuit, item.instanceId, d.instanceId) }))
+    : []
+  const recommended = module.motor && !attached ? recommendDriver(module) : null
+  const wired = circuit.connections.some((c) => [c.from, c.to].some((e) => e.kind === 'module' && e.instanceId === item.instanceId))
+  const myShares = (circuit.shares ?? []).flatMap((s) => s.members.filter((k) => k.startsWith(`module:${item.instanceId}:`)).map((k) => ({ s, key: k })))
+  const sharable = module.pins.some((p) => shareRole(module, p))
+  return (
+    <>
+      <section className="prop-section" data-testid="module-wiring">
+        <h3>이 부품의 배선</h3>
+        <p className="muted small">작업 화면에서 이 부품의 전선과 보드까지의 경로가 빛납니다.</p>
+        <div className="prop-actions">
+          <button type="button" className="button button--small" onClick={() => props.onAutoAssignModule(item.instanceId)} data-testid="module-autoassign">
+            이 부품만 자동 배정
+          </button>
+          <button type="button" className="button button--small button--danger-outline" disabled={!wired} onClick={() => props.onResetModuleWiring(item.instanceId)} data-testid="module-reset-wiring">
+            배선 초기화
+          </button>
+        </div>
+      </section>
+      {(myShares.length > 0 || sharable) && (
+        <section className="prop-section" data-testid="share-section">
+          <h3>핀 공유</h3>
+          {myShares.length ? (
+            myShares.map(({ s, key }) => {
+              const pin = module.pins.find((p) => key.endsWith(`:${p.id}`))
+              const at = shareBoardPin(circuit, s)
+              const others = s.members.filter((k) => k !== key).map((k) => circuit.placed.find((p) => k.startsWith(`module:${p.instanceId}:`))?.label ?? k)
+              return (
+                <div key={key} className="share-row">
+                  <p className="small">
+                    <strong>{pin?.name}</strong> 를 {others.join(', ')}와(과) {at ? `${at.pinId} 에서 ` : ''}함께 씁니다.
+                  </p>
+                  <button type="button" className="button button--small" onClick={() => props.onUnshare(key)} data-testid="unshare">
+                    공유 풀기
+                  </button>
+                </div>
+              )
+            })
+          ) : (
+            <p className="muted small">이 부품의 핀을 같은 종류 부품(출력끼리·버튼끼리)의 핀에 끌어 놓으면 한 보드 핀을 함께 쓰는 그룹이 됩니다. Uno·Nano·Mega 아날로그 핀의 버튼은 저항 사다리로 구분됩니다.</p>
+          )}
+        </section>
+      )}
+      {module.motor && (
+        <section className="prop-section" data-testid="motor-hookup">
+          <h3>모터 드라이버</h3>
+          {attached ? (
+            <p className="callout callout--ok">
+              {attached.driver.label} {attached.channel.label}에 연결됨
+            </p>
+          ) : (
+            <>
+              <p className="muted small">{MOTOR_KIND_LABELS[module.motor.kind]}는 드라이버를 거쳐야 합니다. 이 카드를 드라이버 카드 위로 끌어다 놓아도 연결됩니다.</p>
+              <div className="prop-actions">
+                {drivers.filter((x) => x.plan.ok).map(({ d, plan }) => (
+                  <button key={d.instanceId} type="button" className="button button--small" onClick={() => props.onAttachMotor(item.instanceId, d.instanceId)}>
+                    {d.label} {plan.ok ? plan.channel.label : ''}에 연결
+                  </button>
+                ))}
+                {recommended && (
+                  <button type="button" className="button button--small button--primary" onClick={() => props.onAddDriver(item.instanceId)} data-testid="prop-add-driver">
+                    {recommended.name} 추가하고 연결
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </section>
+      )}
+      {module.driver && (
+        <section className="prop-section">
+          <h3>연결할 수 있는 모터</h3>
+          <p className="muted small">{capacityLabel(module)} — 모터 카드를 이 카드 위로 끌어다 놓으면 빈 채널에 연결됩니다.</p>
+        </section>
+      )}
+      {need && (
+        <section className="prop-section" data-testid="power-hookup">
+          <h3>외부 전원</h3>
+          <NeedQuick need={need} onApply={props.onApplySupply} onMore={() => props.onTabChange('power')} />
+        </section>
+      )}
+      {merge && (
+        <section className="prop-section">
+          <h3>같은 전압 전원</h3>
+          <p className="muted small">
+            {merge.items.map((i) => i.label).join(', ')}이(가) 모두 {merge.voltage} V 입니다. 하나로 합치면 부품들이 한 전원을 나눠 쓰고, 전류 용량은 둘을 더한 값으로 맞춥니다.
+          </p>
+          <button
+            type="button"
+            className="button button--small"
+            data-testid="merge-supplies"
+            onClick={() => props.onMerge(item.instanceId, merge.items.filter((i) => i.instanceId !== item.instanceId).map((i) => i.instanceId))}
+          >
+            이 전원으로 합치기
+          </button>
+        </section>
+      )}
+    </>
+  )
 }
 
 function ElectricalList({ specs }: { specs: ElectricalSpec[] }) {
@@ -510,8 +630,19 @@ function ModuleProperties({
   )
 }
 
-function BreadboardProperties({ circuit, routing, onExport }: { circuit: Circuit; routing: BreadboardRouting; onExport: PropertyPanelProps['onExportBreadboard'] }) {
+function BreadboardProperties({
+  circuit,
+  routing,
+  onExport,
+  onReset,
+}: {
+  circuit: Circuit
+  routing: BreadboardRouting
+  onExport: PropertyPanelProps['onExportBreadboard']
+  onReset: () => void
+}) {
   const check = verifyRouting(routing, circuit)
+  const manual = routing.leads.some((l) => l.pinned)
   const used = routing.leads.length > 0
   const rails = Object.entries(routing.rails)
   return (
@@ -535,7 +666,11 @@ function BreadboardProperties({ circuit, routing, onExport }: { circuit: Circuit
             </span>
           </p>
           <p className="muted small">
-            전선 {routing.leads.length}개 · 점퍼 {routing.jumpers.length}개 · 저항 {routing.resistors.length}개
+            전선 {routing.leads.length}개 · 점퍼 {routing.jumpers.length}개 · 저항 {routing.resistors.length}개 · {manual ? '직접 옮긴 배치' : '자동 배치'}
+          </p>
+          <p className="muted small">
+            배선도에서 구멍에 꽂힌 전선 끝을 끌어 다른 구멍에 놓으면 옮겨집니다. 같은 줄의 다른 신호와 단락되는 자리에는 놓을 수 없고, 줄이 떨어지면
+            점퍼를 자동으로 넣습니다.
           </p>
           {[...check.problems, ...routing.warnings].length > 0 && (
             <ul className="note-list">
@@ -568,14 +703,16 @@ function BreadboardProperties({ circuit, routing, onExport }: { circuit: Circuit
             <tbody>
               {routing.leads.map((l) => (
                 <tr key={l.key}>
-                  <td className="mono">{holeName(l.hole)}</td>
+                  <td className="mono">
+                    {holeLabel(l.hole)}
+                  </td>
                   <td>{leadLabel(l, circuit)}</td>
                 </tr>
               ))}
               {routing.jumpers.map((j, i) => (
                 <tr key={i}>
                   <td className="mono">
-                    {holeName(j.from)} ↔ {holeName(j.to)}
+                    {holeLabel(j.from)} ↔ {holeLabel(j.to)}
                   </td>
                   <td>점퍼 ({j.net})</td>
                 </tr>
@@ -583,7 +720,7 @@ function BreadboardProperties({ circuit, routing, onExport }: { circuit: Circuit
               {routing.resistors.map((r) => (
                 <tr key={`${r.instanceId}:${r.pinId}`}>
                   <td className="mono">
-                    {r.col}e ↔ {r.col}f
+                    {holeLabel(r.legs[0])} ↔ {holeLabel(r.legs[1])}
                   </td>
                   <td>직렬 저항 {r.label}</td>
                 </tr>
@@ -591,6 +728,9 @@ function BreadboardProperties({ circuit, routing, onExport }: { circuit: Circuit
             </tbody>
           </table>
           <div className="prop-actions">
+            <button type="button" className="button button--small" onClick={onReset} disabled={!manual} data-testid="breadboard-reset">
+              자동 배치로 되돌리기
+            </button>
             <button type="button" className="button button--small" onClick={() => onExport('svg')}>
               SVG 저장
             </button>
@@ -616,6 +756,44 @@ function BreadboardProperties({ circuit, routing, onExport }: { circuit: Circuit
   )
 }
 
+/** 전선의 보드 쪽 끝을 다른 보드 핀으로 옮기는 선택 상자 */
+function BoardPinPicker({
+  circuit,
+  end,
+  other,
+  testId,
+  onPick,
+}: {
+  circuit: Circuit
+  end: Extract<Endpoint, { kind: 'board' }>
+  other: Endpoint
+  testId: string
+  onPick: (to: Endpoint) => void
+}) {
+  const board = boardDefOf(circuit, end.boardInstanceId)
+  if (!board) return null
+  const peer = other.kind === 'module' ? resolveModulePin(circuit.placed, other) : null
+  const ok = new Set(peer ? compatiblePins(board, peer.module, peer.pin, peer.placed) : board.pins.map((p) => p.id))
+  const pins = [...board.pins].sort((a, b) => Number(ok.has(b.id)) - Number(ok.has(a.id)))
+  return (
+    <label className="field prop-pin-picker">
+      <span>{circuit.boards.length > 1 ? `${boardLabel(circuit, end.boardInstanceId)} 핀 바꾸기` : '보드 핀 바꾸기'}</span>
+      <select
+        value={end.pinId}
+        data-testid={testId}
+        onChange={(e) => onPick({ kind: 'board', boardInstanceId: end.boardInstanceId, pinId: e.target.value })}
+      >
+        {pins.map((p) => (
+          <option key={p.id} value={p.id}>
+            {pinDisplayName(p)}
+            {ok.has(p.id) ? '' : ' (맞지 않음)'}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
 function ConnectionProperties({
   connection,
   circuit,
@@ -624,6 +802,7 @@ function ConnectionProperties({
   onRemove,
   onSelect,
   onSetRoute,
+  onRetarget,
 }: {
   connection: Connection
   circuit: Circuit
@@ -632,6 +811,7 @@ function ConnectionProperties({
   onRemove: (connectionId: string) => void
   onSelect: (selection: Selection) => void
   onSetRoute: PropertyPanelProps['onSetRoute']
+  onRetarget: PropertyPanelProps['onRetarget']
 }) {
   const ownIssues = issues.filter((i) => i.connectionId === connection.id)
   const link = connection.linkId ? circuit.links.find((l) => l.id === connection.linkId) : undefined
@@ -675,6 +855,19 @@ function ConnectionProperties({
             </div>
           )}
         </dl>
+        {!link &&
+          ([connection.from, connection.to] as Endpoint[]).map((end, i) =>
+            end.kind === 'board' ? (
+              <BoardPinPicker
+                key={i}
+                circuit={circuit}
+                end={end}
+                other={i === 0 ? connection.to : connection.from}
+                testId={i === 0 ? 'wire-pin-from' : 'wire-pin-to'}
+                onPick={(to) => onRetarget([connection.id], end, to)}
+              />
+            ) : null,
+          )}
         <div className="segmented prop-route" role="group" aria-label="이 전선의 경로">
           <button type="button" aria-pressed={connection.via !== 'breadboard'} onClick={() => onSetRoute(connection.id, 'direct')} data-testid="wire-direct">
             보드 직결
@@ -748,10 +941,10 @@ export function PropertyPanel(props: PropertyPanelProps) {
         {tab === 'pins' && (
           <PinTable rows={pinRows} boardName={circuit.boards.length > 1 ? `보드 ${circuit.boards.length}개` : board.name} multiBoard={circuit.boards.length > 1} onSelect={onSelect} />
         )}
-        {tab === 'power' && <PowerPanel report={props.power} onApply={props.onApplySupply} />}
+        {tab === 'power' && <PowerPanel report={props.power} onApply={props.onApplySupply} merges={props.merges} onMerge={props.onMerge} />}
         {tab === 'properties' && (
           <>
-            {selection.kind === 'breadboard' && <BreadboardProperties circuit={circuit} routing={props.routing} onExport={props.onExportBreadboard} />}
+            {selection.kind === 'breadboard' && <BreadboardProperties circuit={circuit} routing={props.routing} onExport={props.onExportBreadboard} onReset={props.onResetBreadboard} />}
             {selectedBoard && selectedBoardDef && (
               <BoardProperties board={selectedBoardDef} instance={selectedBoard} circuit={circuit} onRemoveBoard={props.onRemoveBoard} />
             )}
@@ -767,6 +960,7 @@ export function PropertyPanel(props: PropertyPanelProps) {
                 onSelect={onSelect}
               />
             )}
+            {selectedModule && <ModuleHookups item={selectedModule} circuit={circuit} props={props} />}
             {selectedConnection && (
               <ConnectionProperties
                 connection={selectedConnection}
@@ -776,6 +970,7 @@ export function PropertyPanel(props: PropertyPanelProps) {
                 onRemove={props.onRemoveConnection}
                 onSelect={onSelect}
                 onSetRoute={props.onSetRoute}
+                onRetarget={props.onRetarget}
               />
             )}
             {selection.kind !== 'breadboard' && !selectedBoard && !selectedModule && !selectedConnection && (

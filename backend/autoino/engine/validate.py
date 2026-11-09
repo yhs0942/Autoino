@@ -47,6 +47,26 @@ from .power import (
     wire_peak_ma,
 )
 from .resistor import compute_series_resistors, format_ohms
+from .shares import compute_ladder_resistors, ladder_label, role_of_key, share_kind, share_of
+
+
+def _is_servo_module(module) -> bool:
+    return bool(module.code and module.code.template in ("servo", "servo-continuous"))
+
+
+def _is_servo_channel_link(resolved) -> bool:
+    """서보 드라이버 채널 출력(drive)과 서보 신호선을 잇는 연결인지"""
+    if len(resolved) != 2 or not all(resolved):
+        return False
+
+    def servo_out(r) -> bool:
+        return r.pin.role == "drive" and bool(r.module.driver) and any(r.pin.id in ch.outputs and "servo" in ch.accepts for ch in r.module.driver.channels)
+
+    def servo_in(r) -> bool:
+        return r.pin.role == "signal" and _is_servo_module(r.module)
+
+    a, b = resolved
+    return (servo_out(a) and servo_in(b)) or (servo_out(b) and servo_in(a))
 
 SEVERITY_ORDER = {"error": 0, "warning": 1, "info": 2}
 
@@ -68,9 +88,9 @@ def validate_circuit(c: Circuit) -> list[dict]:
 
     gpio_users: dict[str, list[dict]] = {}
 
-    def add_user(board_instance_id: str, pin_id: str, connection_id: str, label: str, bus: str | None) -> None:
+    def add_user(board_instance_id: str, pin_id: str, connection_id: str, label: str, bus: str | None, key: str = "") -> None:
         gpio_users.setdefault(f"{board_instance_id}:{pin_id}", []).append(
-            {"connectionId": connection_id, "label": label, "bus": bus, "pinId": pin_id, "boardInstanceId": board_instance_id}
+            {"connectionId": connection_id, "label": label, "bus": bus, "key": key, "pinId": pin_id, "boardInstanceId": board_instance_id}
         )
 
     for conn in c.connections:
@@ -113,7 +133,7 @@ def validate_circuit(c: Circuit) -> list[dict]:
                 push("module-short", "error", f"전원과 GND 가 연결되어 단락(쇼트)됩니다: {label}", connectionId=conn.id)
             elif "source" in roles and "signal" in roles:
                 push("source-on-signal", "error", f"외부 전원을 신호 핀에 직접 연결했습니다: {label}", connectionId=conn.id)
-            elif "drive" in roles and "load" not in roles and "passive" not in roles:
+            elif "drive" in roles and "load" not in roles and "passive" not in roles and not _is_servo_channel_link(resolved):
                 push("driver-output", "error", f"모터 드라이버 출력은 모터 단자에 연결합니다: {label}", connectionId=conn.id)
             continue
 
@@ -168,7 +188,7 @@ def validate_circuit(c: Circuit) -> list[dict]:
                 push("supply-note", "info", f"{r.placed.label}: {board_pin.id} — {note}", instanceId=link.instance_id, connectionId=conn.id)
 
         if r.pin.role == "signal" and is_gpio(board_pin):
-            add_user(link.board_instance_id, board_pin.id, conn.id, f"{r.placed.label} · {r.pin.name}", shared_bus_capability(r.pin))
+            add_user(link.board_instance_id, board_pin.id, conn.id, f"{r.placed.label} · {r.pin.name}", shared_bus_capability(r.pin), endpoint_key(module_ep(link.instance_id, link.module_pin_id)))
             if r.pin.max_input_voltage and board.logic_voltage > r.pin.max_input_voltage + 0.01:
                 push(
                     "module-input-overvoltage", "warning",
@@ -202,7 +222,9 @@ def validate_circuit(c: Circuit) -> list[dict]:
                     hint="켜기/끄기는 가능합니다. 밝기 조절이 필요하면 다른 PWM 핀으로 옮기세요.", instanceId=link.instance_id, connectionId=conn.id,
                 )
 
-    # ---------- 핀 충돌 ----------
+    # ---------- 핀 충돌 · 핀 공유 ----------
+    shared_pins: set[str] = set()
+    ladder = compute_ladder_resistors(c)
     for users in gpio_users.values():
         if len(users) < 2:
             continue
@@ -210,10 +232,38 @@ def validate_circuit(c: Circuit) -> list[dict]:
         if bus and all(u["bus"] == bus for u in users):
             continue
         prefix = f"{board_label(c, users[0]['boardInstanceId'])} " if len(c.boards) > 1 else ""
+        at = f"{prefix}{users[0]['pinId']}"
+        labels = ", ".join(u["label"] for u in users)
+        share = share_of(c, users[0]["key"])
+        target = resolve_board_pin(c, users[0]["boardInstanceId"], users[0]["pinId"])
+        kind = (
+            share_kind(c, [u["key"] for u in users], target.board if target else None, target.pin if target else None)
+            if share and all(u["key"] in share.members for u in users)
+            else None
+        )
+        if kind:
+            shared_pins.add(f"{users[0]['boardInstanceId']}:{users[0]['pinId']}")
+            rungs = [r for r in ladder if r["boardInstanceId"] == users[0]["boardInstanceId"] and r["boardPinId"] == users[0]["pinId"]]
+            if kind == "output":
+                message, hint = f"핀 공유: {at} 을(를) {labels} 이(가) 함께 씁니다. 같이 켜지고 꺼집니다.", None
+            elif kind == "input":
+                message = f"핀 공유: {at} 을(를) {labels} 이(가) 함께 씁니다. 어느 것을 눌러도 같은 신호가 되어 서로 구분할 수 없습니다."
+                hint = "Uno·Nano·Mega 의 아날로그 핀(A0 등)에 묶으면 저항 사다리로 어느 버튼인지 구분합니다."
+            else:
+                message = f"핀 공유: {at} 을(를) 버튼 {len(users)}개가 저항 사다리로 함께 씁니다 ({ladder_label(c, rungs)})."
+                hint = "버튼과 핀 사이에 직렬 저항을 넣고, 한 번에 버튼 하나만 누르세요. 코드는 analogRead 값으로 어느 버튼인지 구분합니다."
+            push("pin-shared", "info", message, hint=hint, connectionId=users[-1]["connectionId"], boardInstanceId=users[0]["boardInstanceId"])
+            continue
+        roles = [role_of_key(c, u["key"]) for u in users]
+        sharable = all(r is not None and r == roles[0] for r in roles)
         push(
             "pin-conflict", "error",
-            f"핀 충돌: {prefix}{users[0]['pinId']} 에 신호 {len(users)}개가 연결되어 있습니다 ({', '.join(u['label'] for u in users)}).",
-            hint="[자동 핀 배정]을 누르면 나중에 연결된 신호를 빈 핀으로 재배치합니다.",
+            f"핀 충돌: {at} 에 신호 {len(users)}개가 연결되어 있습니다 ({labels}).",
+            hint=(
+                "같은 핀을 일부러 함께 쓰려면 한 부품의 핀을 다른 부품의 핀에 끌어 놓아 핀 공유 그룹으로 묶으세요. 아니면 [자동 핀 배정]으로 빈 핀에 다시 배치합니다."
+                if sharable
+                else "[자동 핀 배정]을 누르면 나중에 연결된 신호를 빈 핀으로 재배치합니다."
+            ),
             connectionId=users[-1]["connectionId"], boardInstanceId=users[0]["boardInstanceId"],
         )
 
@@ -224,6 +274,25 @@ def validate_circuit(c: Circuit) -> list[dict]:
         if missing:
             hint = "모터는 보드에 바로 연결하지 않습니다. 모터 드라이버(L298N 등)를 추가하고 [자동 핀 배정]을 누르세요." if module.motor else "핀을 끌어 보드 핀에 연결하거나 [자동 핀 배정]을 사용하세요."
             push("unconnected", "warning", f"{item.label}: {', '.join(p.name for p in missing)} 미연결", hint=hint, instanceId=item.instance_id)
+        # 외부 전원이 꼭 필요한 전원 핀이 다른 부하(서보 등)에만 물려 있고 전원이 없으면
+        for pin in module.pins:
+            if pin.role != "power" or pin.external != "required" or not is_pin_connected(c.connections, item.instance_id, pin.id):
+                continue
+            key = endpoint_key(module_ep(item.instance_id, pin.id))
+            fed = False
+            for k in netlist.members.get(netlist.net_of(key), []):
+                e = parse_endpoint_key(k)
+                if isinstance(e, BoardEndpoint):
+                    fed = True
+                elif e is not None:
+                    r = resolve_module_pin(c, e)
+                    fed = fed or bool(r and r.pin.role == "source")
+            if not fed:
+                push(
+                    "supply-missing", "error",
+                    f"{item.label} · {pin.name}: 전원이 연결되어 있지 않습니다. 외부 전원 + 를 이 핀에 연결하세요.",
+                    hint="카드의 ⚡ 전원 필요 표시나 [전원] 탭에서 맞는 전원을 바로 연결할 수 있습니다.", instanceId=item.instance_id,
+                )
 
     # ---------- 전압 레벨 (넷 단위) ----------
     for f in analyze_levels(c, netlist):
@@ -277,6 +346,7 @@ def validate_circuit(c: Circuit) -> list[dict]:
     # ---------- 직렬 저항 · 전류 ----------
     gpio_ma: dict[str, float] = {}
     five_ma: dict[str, float] = {}
+    shared_ma: dict[str, dict] = {}
     for res in compute_series_resistors(c):
         item = c.placed_module(res["instanceId"])
         if res["status"] == "insufficient-voltage":
@@ -299,6 +369,10 @@ def validate_circuit(c: Circuit) -> list[dict]:
             )
         if target.pin and is_gpio(target.pin):
             gpio_ma[res["boardInstanceId"]] = gpio_ma.get(res["boardInstanceId"], 0) + ch["actualMa"]
+            pin_key = f"{res['boardInstanceId']}:{res['boardPinId']}"
+            if pin_key in shared_pins:
+                entry = shared_ma.setdefault(pin_key, {"ma": 0, "limit": target.board.io_pin_current_limit_ma, "boardInstanceId": res["boardInstanceId"], "pinId": res["boardPinId"]})
+                entry["ma"] += ch["actualMa"]
             if ch["actualMa"] > target.board.io_pin_current_limit_ma * 0.9:
                 push(
                     "led-near-limit", "warning",
@@ -312,6 +386,15 @@ def validate_circuit(c: Circuit) -> list[dict]:
                 f"{item.label}: {res['boardPinId']} 에 직접 연결되어 항상 켜져 있습니다 (직렬 저항 {format_ohms(ch['standardOhms'])}).",
                 instanceId=item.instance_id,
             )
+    for entry in shared_ma.values():
+        if entry["ma"] <= entry["limit"]:
+            continue
+        prefix = f"{board_label(c, entry['boardInstanceId'])} " if len(c.boards) > 1 else ""
+        push(
+            "pin-shared-current", "warning",
+            f"핀 공유: {prefix}{entry['pinId']} 에 함께 연결한 LED 전류 합계 약 {to_fixed(entry['ma'], 1)} mA 가 핀 권장 한계({js_str(entry['limit'])} mA)를 넘습니다.",
+            hint="LED 목표 전류를 낮추거나 트랜지스터로 구동하세요.", boardInstanceId=entry["boardInstanceId"],
+        )
     for bid, ma in gpio_ma.items():
         board = c.board_def(bid)
         if ma > board.total_current_limit_ma:

@@ -17,6 +17,9 @@ interface WorkspaceToolbarProps {
   wireStyle: WireStyle
   /** 새 전선의 경로 */
   route: RouteMode
+  /** 작업 화면: 배선도 또는 실물 배치 */
+  view: 'wiring' | 'layout'
+  onViewChange: (view: 'wiring' | 'layout') => void
   onBoardChange: (boardId: string) => void
   onAddBoard: () => void
   onAutoAssign: () => void
@@ -32,7 +35,7 @@ interface WorkspaceToolbarProps {
 }
 
 export function WorkspaceToolbar(props: WorkspaceToolbarProps) {
-  const { boards, board, boardLabel, boardCount, placedCount, connectionCount, canUndo, canRedo, wireStyle, route } = props
+  const { boards, board, boardLabel, boardCount, placedCount, connectionCount, canUndo, canRedo, wireStyle, route, view } = props
   return (
     <div className="workspace-toolbar" role="toolbar" aria-label="작업 공간 도구">
       <div className="workspace-toolbar__row">
@@ -42,6 +45,21 @@ export function WorkspaceToolbar(props: WorkspaceToolbarProps) {
             보드 <strong data-testid="board-count">{boardCount}</strong> · 부품 <strong data-testid="placed-count">{placedCount}</strong>개 · 연결{' '}
             <strong data-testid="connection-count">{connectionCount}</strong>개
           </span>
+          <span className="workspace-toolbar__route-label">보기</span>
+          <div className="segmented" role="group" aria-label="작업 화면">
+            <button type="button" aria-pressed={view === 'wiring'} onClick={() => props.onViewChange('wiring')} title="부품 핀과 전선을 보여 주는 배선도" data-testid="view-wiring">
+              배선도
+            </button>
+            <button
+              type="button"
+              aria-pressed={view === 'layout'}
+              onClick={() => props.onViewChange('layout')}
+              title="전선과 설명 없이 보드·부품을 실제 상대 크기로 보여 주고 끌어서 자리를 잡습니다"
+              data-testid="view-layout"
+            >
+              실물 배치
+            </button>
+          </div>
           <span className="workspace-toolbar__route-label">새 전선</span>
           <div className="segmented" role="group" aria-label="새 전선의 경로">
             <button type="button" aria-pressed={route === 'direct'} onClick={() => props.onRouteChange('direct')} title="부품 핀을 보드 핀에 바로 연결합니다" data-testid="route-direct">

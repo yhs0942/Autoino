@@ -20,6 +20,7 @@ from .engine.electrical import is_gpio, supply_pin_of
 from .engine.netlist import build_netlist
 from .engine.paths import route_to_board
 from .engine.resistor import compute_series_resistors, format_ohms
+from .engine.shares import compute_ladder_resistors, ladder_label, ladder_thresholds, share_board_pin, share_kind
 from .engine.validate import count_issues, validate_circuit
 from .models import BoardLink, PlacedBoard, PlacedModule
 
@@ -35,6 +36,7 @@ LIBRARY_INFO = {
     "Adafruit_NeoPixel": {"name": "Adafruit NeoPixel", "install": "라이브러리 관리자에서 'Adafruit NeoPixel' 설치", "builtIn": False},
     "TM1637Display": {"name": "TM1637", "install": "라이브러리 관리자에서 'TM1637' (Avishay Orpaz) 설치", "builtIn": False},
     "MFRC522": {"name": "MFRC522", "install": "라이브러리 관리자에서 'MFRC522' 설치", "builtIn": False},
+    "Adafruit_PWMServoDriver": {"name": "Adafruit PWM Servo Driver Library", "install": "라이브러리 관리자에서 'Adafruit PWM Servo Driver Library' 설치", "builtIn": False},
 }
 
 MOTOR_SPEED = 180  # analogWrite 값 (0–255). 모터 예시 속도
@@ -115,6 +117,28 @@ def code_board_of(c: Circuit, item: PlacedModule, traced=None) -> str | None:
         return route.board_instance_id
     host = host_board_of(c, item)
     return host.instance_id if host else None
+
+
+def _servo_driver_channel(c: Circuit, item: PlacedModule) -> tuple[PlacedModule, int] | None:
+    """서보 신호선이 서보 드라이버(PCA9685) 채널에 연결되어 있으면 (드라이버, 채널 번호)"""
+    module = c.module_def(item.module_id)
+    signal = next((p.id for p in module.pins if p.role == "signal"), None) if module else None
+    if not signal:
+        return None
+    for conn in c.connections:
+        ends = [conn.from_, conn.to]
+        mine = [e for e in ends if getattr(e, "instance_id", None) == item.instance_id and e.pin_id == signal]
+        other = [e for e in ends if getattr(e, "instance_id", None) and e.instance_id != item.instance_id]
+        if not mine or not other:
+            continue
+        driver = c.placed_module(other[0].instance_id)
+        dmod = c.module_def(driver.module_id) if driver else None
+        if not dmod or not dmod.driver:
+            continue
+        for index, ch in enumerate(dmod.driver.channels):
+            if other[0].pin_id in ch.outputs and "servo" in ch.accepts:
+                return driver, index
+    return None
 
 
 def pin_expr(c: Circuit, board_instance_id: str, pin_id: str) -> str:
@@ -214,8 +238,67 @@ def _sketch_for(c: Circuit, board: PlacedBoard, project_name: str, now: datetime
         pin_rows.append(f" *   {item.label} · {pin.name} → {board_pin}{via}{extra}")
         return name
 
+    # ---------- 핀 공유 그룹 ----------
+    # 같은 보드 핀을 함께 쓰는 부품은 첫 부품의 코드가 그 핀을 다루고, 나머지는 설명만 남긴다.
+    # 저항 사다리는 첫 버튼 자리에서 analogRead 로 눌린 버튼을 구분하는 코드를 만든다.
+    shared: dict[str, dict] = {}
+    ladder = compute_ladder_resistors(c)
+    for share in c.shares:
+        target = share_board_pin(c, share)
+        if not target or target[0] != board.instance_id:
+            continue
+        on = [k for k in share.members if _module_pin(c, traced, c.placed_module(k.split(":")[1]), k.rsplit(":", 1)[1], board.instance_id) == target[1]] if all(c.placed_module(k.split(":")[1]) for k in share.members) else []
+        rp = resolve_board_pin(c, target[0], target[1])
+        kind = share_kind(c, on, rp.board if rp else None, rp.pin if rp else None)
+        if not kind:
+            continue
+        labels = ", ".join(c.placed_module(k.split(":")[1]).label for k in on)
+        for k in on:
+            shared[k] = {"kind": kind, "first": on[0], "members": on, "pin": target[1], "labels": labels}
+
+    def share_note(item: PlacedModule, pin_id: str) -> dict | None:
+        return shared.get(f"module:{item.instance_id}:{pin_id}")
+
     for item in hosted:
         module = c.module_def(item.module_id)
+        signal = next((p.id for p in module.pins if p.role == "signal"), None)
+        group = share_note(item, signal) if signal else None
+        if group and group["first"] != f"module:{item.instance_id}:{signal}":
+            first = c.placed_module(group["first"].split(":")[1])
+            how = {"output": "같이 켜지고 꺼집니다", "input": "어느 쪽을 눌러도 같이 읽힙니다", "ladder": "저항 사다리 코드에서 함께 읽습니다"}[group["kind"]]
+            b.globals.append(f"// {item.label}: {first.label} 와(과) 같은 핀({group['pin']})을 함께 씁니다 (핀 공유) — {how}.")
+            if group["kind"] != "ladder":  # 사다리는 첫 버튼 자리에서 저항값과 함께 적는다
+                pin_rows.append(f" *   {item.label} · {module.pin(signal).name} → {group['pin']} (핀 공유)")
+            continue
+        if group:
+            b.globals.append(f"// 핀 공유: {group['labels']} 이(가) {group['pin']} 을(를) 함께 씁니다.")
+        if group and group["kind"] == "ladder":
+            rungs = [r for r in ladder if r["boardInstanceId"] == board.instance_id and r["boardPinId"] == group["pin"]]
+            names = [_ident("button", c.placed_module(r["instanceId"]).label, used_names) for r in rungs]
+            lname = _ident("ladder", group["pin"], used_names)
+            upper = lname.upper()
+            p = const(f"{upper}_PIN", item, signal, group["pin"], f" — 버튼 {len(rungs)}개 저항 사다리 ({ladder_label(c, rungs)})")
+            for r in rungs[1:]:
+                other = c.placed_module(r["instanceId"])
+                pin_rows.append(f" *   {other.label} · {c.module_def(other.module_id).pin(r['pinId']).name} → {group['pin']} (사다리 저항 {format_ohms(r['ohms'])})")
+            limits = ", ".join(str(v) for v in ladder_thresholds(len(rungs)))
+            b.globals.append(f"const int {upper}_LIMITS[] = {{{limits}}};  // analogRead 경계: 이 값보다 작으면 그 순서의 버튼")
+            b.globals.append(f"const char* const {upper}_NAMES[] = {{{', '.join(f'"{n}"' for n in names)}}};")
+            b.globals.append(f"int {lname}Last = -1;")
+            b.globals.append(f"unsigned long timer_{lname} = 0;")
+            b.setup.append(f"  pinMode({p}, INPUT_PULLUP);  // 내부 풀업(20–50 kΩ)이 사다리의 위쪽 저항 역할을 합니다")
+            b.loop.append(f"  // 버튼 사다리 {group['pin']}: 20 ms 마다 읽어 눌린 버튼을 알려 줌 (한 번에 하나만 누르세요)")
+            b.loop.append(f"  if (every(timer_{lname}, 20)) {{")
+            b.loop.append(f"    int v = analogRead({p});")
+            b.loop.append("    int pressed = -1;")
+            b.loop.append(f"    for (int i = 0; i < {len(rungs)}; i++) if (v < {upper}_LIMITS[i]) {{ pressed = i; break; }}")
+            b.loop.append(f"    if (pressed != {lname}Last) {{")
+            b.loop.append(f"      {lname}Last = pressed;")
+            b.loop.append(f'      if (pressed < 0) Serial.println("{lname}: released");')
+            b.loop.append(f'      else {{ Serial.print({upper}_NAMES[pressed]); Serial.println(": pressed"); }}')
+            b.loop.append("    }")
+            b.loop.append("  }")
+            continue
         spec = module.code
         template = spec.template if spec else None
         base = BASE_NAMES.get(item.module_id) or (spec.base if spec else None)
@@ -287,6 +370,55 @@ def _sketch_for(c: Circuit, board: PlacedBoard, project_name: str, now: datetime
                 )
             b.loop.append(f"  // {item.label}: 0.2초마다 거리 측정")
             b.loop.append(f"  if (every(timer_{name}, 200)) {{ {name}Cm = readDistanceCm({t}, {e}); Serial.print(\"{name} cm: \"); Serial.println({name}Cm); }}")
+        elif template in ("servo", "servo-continuous") and _servo_driver_channel(c, item):
+            driver, index = _servo_driver_channel(c, item)
+            b.globals.append(f"// {item.label}: {driver.label} 의 채널 {index} 에서 제어합니다 (아래 서보 드라이버 코드).")
+        elif template == "pca9685":
+            pins = role_pins("sda", "scl")
+            if not pins:
+                continue
+            if i2c_peripheral:
+                b.warnings.append(f"{item.label}: 이 보드는 I²C 주변장치로 설정되어 있어 직접 제어하는 코드를 만들지 않았습니다.")
+                b.globals.append(f"// {item.label}: 이 보드가 I²C 주변장치라 제어 코드를 생략했습니다.")
+                continue
+            const(f"{upper}_SDA", item, spec.pins["sda"], pins["sda"], " (I²C SDA, Wire 가 사용)", declare=False)
+            const(f"{upper}_SCL", item, spec.pins["scl"], pins["scl"], " (I²C SCL, Wire 가 사용)", declare=False)
+            wire_begin()
+            b.include("Adafruit_PWMServoDriver.h", "Adafruit_PWMServoDriver")
+            address = module.i2c_address or "0x40"
+            b.globals.append(f"Adafruit_PWMServoDriver {name}({address});  // {item.label} (I²C {address})")
+            b.setup.append(f"  {name}.begin();")
+            b.setup.append(f"  {name}.setOscillatorFrequency(27000000);")
+            b.setup.append(f"  {name}.setPWMFreq(50);  // 서보 펄스 주기 50 Hz (20 ms)")
+            attached = []
+            for other in c.placed:
+                found = _servo_driver_channel(c, other)
+                if found and found[0].instance_id == item.instance_id:
+                    attached.append((found[1], other))
+            attached.sort(key=lambda x: x[0])
+            if not attached:
+                b.globals.append(f"// {item.label}: 아직 연결된 서보가 없습니다. 서보 카드를 이 드라이버 카드에 끌어다 놓으세요.")
+            for index, servo in attached:
+                sname = _ident("servo", servo.label, used_names)
+                smod = c.module_def(servo.module_id)
+                pin_rows.append(f" *   {servo.label} · 신호 → {item.label} 채널 {index}")
+                b.globals.append(f"unsigned long timer_{sname} = 0;")
+                if smod.code and smod.code.template == "servo-continuous":
+                    b.globals.append(f"uint8_t {sname}State = 0;")
+                    b.setup.append(f"  {name}.writeMicroseconds({index}, 1500);  // {servo.label}: 정지")
+                    b.loop.append(f"  // {servo.label} (채널 {index}): 정방향 → 정지 → 역방향 → 정지 (2초 간격)")
+                    b.loop.append(f"  if (every(timer_{sname}, 2000)) {{")
+                    b.loop.append(f"    {sname}State = ({sname}State + 1) % 4;")
+                    b.loop.append(f"    {name}.writeMicroseconds({index}, {sname}State == 1 ? 1700 : {sname}State == 3 ? 1300 : 1500);")
+                    b.loop.append("  }")
+                else:
+                    b.globals.append(f"int {sname}Angle = 0, {sname}Step = 2;")
+                    b.loop.append(f"  // {servo.label} (채널 {index}): 0°–180° 왕복 (펄스 500–2500 µs)")
+                    b.loop.append(f"  if (every(timer_{sname}, 20)) {{")
+                    b.loop.append(f"    {sname}Angle += {sname}Step;")
+                    b.loop.append(f"    if ({sname}Angle <= 0 || {sname}Angle >= 180) {sname}Step = -{sname}Step;")
+                    b.loop.append(f"    {name}.writeMicroseconds({index}, map({sname}Angle, 0, 180, 500, 2500));")
+                    b.loop.append("  }")
         elif template in ("servo", "servo-continuous", "esc"):
             pins = role_pins("signal")
             if not pins:
