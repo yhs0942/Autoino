@@ -1,0 +1,11 @@
+.assignment-table tbody tr {
+  cursor: pointer;
+}
+
+.assignment-table tbody tr:hover {
+  background: var(--surface-muted);
+}
+
+.assignment-table tbody tr.is-continued td {
+  border-top-color: transparent;
+}

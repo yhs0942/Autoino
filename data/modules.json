@@ -1,0 +1,5005 @@
+[
+  {
+    "id": "led-5mm",
+    "name": "LED",
+    "nameEn": "LED",
+    "category": "output",
+    "icon": "icons/led.svg",
+    "description": "일반 5 mm 발광 다이오드입니다. 전류 제한 저항과 직렬로 연결해야 합니다.",
+    "pins": [
+      {
+        "id": "anode",
+        "name": "애노드 (+)",
+        "role": "signal",
+        "description": "긴 다리. 저항을 거쳐 출력 핀에 연결합니다.",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "cathode",
+        "name": "캐소드 (−)",
+        "role": "ground",
+        "description": "짧은 다리. GND 에 연결합니다.",
+        "requires": []
+      }
+    ],
+    "parameters": [
+      {
+        "id": "color",
+        "label": "색상",
+        "defaultValue": "red",
+        "note": "색상별 순방향 전압(Vf)은 5 mm LED 의 대표값이며 제품마다 다릅니다.",
+        "options": [
+          {
+            "value": "red",
+            "label": "빨강 (Vf ≈ 2.0 V)",
+            "number": 2
+          },
+          {
+            "value": "yellow",
+            "label": "노랑 (Vf ≈ 2.1 V)",
+            "number": 2.1
+          },
+          {
+            "value": "green",
+            "label": "초록 (Vf ≈ 2.2 V)",
+            "number": 2.2
+          },
+          {
+            "value": "blue",
+            "label": "파랑 (Vf ≈ 3.0 V)",
+            "number": 3
+          },
+          {
+            "value": "white",
+            "label": "흰색 (Vf ≈ 3.0 V)",
+            "number": 3
+          }
+        ]
+      },
+      {
+        "id": "current",
+        "label": "목표 전류",
+        "defaultValue": "10",
+        "note": "아두이노 I/O 핀의 권장 최대 전류는 20 mA 입니다.",
+        "options": [
+          {
+            "value": "5",
+            "label": "5 mA (어둡게)",
+            "number": 5
+          },
+          {
+            "value": "10",
+            "label": "10 mA (권장)",
+            "number": 10
+          },
+          {
+            "value": "15",
+            "label": "15 mA",
+            "number": 15
+          },
+          {
+            "value": "20",
+            "label": "20 mA (최대)",
+            "number": 20
+          }
+        ]
+      }
+    ],
+    "seriesResistor": {
+      "pinId": "anode",
+      "forwardVoltageParam": "color",
+      "currentParam": "current"
+    },
+    "electrical": [
+      {
+        "label": "순방향 전압 (Vf)",
+        "value": "약 1.8–3.3 V",
+        "confidence": "varies",
+        "note": "색상에 따라 다릅니다. 빨강 ≈ 2 V, 파랑·흰색 ≈ 3 V 수준이 일반적입니다."
+      },
+      {
+        "label": "순방향 전류",
+        "value": "보통 20 mA 이하",
+        "confidence": "typical",
+        "note": "제품 데이터시트를 확인하세요."
+      }
+    ],
+    "tags": [
+      "led",
+      "엘이디",
+      "발광",
+      "light",
+      "pwm"
+    ],
+    "notes": [
+      "직렬 저항은 (공급 전압 − Vf) ÷ 목표 전류로 계산하여 E12 표준값 중 가까운 큰 값을 고릅니다."
+    ]
+  },
+  {
+    "id": "push-button",
+    "name": "푸시 버튼",
+    "nameEn": "Push Button",
+    "category": "input",
+    "icon": "icons/button.svg",
+    "description": "4핀 택트 스위치입니다. 마주 보는 두 핀 쌍은 내부적으로 연결되어 있습니다.",
+    "pins": [
+      {
+        "id": "pin1a",
+        "name": "1A",
+        "role": "ground",
+        "description": "1B 와 내부 연결. INPUT_PULLUP 방식에서는 GND 에 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "pin1b",
+        "name": "1B",
+        "role": "passive",
+        "description": "1A 와 내부 연결",
+        "requires": []
+      },
+      {
+        "id": "pin2a",
+        "name": "2A",
+        "role": "signal",
+        "description": "2B 와 내부 연결. 입력 핀 쪽에 사용합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in",
+        "pull": "up"
+      },
+      {
+        "id": "pin2b",
+        "name": "2B",
+        "role": "passive",
+        "description": "2A 와 내부 연결",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "전원",
+        "value": "불필요 (수동 소자)",
+        "confidence": "official"
+      },
+      {
+        "label": "정격 전압·전류",
+        "value": "제품별 상이",
+        "confidence": "varies",
+        "note": "일반적인 택트 스위치는 12 V / 50 mA 정도의 소신호용입니다."
+      }
+    ],
+    "typicalCurrentMa": 0,
+    "tags": [
+      "button",
+      "switch",
+      "스위치",
+      "택트",
+      "tact",
+      "입력"
+    ],
+    "notes": [
+      "풀업 또는 풀다운 저항이 필요합니다. 아두이노 내부 풀업(INPUT_PULLUP)을 사용할 수 있습니다."
+    ],
+    "internalConnections": [
+      [
+        "pin1a",
+        "pin1b"
+      ],
+      [
+        "pin2a",
+        "pin2b"
+      ]
+    ]
+  },
+  {
+    "id": "hc-sr04",
+    "name": "HC-SR04 초음파 센서",
+    "nameEn": "HC-SR04 Ultrasonic Sensor",
+    "category": "sensor",
+    "icon": "icons/hc-sr04.svg",
+    "description": "초음파를 발사하고 반사되어 돌아오는 시간을 측정하여 거리를 계산하는 센서입니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "5 V 전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5,
+        "typicalMa": 15,
+        "peakMa": 15
+      },
+      {
+        "id": "trig",
+        "name": "Trig",
+        "role": "signal",
+        "description": "트리거 입력 (10 µs 펄스)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "echo",
+        "name": "Echo",
+        "role": "signal",
+        "description": "에코 출력 (거리에 비례하는 펄스)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "5 V DC",
+        "confidence": "official"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 15 mA",
+        "confidence": "typical"
+      },
+      {
+        "label": "Echo 출력 레벨",
+        "value": "5 V",
+        "confidence": "typical",
+        "note": "3.3 V 보드에 연결할 때는 전압 분배가 필요합니다."
+      },
+      {
+        "label": "측정 거리",
+        "value": "약 2–400 cm",
+        "confidence": "typical"
+      }
+    ],
+    "typicalCurrentMa": 15,
+    "tags": [
+      "ultrasonic",
+      "초음파",
+      "거리",
+      "distance",
+      "sonar",
+      "hcsr04"
+    ],
+    "notes": [
+      "3.3 V 동작이 가능한 변형 제품(HC-SR04P 등)도 있으므로 제품을 확인하세요.",
+      "5 V 로 구동하면 Echo 출력이 5 V 입니다. 3.3 V 보드(ESP32 등)에는 전압 분배기나 레벨 시프터를 거쳐 연결하세요."
+    ]
+  },
+  {
+    "id": "sg90",
+    "name": "SG90 서보 모터",
+    "nameEn": "SG90 Micro Servo",
+    "category": "motor",
+    "icon": "icons/sg90.svg",
+    "description": "약 180° 범위에서 각도를 제어할 수 있는 소형 서보 모터입니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND (갈색)",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC (빨강)",
+        "role": "power",
+        "description": "전원 (약 5 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.8,
+        "maxVoltage": 6,
+        "typicalMa": 250,
+        "peakMa": 650,
+        "external": "recommended"
+      },
+      {
+        "id": "signal",
+        "name": "Signal (주황)",
+        "role": "signal",
+        "description": "제어 펄스 입력. Servo 라이브러리는 일반 디지털 핀에서도 동작합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "약 4.8–6 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작·스톨 전류",
+        "value": "동작 약 250 mA, 스톨 약 650 mA",
+        "confidence": "varies",
+        "note": "부하 시 수백 mA 까지 흐를 수 있어 별도 전원 사용을 권장합니다."
+      },
+      {
+        "label": "제어 신호",
+        "value": "50 Hz PWM, 약 1–2 ms 펄스",
+        "confidence": "typical"
+      }
+    ],
+    "boardPowerWarning": "서보는 움직일 때 순간 전류가 커서 보드 5V 핀으로 구동하면 보드가 리셋될 수 있습니다. 외부 5 V 전원(GND 공통)을 권장합니다.",
+    "tags": [
+      "servo",
+      "서보",
+      "motor",
+      "모터",
+      "sg90",
+      "pwm"
+    ],
+    "library": "Servo",
+    "notes": [
+      "Uno·Nano 에서 Servo 라이브러리를 사용하면 D9, D10 의 analogWrite(PWM)를 쓸 수 없습니다.",
+      "ESP32 에서는 ESP32Servo 라이브러리를 사용합니다 (표준 Servo 라이브러리는 ESP32 미지원)."
+    ],
+    "libraryByCore": {
+      "arduino-esp32": "ESP32Servo"
+    },
+    "code": {
+      "template": "servo",
+      "base": "servo",
+      "pins": {
+        "signal": "signal"
+      }
+    }
+  },
+  {
+    "id": "i2c-lcd-1602",
+    "name": "I²C LCD 1602",
+    "nameEn": "I2C LCD 1602",
+    "category": "display",
+    "icon": "icons/i2c-lcd.svg",
+    "description": "16×2 문자 LCD 에 I²C 변환 모듈(PCF8574 계열)이 부착된 디스플레이입니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "5 V 전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5,
+        "typicalMa": 25,
+        "peakMa": 40
+      },
+      {
+        "id": "sda",
+        "name": "SDA",
+        "role": "signal",
+        "description": "I²C 데이터",
+        "requires": [
+          "i2c-sda"
+        ],
+        "direction": "inout",
+        "highLevel": "supply"
+      },
+      {
+        "id": "scl",
+        "name": "SCL",
+        "role": "signal",
+        "description": "I²C 클록",
+        "requires": [
+          "i2c-scl"
+        ],
+        "direction": "out",
+        "highLevel": "supply"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "5 V",
+        "confidence": "typical",
+        "note": "3.3 V 전용 제품도 있습니다."
+      },
+      {
+        "label": "I²C 주소",
+        "value": "0x27 또는 0x3F 등",
+        "confidence": "varies",
+        "note": "변환 칩 종류와 점퍼 설정에 따라 다릅니다. I²C 스캐너로 확인하세요."
+      },
+      {
+        "label": "소비 전류",
+        "value": "제품별 상이",
+        "confidence": "varies",
+        "note": "백라이트 사용 여부에 따라 달라집니다."
+      }
+    ],
+    "i2cAddress": "0x27",
+    "tags": [
+      "lcd",
+      "i2c",
+      "display",
+      "디스플레이",
+      "1602",
+      "16x2",
+      "pcf8574",
+      "화면"
+    ],
+    "library": "LiquidCrystal_I2C",
+    "notes": [
+      "백라이트 밝기와 대비는 모듈 뒷면의 가변저항으로 조절합니다.",
+      "대부분의 I²C 변환 모듈은 SDA/SCL 을 모듈 VCC 로 풀업합니다. 5 V 로 구동하면 3.3 V 보드(ESP32 등)의 SDA/SCL 에 5 V 가 걸리므로 레벨 변환이 필요합니다."
+    ]
+  },
+  {
+    "id": "voltage-divider",
+    "name": "전압 분배기",
+    "nameEn": "Voltage Divider",
+    "category": "interface",
+    "icon": "icons/voltage-divider.svg",
+    "description": "저항 두 개로 신호 전압을 낮춥니다. 5 V 센서 출력(예: HC-SR04 Echo)을 3.3 V 보드 입력에 연결할 때 사용합니다.",
+    "pins": [
+      {
+        "id": "in",
+        "name": "IN",
+        "role": "passive",
+        "description": "높은 전압 신호 입력 (위쪽 저항 R1)",
+        "requires": []
+      },
+      {
+        "id": "out",
+        "name": "OUT",
+        "role": "passive",
+        "description": "낮춘 신호 출력 (R1 과 R2 사이)",
+        "requires": [],
+        "highLevel": {
+          "fromPin": "in",
+          "ratioParam": "ratio"
+        }
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "아래쪽 저항 R2 의 접지",
+        "requires": []
+      }
+    ],
+    "parameters": [
+      {
+        "id": "ratio",
+        "label": "저항 조합 (R1 / R2)",
+        "defaultValue": "1k-2k",
+        "note": "출력 전압 = 입력 × R2 ÷ (R1 + R2). 5 V 입력 기준 1 kΩ/2 kΩ → 약 3.33 V.",
+        "options": [
+          {
+            "value": "1k-2k",
+            "label": "1 kΩ / 2 kΩ (×0.67)",
+            "number": 0.6667
+          },
+          {
+            "value": "10k-20k",
+            "label": "10 kΩ / 20 kΩ (×0.67)",
+            "number": 0.6667
+          },
+          {
+            "value": "2k2-3k3",
+            "label": "2.2 kΩ / 3.3 kΩ (×0.60)",
+            "number": 0.6
+          },
+          {
+            "value": "1k-1k5",
+            "label": "1 kΩ / 1.5 kΩ (×0.60)",
+            "number": 0.6
+          }
+        ],
+        "bom": true
+      }
+    ],
+    "passThrough": [
+      [
+        "in",
+        "out"
+      ]
+    ],
+    "typicalCurrentMa": 0,
+    "electrical": [
+      {
+        "label": "출력 전압",
+        "value": "입력 × R2 ÷ (R1 + R2)",
+        "confidence": "official"
+      },
+      {
+        "label": "적합한 신호",
+        "value": "단방향 · 저속 신호",
+        "confidence": "typical",
+        "note": "I²C 같은 양방향 신호나 고속 신호에는 레벨 시프터를 사용하세요."
+      }
+    ],
+    "tags": [
+      "divider",
+      "분배기",
+      "level",
+      "레벨",
+      "저항",
+      "3.3v",
+      "5v"
+    ],
+    "notes": [
+      "저항값이 클수록 소비 전류는 작지만 신호가 느려집니다. Echo 처럼 느린 신호에는 1 kΩ/2 kΩ 가 일반적입니다."
+    ]
+  },
+  {
+    "id": "level-shifter-4ch",
+    "name": "레벨 시프터 (4채널)",
+    "nameEn": "4-channel Bidirectional Logic Level Converter (BSS138)",
+    "category": "interface",
+    "icon": "icons/level-shifter.svg",
+    "description": "MOSFET(BSS138) 방식의 양방향 논리 레벨 변환 모듈입니다. 5 V 와 3.3 V 장치 사이의 I²C·UART 등 신호를 변환합니다.",
+    "pins": [
+      {
+        "id": "hv",
+        "name": "HV",
+        "role": "power",
+        "description": "높은 쪽 전압 (예: 5 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3,
+        "maxVoltage": 12,
+        "typicalMa": 1,
+        "peakMa": 1
+      },
+      {
+        "id": "lv",
+        "name": "LV",
+        "role": "power",
+        "description": "낮은 쪽 전압 (예: 3.3 V)",
+        "requires": [],
+        "supplyVoltage": 3.3,
+        "minVoltage": 1.8,
+        "maxVoltage": 5,
+        "typicalMa": 1,
+        "peakMa": 1
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "공통 접지",
+        "requires": []
+      },
+      {
+        "id": "hv1",
+        "name": "HV1",
+        "role": "passive",
+        "description": "1번 채널 높은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "hv"
+        }
+      },
+      {
+        "id": "hv2",
+        "name": "HV2",
+        "role": "passive",
+        "description": "2번 채널 높은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "hv"
+        }
+      },
+      {
+        "id": "hv3",
+        "name": "HV3",
+        "role": "passive",
+        "description": "3번 채널 높은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "hv"
+        }
+      },
+      {
+        "id": "hv4",
+        "name": "HV4",
+        "role": "passive",
+        "description": "4번 채널 높은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "hv"
+        }
+      },
+      {
+        "id": "lv1",
+        "name": "LV1",
+        "role": "passive",
+        "description": "1번 채널 낮은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "lv"
+        }
+      },
+      {
+        "id": "lv2",
+        "name": "LV2",
+        "role": "passive",
+        "description": "2번 채널 낮은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "lv"
+        }
+      },
+      {
+        "id": "lv3",
+        "name": "LV3",
+        "role": "passive",
+        "description": "3번 채널 낮은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "lv"
+        }
+      },
+      {
+        "id": "lv4",
+        "name": "LV4",
+        "role": "passive",
+        "description": "4번 채널 낮은 전압 쪽",
+        "requires": [],
+        "highLevel": {
+          "powerPin": "lv"
+        }
+      }
+    ],
+    "passThrough": [
+      [
+        "hv1",
+        "lv1"
+      ],
+      [
+        "hv2",
+        "lv2"
+      ],
+      [
+        "hv3",
+        "lv3"
+      ],
+      [
+        "hv4",
+        "lv4"
+      ]
+    ],
+    "electrical": [
+      {
+        "label": "HV / LV",
+        "value": "HV 5 V, LV 3.3 V (일반적인 사용)",
+        "confidence": "typical"
+      },
+      {
+        "label": "채널 구조",
+        "value": "채널마다 HV·LV 양쪽에 풀업 저항",
+        "confidence": "typical",
+        "note": "제품마다 풀업 저항값(보통 10 kΩ)이 다릅니다."
+      },
+      {
+        "label": "최대 속도",
+        "value": "제품별 상이",
+        "confidence": "varies",
+        "note": "I²C 표준 모드(100 kHz)는 대부분 문제없습니다."
+      }
+    ],
+    "tags": [
+      "level",
+      "shifter",
+      "converter",
+      "레벨",
+      "시프터",
+      "변환",
+      "bss138",
+      "i2c",
+      "3.3v",
+      "5v"
+    ],
+    "notes": [
+      "HV 에는 높은 쪽 전원(5 V), LV 에는 낮은 쪽 전원(3.3 V)을 연결하고 GND 를 공통으로 연결해야 합니다."
+    ]
+  },
+  {
+    "id": "external-power",
+    "name": "외부 전원",
+    "nameEn": "External DC Power Supply",
+    "category": "power",
+    "icon": "icons/external-power.svg",
+    "description": "DC 어댑터·배터리 같은 외부 전원입니다. 전압과 최대 전류를 고른 뒤 + 는 부품 전원에, − 는 GND 에 연결합니다.",
+    "pins": [
+      {
+        "id": "plus",
+        "name": "+ 출력",
+        "role": "source",
+        "description": "전원 + 단자. 여러 부품에 나눠 연결할 수 있습니다.",
+        "requires": [],
+        "voltageParam": "voltage",
+        "currentParam": "current",
+        "fanout": true
+      },
+      {
+        "id": "minus",
+        "name": "− GND",
+        "role": "ground",
+        "description": "전원 − 단자. 보드 GND 와 공통으로 연결해야 신호가 통합니다.",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "parameters": [
+      {
+        "id": "voltage",
+        "label": "출력 전압",
+        "defaultValue": "12",
+        "note": "연결된 부품의 허용 전압을 넘으면 [검사]에서 오류로 표시됩니다.",
+        "options": [
+          {
+            "value": "3.7",
+            "label": "3.7 V (리튬 1셀)",
+            "number": 3.7
+          },
+          {
+            "value": "4.8",
+            "label": "4.8 V (니켈수소 4셀)",
+            "number": 4.8
+          },
+          {
+            "value": "5",
+            "label": "5 V",
+            "number": 5
+          },
+          {
+            "value": "6",
+            "label": "6 V (AA 4개)",
+            "number": 6
+          },
+          {
+            "value": "7.4",
+            "label": "7.4 V (리튬 2셀)",
+            "number": 7.4
+          },
+          {
+            "value": "7.5",
+            "label": "7.5 V",
+            "number": 7.5
+          },
+          {
+            "value": "9",
+            "label": "9 V",
+            "number": 9
+          },
+          {
+            "value": "11.1",
+            "label": "11.1 V (리튬 3셀)",
+            "number": 11.1
+          },
+          {
+            "value": "12",
+            "label": "12 V",
+            "number": 12
+          },
+          {
+            "value": "14.8",
+            "label": "14.8 V (리튬 4셀)",
+            "number": 14.8
+          },
+          {
+            "value": "24",
+            "label": "24 V",
+            "number": 24
+          }
+        ],
+        "bom": true
+      },
+      {
+        "id": "current",
+        "label": "최대 전류",
+        "defaultValue": "2000",
+        "note": "전원이 안정적으로 낼 수 있는 전류입니다. 어댑터 라벨이나 배터리 방전 정격을 확인하세요.",
+        "options": [
+          {
+            "value": "300",
+            "label": "300 mA",
+            "number": 300
+          },
+          {
+            "value": "500",
+            "label": "500 mA",
+            "number": 500
+          },
+          {
+            "value": "1000",
+            "label": "1 A",
+            "number": 1000
+          },
+          {
+            "value": "2000",
+            "label": "2 A",
+            "number": 2000
+          },
+          {
+            "value": "2400",
+            "label": "2.4 A",
+            "number": 2400
+          },
+          {
+            "value": "3000",
+            "label": "3 A",
+            "number": 3000
+          },
+          {
+            "value": "5000",
+            "label": "5 A",
+            "number": 5000
+          },
+          {
+            "value": "10000",
+            "label": "10 A",
+            "number": 10000
+          },
+          {
+            "value": "30000",
+            "label": "30 A",
+            "number": 30000
+          }
+        ],
+        "bom": true
+      }
+    ],
+    "electrical": [
+      {
+        "label": "출력",
+        "value": "설정한 전압·최대 전류",
+        "confidence": "varies",
+        "note": "실제 제품의 라벨을 기준으로 설정하세요."
+      },
+      {
+        "label": "연결 원칙",
+        "value": "− 를 보드 GND 와 공통으로",
+        "confidence": "official",
+        "note": "GND 가 공통이 아니면 제어 신호의 기준 전압이 달라 동작하지 않습니다."
+      }
+    ],
+    "tags": [
+      "power",
+      "전원",
+      "외부",
+      "어댑터",
+      "adapter",
+      "배터리",
+      "battery",
+      "dc",
+      "supply"
+    ],
+    "notes": [
+      "오른쪽 [전원] 탭에서 이 회로에 맞는 전압·전류와 전원 예시를 확인하고 바로 적용할 수 있습니다.",
+      "보드 자체도 외부 전원으로 돌리려면 + 를 VIN 에 연결하세요 (Uno 7–12 V). USB 를 함께 연결해도 됩니다."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "buck-lm2596",
+    "name": "벅 컨버터 (LM2596)",
+    "nameEn": "LM2596 Buck Converter",
+    "category": "power",
+    "icon": "icons/buck-converter.svg",
+    "description": "높은 전압을 낮은 전압으로 효율 좋게 낮춥니다. 12 V 전원 하나로 5 V 서보·보드까지 함께 구동할 때 씁니다.",
+    "pins": [
+      {
+        "id": "vin",
+        "name": "IN+",
+        "role": "power",
+        "description": "입력 + (4.5–40 V, 출력보다 1.5 V 이상 높게)",
+        "requires": [],
+        "supplyVoltage": 12,
+        "minVoltage": 4.5,
+        "maxVoltage": 40,
+        "typicalMa": 5,
+        "peakMa": 10,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "IN−",
+        "role": "ground",
+        "description": "입력 −",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "vout",
+        "name": "OUT+",
+        "role": "source",
+        "description": "조절된 출력 +. 쓰기 전에 가변저항으로 전압을 맞추세요.",
+        "requires": [],
+        "voltageParam": "output",
+        "maxCurrentMa": 2000,
+        "fanout": true
+      },
+      {
+        "id": "gnd2",
+        "name": "OUT−",
+        "role": "ground",
+        "description": "출력 − (입력 − 와 연결됨)",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "internalConnections": [
+      [
+        "gnd",
+        "gnd2"
+      ]
+    ],
+    "parameters": [
+      {
+        "id": "output",
+        "label": "출력 전압 (가변저항으로 조절)",
+        "defaultValue": "5",
+        "note": "연결하기 전에 멀티미터로 출력 전압을 꼭 확인하세요.",
+        "options": [
+          {
+            "value": "3.3",
+            "label": "3.3 V",
+            "number": 3.3
+          },
+          {
+            "value": "5",
+            "label": "5 V",
+            "number": 5
+          },
+          {
+            "value": "6",
+            "label": "6 V",
+            "number": 6
+          },
+          {
+            "value": "7.4",
+            "label": "7.4 V",
+            "number": 7.4
+          },
+          {
+            "value": "9",
+            "label": "9 V",
+            "number": 9
+          },
+          {
+            "value": "12",
+            "label": "12 V",
+            "number": 12
+          }
+        ],
+        "bom": true
+      }
+    ],
+    "regulator": {
+      "inputPin": "vin",
+      "dropVoltage": 1.5
+    },
+    "electrical": [
+      {
+        "label": "입력 전압",
+        "value": "약 4.5–40 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "출력 전압",
+        "value": "약 1.25–35 V (입력보다 1.5 V 이상 낮게)",
+        "confidence": "typical"
+      },
+      {
+        "label": "출력 전류",
+        "value": "연속 약 2 A (최대 3 A, 방열 필요)",
+        "confidence": "varies"
+      }
+    ],
+    "tags": [
+      "buck",
+      "벅",
+      "컨버터",
+      "강압",
+      "lm2596",
+      "dcdc",
+      "regulator",
+      "전원"
+    ],
+    "notes": [
+      "출고 시 출력 전압이 맞춰져 있지 않습니다. 부품을 연결하기 전에 멀티미터로 조정하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "mb102-power",
+    "name": "브레드보드 전원 모듈 (MB102)",
+    "nameEn": "MB102 Breadboard Power Module",
+    "category": "power",
+    "icon": "icons/buck-converter.svg",
+    "description": "브레드보드 레일에 꽂아 5 V 와 3.3 V 를 공급합니다. 소형 센서·LED 처럼 전류가 작은 회로에 적합합니다.",
+    "pins": [
+      {
+        "id": "vin",
+        "name": "IN",
+        "role": "power",
+        "description": "입력 (6.5–12 V, 배럴잭)",
+        "requires": [],
+        "supplyVoltage": 9,
+        "minVoltage": 6.5,
+        "maxVoltage": 12,
+        "typicalMa": 5,
+        "peakMa": 10,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "입력·출력 공통 접지",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "v5",
+        "name": "5V",
+        "role": "source",
+        "description": "5 V 출력",
+        "requires": [],
+        "supplyVoltage": 5,
+        "maxCurrentMa": 700,
+        "fanout": true
+      },
+      {
+        "id": "v33",
+        "name": "3.3V",
+        "role": "source",
+        "description": "3.3 V 출력",
+        "requires": [],
+        "supplyVoltage": 3.3,
+        "maxCurrentMa": 700,
+        "fanout": true
+      }
+    ],
+    "regulator": {
+      "inputPin": "vin",
+      "dropVoltage": 1.5
+    },
+    "electrical": [
+      {
+        "label": "입력 전압",
+        "value": "6.5–12 V (또는 USB 5 V)",
+        "confidence": "typical"
+      },
+      {
+        "label": "출력",
+        "value": "3.3 V / 5 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "출력 전류",
+        "value": "약 700 mA 이하",
+        "confidence": "varies",
+        "note": "선형 레귤레이터라 입력 전압이 높을수록 많이 뜨거워집니다."
+      }
+    ],
+    "tags": [
+      "mb102",
+      "브레드보드",
+      "breadboard",
+      "전원",
+      "power",
+      "3.3v",
+      "5v"
+    ],
+    "notes": [
+      "모터 구동용으로는 전류가 부족합니다."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "dc-motor-130",
+    "name": "130 소형 DC 모터",
+    "nameEn": "130 Size DC Motor",
+    "category": "motor",
+    "icon": "icons/dc-motor.svg",
+    "description": "장난감·교육용으로 흔한 소형 브러시 DC 모터입니다. 속도가 빠르고 토크가 작습니다.",
+    "pins": [
+      {
+        "id": "m1",
+        "name": "M+ 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 보드 핀에 직접 연결하면 안 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "m2",
+        "name": "M− 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 두 단자를 바꾸면 회전 방향이 바뀝니다.",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "dc",
+      "minVoltage": 3,
+      "maxVoltage": 6,
+      "nominalVoltage": 6,
+      "typicalMa": 250,
+      "peakMa": 1500
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3–6 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 250 mA",
+        "confidence": "varies",
+        "note": "부하에 따라 크게 달라집니다."
+      },
+      {
+        "label": "기동·스톨 전류",
+        "value": "약 1.5 A",
+        "confidence": "varies",
+        "note": "전원과 드라이버는 이 전류를 견뎌야 합니다."
+      }
+    ],
+    "tags": [
+      "motor",
+      "모터",
+      "dc",
+      "130",
+      "brushed",
+      "소형"
+    ],
+    "notes": [
+      "모터는 GPIO 로 직접 구동할 수 없습니다. 모터 드라이버를 거쳐 외부 전원으로 구동하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "dc-gear-tt",
+    "name": "TT 기어드 모터",
+    "nameEn": "TT Gearbox DC Motor",
+    "category": "motor",
+    "icon": "icons/gear-motor.svg",
+    "description": "2WD·4WD 로봇카에 많이 쓰는 1:48 기어드 모터입니다.",
+    "pins": [
+      {
+        "id": "m1",
+        "name": "M+ 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 보드 핀에 직접 연결하면 안 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "m2",
+        "name": "M− 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 두 단자를 바꾸면 회전 방향이 바뀝니다.",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "dc",
+      "minVoltage": 3,
+      "maxVoltage": 6,
+      "nominalVoltage": 6,
+      "typicalMa": 160,
+      "peakMa": 1500
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3–6 V",
+        "confidence": "official"
+      },
+      {
+        "label": "무부하 전류",
+        "value": "약 150–160 mA",
+        "confidence": "typical",
+        "note": "Adafruit 측정값 기준입니다."
+      },
+      {
+        "label": "스톨 전류",
+        "value": "약 1.1 A (3 V) – 1.5 A (6 V)",
+        "confidence": "typical",
+        "note": "기어비·제품에 따라 다릅니다."
+      }
+    ],
+    "tags": [
+      "motor",
+      "모터",
+      "dc",
+      "tt",
+      "기어",
+      "gear",
+      "로봇카",
+      "robot"
+    ],
+    "notes": [
+      "모터는 GPIO 로 직접 구동할 수 없습니다. 모터 드라이버를 거쳐 외부 전원으로 구동하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "dc-gear-n20",
+    "name": "N20 미니 기어드 모터",
+    "nameEn": "N20 Micro Gear Motor",
+    "category": "motor",
+    "icon": "icons/gear-motor.svg",
+    "description": "금속 기어가 달린 아주 작은 모터입니다. 소형 로봇에 알맞습니다.",
+    "pins": [
+      {
+        "id": "m1",
+        "name": "M+ 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 보드 핀에 직접 연결하면 안 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "m2",
+        "name": "M− 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 두 단자를 바꾸면 회전 방향이 바뀝니다.",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "dc",
+      "minVoltage": 3,
+      "maxVoltage": 6,
+      "nominalVoltage": 6,
+      "typicalMa": 100,
+      "peakMa": 700
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3–6 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 100 mA",
+        "confidence": "varies",
+        "note": "부하에 따라 크게 달라집니다."
+      },
+      {
+        "label": "기동·스톨 전류",
+        "value": "약 700 mA",
+        "confidence": "varies",
+        "note": "전원과 드라이버는 이 전류를 견뎌야 합니다."
+      }
+    ],
+    "tags": [
+      "motor",
+      "모터",
+      "dc",
+      "n20",
+      "기어",
+      "gear",
+      "미니",
+      "micro"
+    ],
+    "notes": [
+      "모터는 GPIO 로 직접 구동할 수 없습니다. 모터 드라이버를 거쳐 외부 전원으로 구동하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "dc-gear-25ga370",
+    "name": "25GA-370 기어드 모터 (12 V)",
+    "nameEn": "25GA-370 12 V Gear Motor",
+    "category": "motor",
+    "icon": "icons/gear-motor.svg",
+    "description": "토크가 큰 12 V 기어드 모터입니다. 무거운 로봇이나 메커니즘 구동에 씁니다.",
+    "pins": [
+      {
+        "id": "m1",
+        "name": "M+ 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 보드 핀에 직접 연결하면 안 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "m2",
+        "name": "M− 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 두 단자를 바꾸면 회전 방향이 바뀝니다.",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "dc",
+      "minVoltage": 6,
+      "maxVoltage": 12,
+      "nominalVoltage": 12,
+      "typicalMa": 350,
+      "peakMa": 2500
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "6–12 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 350 mA",
+        "confidence": "varies",
+        "note": "부하에 따라 크게 달라집니다."
+      },
+      {
+        "label": "기동·스톨 전류",
+        "value": "약 2.5 A",
+        "confidence": "varies",
+        "note": "전원과 드라이버는 이 전류를 견뎌야 합니다."
+      }
+    ],
+    "tags": [
+      "motor",
+      "모터",
+      "dc",
+      "25ga",
+      "370",
+      "기어",
+      "gear",
+      "12v"
+    ],
+    "notes": [
+      "모터는 GPIO 로 직접 구동할 수 없습니다. 모터 드라이버를 거쳐 외부 전원으로 구동하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "vibration-motor",
+    "name": "코인 진동 모터",
+    "nameEn": "Coin Vibration Motor",
+    "category": "motor",
+    "icon": "icons/vibration-motor.svg",
+    "description": "손목밴드·게임패드 같은 촉각 피드백에 쓰는 작은 진동 모터입니다.",
+    "pins": [
+      {
+        "id": "m1",
+        "name": "M+ 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 보드 핀에 직접 연결하면 안 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "m2",
+        "name": "M− 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 두 단자를 바꾸면 회전 방향이 바뀝니다.",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "dc",
+      "minVoltage": 2,
+      "maxVoltage": 3.6,
+      "nominalVoltage": 3,
+      "typicalMa": 75,
+      "peakMa": 120
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "2–3.6 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 75 mA",
+        "confidence": "varies",
+        "note": "부하에 따라 크게 달라집니다."
+      },
+      {
+        "label": "기동·스톨 전류",
+        "value": "약 120 mA",
+        "confidence": "varies",
+        "note": "전원과 드라이버는 이 전류를 견뎌야 합니다."
+      }
+    ],
+    "tags": [
+      "motor",
+      "모터",
+      "dc",
+      "vibration",
+      "진동",
+      "haptic",
+      "coin"
+    ],
+    "notes": [
+      "모터는 GPIO 로 직접 구동할 수 없습니다. 모터 드라이버를 거쳐 외부 전원으로 구동하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "dc-pump-mini",
+    "name": "미니 워터 펌프",
+    "nameEn": "Mini Submersible Water Pump",
+    "category": "motor",
+    "icon": "icons/water-pump.svg",
+    "description": "물을 옮기는 소형 수중 펌프입니다. 자동 화분·정수 실험에 씁니다. 방향을 바꿀 필요가 없어 릴레이로도 켤 수 있습니다.",
+    "pins": [
+      {
+        "id": "m1",
+        "name": "M+ 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 보드 핀에 직접 연결하면 안 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "m2",
+        "name": "M− 단자",
+        "role": "load",
+        "description": "모터 드라이버 출력에 연결합니다. 두 단자를 바꾸면 회전 방향이 바뀝니다.",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "dc",
+      "minVoltage": 3,
+      "maxVoltage": 6,
+      "nominalVoltage": 5,
+      "typicalMa": 200,
+      "peakMa": 800
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3–6 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 200 mA",
+        "confidence": "varies",
+        "note": "부하에 따라 크게 달라집니다."
+      },
+      {
+        "label": "기동·스톨 전류",
+        "value": "약 800 mA",
+        "confidence": "varies",
+        "note": "전원과 드라이버는 이 전류를 견뎌야 합니다."
+      }
+    ],
+    "tags": [
+      "motor",
+      "모터",
+      "dc",
+      "pump",
+      "펌프",
+      "물",
+      "water",
+      "화분"
+    ],
+    "notes": [
+      "모터는 GPIO 로 직접 구동할 수 없습니다. 모터 드라이버를 거쳐 외부 전원으로 구동하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "mg90s",
+    "name": "MG90S 서보 모터",
+    "nameEn": "MG90S Metal Gear Micro Servo",
+    "category": "motor",
+    "icon": "icons/sg90.svg",
+    "description": "금속 기어로 SG90 보다 튼튼한 마이크로 서보입니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND (갈색)",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC (빨강)",
+        "role": "power",
+        "description": "전원 (4.8–6 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.8,
+        "maxVoltage": 6,
+        "typicalMa": 250,
+        "peakMa": 1200,
+        "external": "recommended"
+      },
+      {
+        "id": "signal",
+        "name": "Signal (주황)",
+        "role": "signal",
+        "description": "제어 펄스 입력. Servo 라이브러리는 일반 디지털 핀에서도 동작합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "4.8–6 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 250 mA",
+        "confidence": "varies"
+      },
+      {
+        "label": "스톨 전류",
+        "value": "약 1.2 A",
+        "confidence": "varies",
+        "note": "여러 개를 쓰면 스톨 전류의 합을 기준으로 전원을 고르세요."
+      },
+      {
+        "label": "토크",
+        "value": "약 1.8–2.2 kg·cm",
+        "confidence": "varies"
+      }
+    ],
+    "boardPowerWarning": "서보는 움직일 때 순간 전류가 커서 보드 5V 핀으로 구동하면 보드가 리셋될 수 있습니다. 외부 5 V 전원(GND 공통)을 권장합니다.",
+    "tags": [
+      "servo",
+      "서보",
+      "motor",
+      "모터",
+      "mg90s",
+      "금속기어",
+      "pwm"
+    ],
+    "library": "Servo",
+    "libraryByCore": {
+      "arduino-esp32": "ESP32Servo"
+    },
+    "notes": [
+      "Uno·Nano 에서 Servo 라이브러리를 사용하면 D9, D10 의 analogWrite(PWM)를 쓸 수 없습니다.",
+      "스톨 전류는 제품마다 0.7–1.5 A 로 차이가 큽니다."
+    ],
+    "code": {
+      "template": "servo",
+      "base": "servo",
+      "pins": {
+        "signal": "signal"
+      }
+    }
+  },
+  {
+    "id": "mg996r",
+    "name": "MG996R 서보 모터",
+    "nameEn": "MG996R High Torque Servo",
+    "category": "motor",
+    "icon": "icons/servo-large.svg",
+    "description": "큰 토크를 내는 표준 크기 서보입니다. 로봇 팔 관절에 많이 씁니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND (갈색)",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC (빨강)",
+        "role": "power",
+        "description": "전원 (4.8–7.2 V)",
+        "requires": [],
+        "supplyVoltage": 6,
+        "minVoltage": 4.8,
+        "maxVoltage": 7.2,
+        "typicalMa": 700,
+        "peakMa": 2500,
+        "external": "recommended"
+      },
+      {
+        "id": "signal",
+        "name": "Signal (주황)",
+        "role": "signal",
+        "description": "제어 펄스 입력. Servo 라이브러리는 일반 디지털 핀에서도 동작합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "4.8–7.2 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 700 mA",
+        "confidence": "varies"
+      },
+      {
+        "label": "스톨 전류",
+        "value": "약 2.5 A",
+        "confidence": "varies",
+        "note": "여러 개를 쓰면 스톨 전류의 합을 기준으로 전원을 고르세요."
+      },
+      {
+        "label": "토크",
+        "value": "약 9.4 kg·cm (4.8 V) – 11 kg·cm (6 V)",
+        "confidence": "varies"
+      }
+    ],
+    "boardPowerWarning": "서보는 움직일 때 순간 전류가 커서 보드 5V 핀으로 구동하면 보드가 리셋될 수 있습니다. 외부 5 V 전원(GND 공통)을 권장합니다.",
+    "tags": [
+      "servo",
+      "서보",
+      "motor",
+      "모터",
+      "mg996r",
+      "고토크",
+      "로봇팔",
+      "pwm"
+    ],
+    "library": "Servo",
+    "libraryByCore": {
+      "arduino-esp32": "ESP32Servo"
+    },
+    "notes": [
+      "Uno·Nano 에서 Servo 라이브러리를 사용하면 D9, D10 의 analogWrite(PWM)를 쓸 수 없습니다.",
+      "여러 개를 쓸 때는 5–6 V 고전류 전원이 필수입니다."
+    ],
+    "code": {
+      "template": "servo",
+      "base": "servo",
+      "pins": {
+        "signal": "signal"
+      }
+    }
+  },
+  {
+    "id": "fs90r",
+    "name": "FS90R 연속 회전 서보",
+    "nameEn": "FS90R Continuous Rotation Servo",
+    "category": "motor",
+    "icon": "icons/sg90.svg",
+    "description": "각도 대신 회전 방향과 속도를 제어하는 360° 서보입니다. 소형 바퀴 구동에 씁니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND (갈색)",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC (빨강)",
+        "role": "power",
+        "description": "전원 (4.8–6 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.8,
+        "maxVoltage": 6,
+        "typicalMa": 200,
+        "peakMa": 800,
+        "external": "recommended"
+      },
+      {
+        "id": "signal",
+        "name": "Signal (주황)",
+        "role": "signal",
+        "description": "제어 펄스 입력. Servo 라이브러리는 일반 디지털 핀에서도 동작합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "4.8–6 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 200 mA",
+        "confidence": "varies"
+      },
+      {
+        "label": "스톨 전류",
+        "value": "약 800 mA",
+        "confidence": "varies",
+        "note": "여러 개를 쓰면 스톨 전류의 합을 기준으로 전원을 고르세요."
+      },
+      {
+        "label": "토크",
+        "value": "약 1.3 kg·cm",
+        "confidence": "varies"
+      }
+    ],
+    "boardPowerWarning": "서보는 움직일 때 순간 전류가 커서 보드 5V 핀으로 구동하면 보드가 리셋될 수 있습니다. 외부 5 V 전원(GND 공통)을 권장합니다.",
+    "tags": [
+      "servo",
+      "서보",
+      "motor",
+      "모터",
+      "fs90r",
+      "360",
+      "연속회전",
+      "continuous",
+      "pwm"
+    ],
+    "library": "Servo",
+    "libraryByCore": {
+      "arduino-esp32": "ESP32Servo"
+    },
+    "notes": [
+      "Uno·Nano 에서 Servo 라이브러리를 사용하면 D9, D10 의 analogWrite(PWM)를 쓸 수 없습니다.",
+      "write(90) 부근이 정지입니다. 제품마다 정지 값이 조금씩 다릅니다."
+    ],
+    "code": {
+      "template": "servo-continuous",
+      "base": "servo",
+      "pins": {
+        "signal": "signal"
+      }
+    }
+  },
+  {
+    "id": "stepper-28byj48",
+    "name": "28BYJ-48 스테퍼 모터 (5 V)",
+    "nameEn": "28BYJ-48 5 V Unipolar Stepper",
+    "category": "motor",
+    "icon": "icons/stepper-motor.svg",
+    "description": "기어가 달린 저렴한 5 V 유니폴라 스테퍼 모터입니다. ULN2003 드라이버 보드와 함께 씁니다.",
+    "pins": [
+      {
+        "id": "a",
+        "name": "A (파랑)",
+        "role": "load",
+        "description": "ULN2003 보드 커넥터에 꽂습니다.",
+        "requires": []
+      },
+      {
+        "id": "b",
+        "name": "B (분홍)",
+        "role": "load",
+        "description": "ULN2003 보드 커넥터에 꽂습니다.",
+        "requires": []
+      },
+      {
+        "id": "c",
+        "name": "C (노랑)",
+        "role": "load",
+        "description": "ULN2003 보드 커넥터에 꽂습니다.",
+        "requires": []
+      },
+      {
+        "id": "d",
+        "name": "D (주황)",
+        "role": "load",
+        "description": "ULN2003 보드 커넥터에 꽂습니다.",
+        "requires": []
+      },
+      {
+        "id": "com",
+        "name": "COM (빨강)",
+        "role": "load",
+        "description": "코일 공통 + (5 V)",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "stepper-unipolar",
+      "minVoltage": 4.5,
+      "maxVoltage": 5.5,
+      "nominalVoltage": 5,
+      "typicalMa": 240,
+      "peakMa": 300
+    },
+    "electrical": [
+      {
+        "label": "정격 전압",
+        "value": "5 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "전류",
+        "value": "총 약 240 mA",
+        "confidence": "varies",
+        "note": "상당 전류는 자료마다 80–240 mA 로 다릅니다."
+      },
+      {
+        "label": "회전당 스텝",
+        "value": "약 2048 스텝 (풀스텝, 기어비 1:64 근사)",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "stepper",
+      "스테퍼",
+      "28byj",
+      "motor",
+      "모터",
+      "유니폴라",
+      "unipolar"
+    ],
+    "notes": [
+      "12 V 제품도 있으니 라벨을 확인하세요."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "stepper-nema17",
+    "name": "NEMA 17 스테퍼 모터",
+    "nameEn": "NEMA 17 Bipolar Stepper (17HS4401)",
+    "category": "motor",
+    "icon": "icons/stepper-motor.svg",
+    "description": "3D 프린터·CNC 에 쓰는 강한 바이폴라 스테퍼 모터입니다. A4988·DRV8825 같은 전류 제어 드라이버가 필요합니다.",
+    "pins": [
+      {
+        "id": "a1",
+        "name": "A+ 코일",
+        "role": "load",
+        "description": "드라이버 1A",
+        "requires": []
+      },
+      {
+        "id": "a2",
+        "name": "A− 코일",
+        "role": "load",
+        "description": "드라이버 1B",
+        "requires": []
+      },
+      {
+        "id": "b1",
+        "name": "B+ 코일",
+        "role": "load",
+        "description": "드라이버 2A",
+        "requires": []
+      },
+      {
+        "id": "b2",
+        "name": "B− 코일",
+        "role": "load",
+        "description": "드라이버 2B",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "stepper-bipolar",
+      "minVoltage": 8,
+      "maxVoltage": 35,
+      "nominalVoltage": 12,
+      "typicalMa": 1000,
+      "peakMa": 2000
+    },
+    "electrical": [
+      {
+        "label": "상 전류",
+        "value": "1.7 A (17HS4401 기준)",
+        "confidence": "typical",
+        "note": "드라이버의 전류 제한을 모터 정격에 맞춰 조정하세요."
+      },
+      {
+        "label": "권장 전원",
+        "value": "12–24 V",
+        "confidence": "typical",
+        "note": "전류 제어 드라이버를 쓰므로 코일 정격 전압보다 높은 전원을 씁니다."
+      },
+      {
+        "label": "전원 측 전류",
+        "value": "약 1 A (모터 1개, 12 V)",
+        "confidence": "varies",
+        "note": "전류 제어 드라이버에서는 전원 전류가 상 전류보다 작습니다."
+      }
+    ],
+    "tags": [
+      "stepper",
+      "스테퍼",
+      "nema",
+      "nema17",
+      "motor",
+      "모터",
+      "바이폴라",
+      "bipolar",
+      "cnc",
+      "3d"
+    ],
+    "notes": [
+      "코일 짝을 잘못 연결하면 떨기만 하고 돌지 않습니다."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "bldc-a2212",
+    "name": "BLDC 모터 (A2212)",
+    "nameEn": "A2212 Brushless Motor",
+    "category": "motor",
+    "icon": "icons/bldc-motor.svg",
+    "description": "드론·RC 에 쓰는 고속 브러시리스 모터입니다. ESC 로 구동합니다.",
+    "pins": [
+      {
+        "id": "a",
+        "name": "A 상",
+        "role": "load",
+        "description": "ESC 출력에 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "b",
+        "name": "B 상",
+        "role": "load",
+        "description": "ESC 출력에 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c",
+        "name": "C 상",
+        "role": "load",
+        "description": "ESC 출력에 연결합니다. 두 선을 바꾸면 회전 방향이 바뀝니다.",
+        "requires": []
+      }
+    ],
+    "motor": {
+      "kind": "bldc",
+      "minVoltage": 7.4,
+      "maxVoltage": 11.1,
+      "nominalVoltage": 11.1,
+      "typicalMa": 5000,
+      "peakMa": 13000
+    },
+    "electrical": [
+      {
+        "label": "권장 전원",
+        "value": "2–3S 리튬폴리머 (7.4–11.1 V)",
+        "confidence": "typical"
+      },
+      {
+        "label": "전류",
+        "value": "수 A – 약 13 A",
+        "confidence": "varies",
+        "note": "프로펠러 크기와 스로틀에 따라 크게 달라집니다."
+      }
+    ],
+    "tags": [
+      "bldc",
+      "브러시리스",
+      "brushless",
+      "a2212",
+      "드론",
+      "drone",
+      "motor",
+      "모터"
+    ],
+    "notes": [
+      "프로펠러를 빼고 시험하세요. 시동 중 갑자기 돌 수 있습니다."
+    ],
+    "code": {
+      "template": "none"
+    }
+  },
+  {
+    "id": "l298n",
+    "name": "L298N 모터 드라이버",
+    "nameEn": "L298N Dual H-Bridge Motor Driver",
+    "category": "driver",
+    "icon": "icons/motor-driver.svg",
+    "description": "DC 모터 2개를 방향·속도 제어하는 가장 흔한 드라이버 모듈입니다. 전압 강하가 커서 모터 전압이 약 2 V 낮아집니다.",
+    "pins": [
+      {
+        "id": "vs",
+        "name": "12V",
+        "role": "power",
+        "description": "모터 전원 입력 (7–35 V, 12 V 넘으면 5V-EN 점퍼 제거)",
+        "requires": [],
+        "supplyVoltage": 12,
+        "minVoltage": 7,
+        "maxVoltage": 35,
+        "typicalMa": 40,
+        "peakMa": 60,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "모터 전원 − 와 보드 GND 를 함께 연결합니다.",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "v5",
+        "name": "5V",
+        "role": "passive",
+        "description": "VS ≤ 12 V 이고 5V-EN 점퍼가 끼워져 있으면 모듈이 5 V 를 만들므로 연결하지 않습니다. 점퍼를 뺐을 때만 보드 5V 에 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "ena",
+        "name": "ENA",
+        "role": "signal",
+        "description": "채널 A 속도 (PWM). 점퍼를 빼고 연결합니다.",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "in1",
+        "name": "IN1",
+        "role": "signal",
+        "description": "채널 A 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "in2",
+        "name": "IN2",
+        "role": "signal",
+        "description": "채널 A 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "in3",
+        "name": "IN3",
+        "role": "signal",
+        "description": "채널 B 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "in4",
+        "name": "IN4",
+        "role": "signal",
+        "description": "채널 B 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "enb",
+        "name": "ENB",
+        "role": "signal",
+        "description": "채널 B 속도 (PWM). 점퍼를 빼고 연결합니다.",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "out1",
+        "name": "OUT1",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "out2",
+        "name": "OUT2",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "out3",
+        "name": "OUT3",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "out4",
+        "name": "OUT4",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "vs",
+      "dropVoltage": 2,
+      "channelMa": 2000,
+      "channelPeakMa": 3000,
+      "channels": [
+        {
+          "id": "a",
+          "label": "모터 A",
+          "outputs": [
+            "out1",
+            "out2"
+          ],
+          "inputs": [
+            "ena",
+            "in1",
+            "in2"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        },
+        {
+          "id": "b",
+          "label": "모터 B",
+          "outputs": [
+            "out3",
+            "out4"
+          ],
+          "inputs": [
+            "enb",
+            "in3",
+            "in4"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "모터 전원을 보드 5V 에서 가져오면 보드가 리셋되거나 손상될 수 있습니다. 외부 전원을 연결하세요.",
+    "electrical": [
+      {
+        "label": "모터 전압",
+        "value": "7–35 V",
+        "confidence": "typical",
+        "note": "모듈의 5 V 레귤레이터를 쓰는 기준입니다. 7 V 보다 낮으면 5V-EN 점퍼를 빼고 5V 핀에 보드 5V 를 넣어야 합니다."
+      },
+      {
+        "label": "채널당 전류",
+        "value": "연속 약 2 A",
+        "confidence": "typical"
+      },
+      {
+        "label": "전압 강하",
+        "value": "약 2 V",
+        "confidence": "typical",
+        "note": "데이터시트 기준 1 A 에서 1.8–3.2 V 입니다."
+      },
+      {
+        "label": "로직 입력",
+        "value": "3.3 V·5 V 호환",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "l298n",
+      "l298",
+      "드라이버",
+      "driver",
+      "모터",
+      "motor",
+      "h-bridge",
+      "h브리지"
+    ],
+    "notes": [
+      "ENA/ENB 점퍼를 끼운 채로 두면 항상 최고 속도입니다. 속도를 제어하려면 점퍼를 빼고 PWM 핀에 연결하세요.",
+      "전압 강하가 커서 저전압 모터에는 TB6612FNG 나 DRV8833 이 더 낫습니다.",
+      "7 V 미만에서는 모듈의 5 V 레귤레이터가 제대로 동작하지 않습니다. 저전압 모터에는 TB6612FNG 나 DRV8833 을 쓰세요."
+    ],
+    "code": {
+      "template": "h-bridge",
+      "base": "motor",
+      "scheme": "en-in1-in2"
+    },
+    "setupNote": "쓰는 채널의 ENA·ENB 점퍼를 빼야 PWM 으로 속도를 조절할 수 있습니다."
+  },
+  {
+    "id": "tb6612fng",
+    "name": "TB6612FNG 모터 드라이버",
+    "nameEn": "TB6612FNG Dual Motor Driver",
+    "category": "driver",
+    "icon": "icons/motor-driver.svg",
+    "description": "효율이 좋고 전압 강하가 작은 2채널 드라이버입니다. 3.3 V 보드(ESP32)와도 잘 맞습니다.",
+    "pins": [
+      {
+        "id": "vm",
+        "name": "VM",
+        "role": "power",
+        "description": "모터 전원 (2.5–13.5 V)",
+        "requires": [],
+        "supplyVoltage": 6,
+        "minVoltage": 2.5,
+        "maxVoltage": 13.5,
+        "typicalMa": 2,
+        "peakMa": 3,
+        "external": "required"
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "로직 전원 (2.7–5.5 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 2.7,
+        "maxVoltage": 5.5,
+        "typicalMa": 2,
+        "peakMa": 3,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "모터 전원 − 와 보드 GND 를 함께 연결합니다.",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "stby",
+        "name": "STBY",
+        "role": "signal",
+        "description": "HIGH 여야 동작합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "pwma",
+        "name": "PWMA",
+        "role": "signal",
+        "description": "채널 A 속도",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "ain1",
+        "name": "AIN1",
+        "role": "signal",
+        "description": "채널 A 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "ain2",
+        "name": "AIN2",
+        "role": "signal",
+        "description": "채널 A 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "bin1",
+        "name": "BIN1",
+        "role": "signal",
+        "description": "채널 B 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "bin2",
+        "name": "BIN2",
+        "role": "signal",
+        "description": "채널 B 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "pwmb",
+        "name": "PWMB",
+        "role": "signal",
+        "description": "채널 B 속도",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "ao1",
+        "name": "AO1",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "ao2",
+        "name": "AO2",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "bo1",
+        "name": "BO1",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "bo2",
+        "name": "BO2",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "vm",
+      "dropVoltage": 0.5,
+      "channelMa": 1200,
+      "channelPeakMa": 3200,
+      "channels": [
+        {
+          "id": "a",
+          "label": "모터 A",
+          "outputs": [
+            "ao1",
+            "ao2"
+          ],
+          "inputs": [
+            "pwma",
+            "ain1",
+            "ain2"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        },
+        {
+          "id": "b",
+          "label": "모터 B",
+          "outputs": [
+            "bo1",
+            "bo2"
+          ],
+          "inputs": [
+            "pwmb",
+            "bin1",
+            "bin2"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "모터 전원을 보드 5V 에서 가져오면 보드가 리셋되거나 손상될 수 있습니다. 외부 전원을 연결하세요.",
+    "electrical": [
+      {
+        "label": "모터 전압 (VM)",
+        "value": "2.5–13.5 V",
+        "confidence": "typical",
+        "note": "제품 설명에 따라 하한을 4.5 V 로 적기도 합니다."
+      },
+      {
+        "label": "로직 전압 (VCC)",
+        "value": "2.7–5.5 V",
+        "confidence": "official"
+      },
+      {
+        "label": "채널당 전류",
+        "value": "연속 1.2 A, 최대 3.2 A",
+        "confidence": "official"
+      }
+    ],
+    "tags": [
+      "tb6612",
+      "tb6612fng",
+      "드라이버",
+      "driver",
+      "모터",
+      "motor",
+      "h-bridge",
+      "esp32"
+    ],
+    "notes": [
+      "STBY 를 LOW 로 두면 모터가 돌지 않습니다."
+    ],
+    "code": {
+      "template": "h-bridge",
+      "base": "motor",
+      "scheme": "en-in1-in2",
+      "standbyPin": "stby"
+    }
+  },
+  {
+    "id": "l9110s",
+    "name": "L9110S 모터 드라이버",
+    "nameEn": "L9110S Dual Motor Driver",
+    "category": "driver",
+    "icon": "icons/motor-driver.svg",
+    "description": "작고 저렴한 2채널 드라이버입니다. 소형 DC 모터에 알맞습니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원 (2.5–12 V, 로직과 모터 공용)",
+        "requires": [],
+        "supplyVoltage": 6,
+        "minVoltage": 2.5,
+        "maxVoltage": 12,
+        "typicalMa": 5,
+        "peakMa": 10,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "모터 전원 − 와 보드 GND 를 함께 연결합니다.",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "aia",
+        "name": "A-IA",
+        "role": "signal",
+        "description": "채널 A 속도·방향",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "aib",
+        "name": "A-IB",
+        "role": "signal",
+        "description": "채널 A 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "bia",
+        "name": "B-IA",
+        "role": "signal",
+        "description": "채널 B 속도·방향",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "bib",
+        "name": "B-IB",
+        "role": "signal",
+        "description": "채널 B 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "oa1",
+        "name": "MA+",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "oa2",
+        "name": "MA−",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "ob1",
+        "name": "MB+",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "ob2",
+        "name": "MB−",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "vcc",
+      "dropVoltage": 1,
+      "channelMa": 800,
+      "channelPeakMa": 1500,
+      "channels": [
+        {
+          "id": "a",
+          "label": "모터 A",
+          "outputs": [
+            "oa1",
+            "oa2"
+          ],
+          "inputs": [
+            "aia",
+            "aib"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        },
+        {
+          "id": "b",
+          "label": "모터 B",
+          "outputs": [
+            "ob1",
+            "ob2"
+          ],
+          "inputs": [
+            "bia",
+            "bib"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "모터 전원을 보드 5V 에서 가져오면 보드가 리셋되거나 손상될 수 있습니다. 외부 전원을 연결하세요.",
+    "electrical": [
+      {
+        "label": "전원",
+        "value": "2.5–12 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "채널당 전류",
+        "value": "연속 약 800 mA",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "l9110",
+      "l9110s",
+      "드라이버",
+      "driver",
+      "모터",
+      "motor",
+      "h-bridge"
+    ],
+    "notes": [
+      "큰 모터에는 전류가 부족합니다."
+    ],
+    "code": {
+      "template": "h-bridge",
+      "base": "motor",
+      "scheme": "in1-in2"
+    }
+  },
+  {
+    "id": "drv8833",
+    "name": "DRV8833 모터 드라이버",
+    "nameEn": "DRV8833 Dual Motor Driver",
+    "category": "driver",
+    "icon": "icons/motor-driver.svg",
+    "description": "저전압 소형 모터용 2채널 드라이버입니다. 전류 제한이 있어 TT 모터에 잘 맞습니다.",
+    "pins": [
+      {
+        "id": "vm",
+        "name": "VM",
+        "role": "power",
+        "description": "모터 전원 (2.7–10.8 V)",
+        "requires": [],
+        "supplyVoltage": 6,
+        "minVoltage": 2.7,
+        "maxVoltage": 10.8,
+        "typicalMa": 3,
+        "peakMa": 5,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "모터 전원 − 와 보드 GND 를 함께 연결합니다.",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "slp",
+        "name": "SLP",
+        "role": "passive",
+        "description": "슬립 입력. 대부분의 모듈은 풀업되어 있어 연결하지 않아도 동작합니다.",
+        "requires": []
+      },
+      {
+        "id": "ain1",
+        "name": "AIN1",
+        "role": "signal",
+        "description": "채널 A",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "ain2",
+        "name": "AIN2",
+        "role": "signal",
+        "description": "채널 A",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "bin1",
+        "name": "BIN1",
+        "role": "signal",
+        "description": "채널 B",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "bin2",
+        "name": "BIN2",
+        "role": "signal",
+        "description": "채널 B",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "ao1",
+        "name": "AO1",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "ao2",
+        "name": "AO2",
+        "role": "drive",
+        "description": "모터 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "bo1",
+        "name": "BO1",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "bo2",
+        "name": "BO2",
+        "role": "drive",
+        "description": "모터 B",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "vm",
+      "dropVoltage": 0.5,
+      "channelMa": 1500,
+      "channelPeakMa": 2000,
+      "channels": [
+        {
+          "id": "a",
+          "label": "모터 A",
+          "outputs": [
+            "ao1",
+            "ao2"
+          ],
+          "inputs": [
+            "ain1",
+            "ain2"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        },
+        {
+          "id": "b",
+          "label": "모터 B",
+          "outputs": [
+            "bo1",
+            "bo2"
+          ],
+          "inputs": [
+            "bin1",
+            "bin2"
+          ],
+          "accepts": [
+            "dc"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "모터 전원을 보드 5V 에서 가져오면 보드가 리셋되거나 손상될 수 있습니다. 외부 전원을 연결하세요.",
+    "electrical": [
+      {
+        "label": "모터 전압",
+        "value": "2.7–10.8 V",
+        "confidence": "official"
+      },
+      {
+        "label": "채널당 전류",
+        "value": "약 1.5 A (최대 2 A)",
+        "confidence": "official"
+      }
+    ],
+    "tags": [
+      "drv8833",
+      "드라이버",
+      "driver",
+      "모터",
+      "motor",
+      "h-bridge"
+    ],
+    "notes": [],
+    "code": {
+      "template": "h-bridge",
+      "base": "motor",
+      "scheme": "in1-in2"
+    }
+  },
+  {
+    "id": "uln2003",
+    "name": "ULN2003 스테퍼 드라이버",
+    "nameEn": "ULN2003 Stepper Driver Board",
+    "category": "driver",
+    "icon": "icons/motor-driver.svg",
+    "description": "28BYJ-48 같은 5선 유니폴라 스테퍼 모터를 구동하는 보드입니다. 모터 커넥터를 그대로 꽂습니다.",
+    "pins": [
+      {
+        "id": "plus",
+        "name": "+",
+        "role": "power",
+        "description": "전원 (5–12 V, 모터 전압에 맞춤)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 5,
+        "maxVoltage": 12,
+        "typicalMa": 10,
+        "peakMa": 20,
+        "external": "recommended"
+      },
+      {
+        "id": "gnd",
+        "name": "−",
+        "role": "ground",
+        "description": "접지",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "in1",
+        "name": "IN1",
+        "role": "signal",
+        "description": "코일 A",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "in2",
+        "name": "IN2",
+        "role": "signal",
+        "description": "코일 B",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "in3",
+        "name": "IN3",
+        "role": "signal",
+        "description": "코일 C",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "in4",
+        "name": "IN4",
+        "role": "signal",
+        "description": "코일 D",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "oa",
+        "name": "OUT-A",
+        "role": "drive",
+        "description": "모터 커넥터",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "ob",
+        "name": "OUT-B",
+        "role": "drive",
+        "description": "모터 커넥터",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "oc",
+        "name": "OUT-C",
+        "role": "drive",
+        "description": "모터 커넥터",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "od",
+        "name": "OUT-D",
+        "role": "drive",
+        "description": "모터 커넥터",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "ocom",
+        "name": "OUT-COM",
+        "role": "drive",
+        "description": "모터 커넥터 공통 +",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "plus",
+      "dropVoltage": 0,
+      "channelMa": 500,
+      "channelPeakMa": 600,
+      "channels": [
+        {
+          "id": "m",
+          "label": "스테퍼",
+          "outputs": [
+            "oa",
+            "ob",
+            "oc",
+            "od",
+            "ocom"
+          ],
+          "inputs": [
+            "in1",
+            "in2",
+            "in3",
+            "in4"
+          ],
+          "accepts": [
+            "stepper-unipolar"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "스테퍼 모터 전원을 보드 5V 에서 가져오면 보드가 불안정해질 수 있습니다. 외부 5 V 전원을 권장합니다.",
+    "electrical": [
+      {
+        "label": "전원",
+        "value": "5–12 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "채널당 전류",
+        "value": "약 500 mA",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "uln2003",
+      "드라이버",
+      "driver",
+      "스테퍼",
+      "stepper",
+      "28byj"
+    ],
+    "notes": [],
+    "code": {
+      "template": "stepper-coils",
+      "base": "stepper"
+    }
+  },
+  {
+    "id": "a4988",
+    "name": "A4988 스테퍼 드라이버",
+    "nameEn": "A4988 Stepper Driver",
+    "category": "driver",
+    "icon": "icons/stepper-driver.svg",
+    "description": "STEP·DIR 두 신호로 바이폴라 스테퍼를 구동하는 전류 제어 드라이버입니다.",
+    "pins": [
+      {
+        "id": "vmot",
+        "name": "VMOT",
+        "role": "power",
+        "description": "모터 전원 (8–35 V). 100 µF 이상 전해 커패시터를 가까이 다세요.",
+        "requires": [],
+        "supplyVoltage": 12,
+        "minVoltage": 8,
+        "maxVoltage": 35,
+        "typicalMa": 5,
+        "peakMa": 10,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "모터 전원 −",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "vdd",
+        "name": "VDD",
+        "role": "power",
+        "description": "로직 전원 (3–5.5 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3,
+        "maxVoltage": 5.5,
+        "typicalMa": 5,
+        "peakMa": 8,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd2",
+        "name": "GND2",
+        "role": "ground",
+        "description": "로직 GND",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "step",
+        "name": "STEP",
+        "role": "signal",
+        "description": "펄스마다 한 스텝 움직입니다.",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "dir",
+        "name": "DIR",
+        "role": "signal",
+        "description": "회전 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "en",
+        "name": "EN",
+        "role": "passive",
+        "description": "LOW 이면 출력 켜짐 (내부 풀다운). 연결하지 않아도 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "ms1",
+        "name": "MS1",
+        "role": "passive",
+        "description": "마이크로스텝 선택 (연결하지 않으면 풀스텝)",
+        "requires": []
+      },
+      {
+        "id": "ms2",
+        "name": "MS2",
+        "role": "passive",
+        "description": "마이크로스텝 선택",
+        "requires": []
+      },
+      {
+        "id": "ms3",
+        "name": "MS3",
+        "role": "passive",
+        "description": "마이크로스텝 선택",
+        "requires": []
+      },
+      {
+        "id": "rst",
+        "name": "RST",
+        "role": "passive",
+        "description": "SLP 와 서로 연결해야 동작합니다.",
+        "requires": []
+      },
+      {
+        "id": "slp",
+        "name": "SLP",
+        "role": "passive",
+        "description": "RST 와 서로 연결해야 동작합니다.",
+        "requires": []
+      },
+      {
+        "id": "o1a",
+        "name": "1A",
+        "role": "drive",
+        "description": "코일 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "o1b",
+        "name": "1B",
+        "role": "drive",
+        "description": "코일 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "o2a",
+        "name": "2A",
+        "role": "drive",
+        "description": "코일 B",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "o2b",
+        "name": "2B",
+        "role": "drive",
+        "description": "코일 B",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "vmot",
+      "dropVoltage": 0,
+      "channelMa": 1000,
+      "channelPeakMa": 2000,
+      "channels": [
+        {
+          "id": "m",
+          "label": "스테퍼",
+          "outputs": [
+            "o1a",
+            "o1b",
+            "o2a",
+            "o2b"
+          ],
+          "inputs": [
+            "step",
+            "dir"
+          ],
+          "accepts": [
+            "stepper-bipolar"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "스테퍼 모터 전원을 보드 5V 에서 가져올 수 없습니다. 8 V 이상의 외부 전원을 연결하세요.",
+    "electrical": [
+      {
+        "label": "모터 전압",
+        "value": "8–35 V",
+        "confidence": "official"
+      },
+      {
+        "label": "로직 전압",
+        "value": "3–5.5 V",
+        "confidence": "official"
+      },
+      {
+        "label": "상 전류",
+        "value": "방열판 없이 약 1 A, 최대 2 A",
+        "confidence": "typical",
+        "note": "가변저항으로 전류 제한을 모터 정격에 맞추세요."
+      }
+    ],
+    "tags": [
+      "a4988",
+      "드라이버",
+      "driver",
+      "스테퍼",
+      "stepper",
+      "nema",
+      "cnc"
+    ],
+    "notes": [
+      "전원이 켜진 상태에서 모터 선을 빼면 드라이버가 망가질 수 있습니다.",
+      "RST 와 SLP 를 서로 연결하지 않으면 동작하지 않습니다."
+    ],
+    "code": {
+      "template": "step-dir",
+      "base": "stepper",
+      "pins": {
+        "step": "step",
+        "dir": "dir"
+      }
+    },
+    "setupNote": "RST 와 SLP 를 서로 연결해야 동작합니다. 전류 제한 가변저항도 모터 정격에 맞추세요."
+  },
+  {
+    "id": "drv8825",
+    "name": "DRV8825 스테퍼 드라이버",
+    "nameEn": "DRV8825 Stepper Driver",
+    "category": "driver",
+    "icon": "icons/stepper-driver.svg",
+    "description": "A4988 보다 높은 전압·전류를 쓸 수 있는 스테퍼 드라이버입니다. 내부 레귤레이터가 있어 로직 전원을 따로 넣지 않습니다.",
+    "pins": [
+      {
+        "id": "vmot",
+        "name": "VMOT",
+        "role": "power",
+        "description": "모터 전원 (8.2–45 V). 100 µF 이상 전해 커패시터를 가까이 다세요.",
+        "requires": [],
+        "supplyVoltage": 12,
+        "minVoltage": 8.2,
+        "maxVoltage": 45,
+        "typicalMa": 5,
+        "peakMa": 14,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "모터 전원 − 와 보드 GND 를 함께 연결합니다.",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "step",
+        "name": "STEP",
+        "role": "signal",
+        "description": "펄스마다 한 스텝 움직입니다.",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "pwm"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "dir",
+        "name": "DIR",
+        "role": "signal",
+        "description": "회전 방향",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "en",
+        "name": "EN",
+        "role": "passive",
+        "description": "LOW 이면 출력 켜짐. 연결하지 않아도 됩니다.",
+        "requires": []
+      },
+      {
+        "id": "m0",
+        "name": "M0",
+        "role": "passive",
+        "description": "마이크로스텝 선택",
+        "requires": []
+      },
+      {
+        "id": "m1",
+        "name": "M1",
+        "role": "passive",
+        "description": "마이크로스텝 선택",
+        "requires": []
+      },
+      {
+        "id": "m2",
+        "name": "M2",
+        "role": "passive",
+        "description": "마이크로스텝 선택",
+        "requires": []
+      },
+      {
+        "id": "rst",
+        "name": "RST",
+        "role": "passive",
+        "description": "SLP 와 함께 HIGH 로 올려야 동작합니다.",
+        "requires": []
+      },
+      {
+        "id": "slp",
+        "name": "SLP",
+        "role": "passive",
+        "description": "RST 와 함께 HIGH 로 올려야 동작합니다.",
+        "requires": []
+      },
+      {
+        "id": "fault",
+        "name": "FLT",
+        "role": "passive",
+        "description": "고장 출력",
+        "requires": []
+      },
+      {
+        "id": "a1",
+        "name": "A1",
+        "role": "drive",
+        "description": "코일 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "a2",
+        "name": "A2",
+        "role": "drive",
+        "description": "코일 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "b1",
+        "name": "B1",
+        "role": "drive",
+        "description": "코일 B",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "b2",
+        "name": "B2",
+        "role": "drive",
+        "description": "코일 B",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "vmot",
+      "dropVoltage": 0,
+      "channelMa": 1500,
+      "channelPeakMa": 2200,
+      "channels": [
+        {
+          "id": "m",
+          "label": "스테퍼",
+          "outputs": [
+            "a1",
+            "a2",
+            "b1",
+            "b2"
+          ],
+          "inputs": [
+            "step",
+            "dir"
+          ],
+          "accepts": [
+            "stepper-bipolar"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "스테퍼 모터 전원을 보드 5V 에서 가져올 수 없습니다. 8.2 V 이상의 외부 전원을 연결하세요.",
+    "electrical": [
+      {
+        "label": "모터 전압",
+        "value": "8.2–45 V",
+        "confidence": "official"
+      },
+      {
+        "label": "상 전류",
+        "value": "방열판 없이 약 1.5 A, 최대 2.2 A",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "drv8825",
+      "드라이버",
+      "driver",
+      "스테퍼",
+      "stepper",
+      "nema",
+      "cnc"
+    ],
+    "notes": [
+      "RST 와 SLP 를 HIGH 로 올리지 않으면 동작하지 않습니다.",
+      "로직 입력은 3.3 V·5 V 를 모두 받습니다."
+    ],
+    "code": {
+      "template": "step-dir",
+      "base": "stepper",
+      "pins": {
+        "step": "step",
+        "dir": "dir"
+      }
+    },
+    "setupNote": "RST 와 SLP 를 로직 전압(HIGH)에 연결해야 동작합니다. 전류 제한 가변저항도 모터 정격에 맞추세요."
+  },
+  {
+    "id": "esc-30a",
+    "name": "ESC 30 A (BLDC 드라이버)",
+    "nameEn": "30 A Brushless ESC",
+    "category": "driver",
+    "icon": "icons/esc.svg",
+    "description": "BLDC 모터를 구동하는 속도 제어기입니다. 서보와 같은 펄스 신호로 스로틀을 제어합니다.",
+    "pins": [
+      {
+        "id": "vbat",
+        "name": "BAT+",
+        "role": "power",
+        "description": "배터리 + (2–4S)",
+        "requires": [],
+        "supplyVoltage": 11.1,
+        "minVoltage": 7.4,
+        "maxVoltage": 14.8,
+        "typicalMa": 30,
+        "peakMa": 50,
+        "external": "required"
+      },
+      {
+        "id": "gnd",
+        "name": "BAT−",
+        "role": "ground",
+        "description": "배터리 −",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "sig",
+        "name": "SIG",
+        "role": "signal",
+        "description": "스로틀 펄스 (1000–2000 µs)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "sgnd",
+        "name": "SGND",
+        "role": "ground",
+        "description": "신호 GND. 보드 GND 와 연결합니다.",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "bec",
+        "name": "BEC",
+        "role": "passive",
+        "description": "ESC 내장 5 V 출력. 보드 5V 와 동시에 연결하지 마세요.",
+        "requires": []
+      },
+      {
+        "id": "pa",
+        "name": "A",
+        "role": "drive",
+        "description": "모터 상 A",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "pb",
+        "name": "B",
+        "role": "drive",
+        "description": "모터 상 B",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "pc",
+        "name": "C",
+        "role": "drive",
+        "description": "모터 상 C",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "driver": {
+      "supplyPin": "vbat",
+      "dropVoltage": 0,
+      "channelMa": 30000,
+      "channelPeakMa": 40000,
+      "channels": [
+        {
+          "id": "m",
+          "label": "BLDC",
+          "outputs": [
+            "pa",
+            "pb",
+            "pc"
+          ],
+          "inputs": [
+            "sig"
+          ],
+          "accepts": [
+            "bldc"
+          ]
+        }
+      ]
+    },
+    "boardPowerWarning": "BLDC 모터 전원을 보드에서 가져올 수 없습니다. 배터리를 연결하세요.",
+    "electrical": [
+      {
+        "label": "입력",
+        "value": "2–4S 리튬폴리머 (7.4–14.8 V)",
+        "confidence": "typical"
+      },
+      {
+        "label": "연속 전류",
+        "value": "30 A",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "esc",
+      "bldc",
+      "브러시리스",
+      "드라이버",
+      "driver",
+      "드론"
+    ],
+    "library": "Servo",
+    "libraryByCore": {
+      "arduino-esp32": "ESP32Servo"
+    },
+    "notes": [
+      "전원을 넣기 전에 스로틀 최소 신호(1000 µs)를 보내야 시동됩니다."
+    ],
+    "code": {
+      "template": "esc",
+      "base": "esc",
+      "pins": {
+        "signal": "sig"
+      }
+    },
+    "setupNote": "프로펠러를 뺀 상태에서 시험하세요. 전원을 넣기 전에 스로틀 최소 신호가 나가야 시동됩니다."
+  },
+  {
+    "id": "relay-1ch",
+    "name": "릴레이 모듈 (1채널)",
+    "nameEn": "1-Channel Relay Module",
+    "category": "actuator",
+    "icon": "icons/relay.svg",
+    "description": "작은 신호로 큰 전원을 켜고 끕니다. 펌프·조명·팬처럼 방향 제어가 필요 없는 부하에 씁니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "코일 전원 (5 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5,
+        "typicalMa": 70,
+        "peakMa": 90
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "in",
+        "name": "IN",
+        "role": "signal",
+        "description": "제어 입력 (대부분 LOW 에서 동작)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "com",
+        "name": "COM",
+        "role": "passive",
+        "description": "접점 공통",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "no",
+        "name": "NO",
+        "role": "passive",
+        "description": "평소 열림",
+        "requires": [],
+        "fanout": true
+      },
+      {
+        "id": "nc",
+        "name": "NC",
+        "role": "passive",
+        "description": "평소 닫힘",
+        "requires": [],
+        "fanout": true
+      }
+    ],
+    "electrical": [
+      {
+        "label": "코일 전류",
+        "value": "약 70 mA",
+        "confidence": "typical"
+      },
+      {
+        "label": "접점 정격",
+        "value": "10 A 250 VAC / 30 VDC",
+        "confidence": "typical",
+        "note": "제품 라벨을 확인하세요."
+      }
+    ],
+    "tags": [
+      "relay",
+      "릴레이",
+      "스위치",
+      "switch",
+      "펌프"
+    ],
+    "notes": [
+      "교류 전원은 감전 위험이 있습니다. 경험이 없다면 저전압 DC 부하에만 쓰세요."
+    ],
+    "code": {
+      "template": "digital-write",
+      "base": "relay",
+      "pins": {
+        "value": "in"
+      },
+      "activeLow": true
+    }
+  },
+  {
+    "id": "active-buzzer",
+    "name": "능동 부저 모듈",
+    "nameEn": "Active Buzzer Module",
+    "category": "output",
+    "icon": "icons/buzzer.svg",
+    "description": "전원을 주면 일정한 음을 내는 부저입니다. 알림음에 씁니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 30,
+        "peakMa": 40,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "sig",
+        "name": "SIG",
+        "role": "signal",
+        "description": "소리 켜기·끄기",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 30 mA",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "buzzer",
+      "부저",
+      "소리",
+      "sound",
+      "alarm"
+    ],
+    "notes": [],
+    "code": {
+      "template": "digital-write",
+      "base": "buzzer",
+      "pins": {
+        "value": "sig"
+      }
+    }
+  },
+  {
+    "id": "neopixel-strip",
+    "name": "WS2812B LED 스트립",
+    "nameEn": "WS2812B Addressable LED Strip",
+    "category": "output",
+    "icon": "icons/neopixel.svg",
+    "description": "LED 마다 색을 따로 정할 수 있는 스트립입니다. LED 개수에 비례해 전류가 커지므로 외부 5 V 전원이 필요합니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "5V",
+        "role": "power",
+        "description": "전원 5 V",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.5,
+        "maxVoltage": 5.3,
+        "typicalMa": 20,
+        "peakMa": 60,
+        "external": "recommended",
+        "scaleParam": "count"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "din",
+        "name": "DIN",
+        "role": "signal",
+        "description": "데이터 입력. 330 Ω 직렬 저항을 권장합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      }
+    ],
+    "parameters": [
+      {
+        "id": "count",
+        "label": "LED 개수",
+        "defaultValue": "8",
+        "note": "LED 1개당 흰색 최대 밝기에서 약 60 mA 입니다.",
+        "options": [
+          {
+            "value": "8",
+            "label": "8개",
+            "number": 8
+          },
+          {
+            "value": "12",
+            "label": "12개",
+            "number": 12
+          },
+          {
+            "value": "16",
+            "label": "16개",
+            "number": 16
+          },
+          {
+            "value": "30",
+            "label": "30개",
+            "number": 30
+          },
+          {
+            "value": "60",
+            "label": "60개",
+            "number": 60
+          },
+          {
+            "value": "144",
+            "label": "144개",
+            "number": 144
+          }
+        ],
+        "bom": true
+      }
+    ],
+    "boardPowerWarning": "LED 스트립을 보드 5V 로 구동하면 전류가 부족할 수 있습니다. 외부 5 V 전원(GND 공통)을 권장합니다.",
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "약 3.5–5.3 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "LED 당 전류",
+        "value": "최대 약 60 mA",
+        "confidence": "typical",
+        "note": "밝기를 낮추면 크게 줄어듭니다."
+      }
+    ],
+    "tags": [
+      "neopixel",
+      "ws2812",
+      "ws2812b",
+      "led",
+      "strip",
+      "스트립",
+      "rgb"
+    ],
+    "library": "Adafruit_NeoPixel",
+    "notes": [
+      "전원 근처에 1000 µF 전해 커패시터를 다는 것을 권장합니다."
+    ],
+    "code": {
+      "template": "neopixel",
+      "base": "strip",
+      "pins": {
+        "data": "din"
+      }
+    }
+  },
+  {
+    "id": "potentiometer",
+    "name": "가변저항 10 kΩ",
+    "nameEn": "10 kΩ Potentiometer",
+    "category": "input",
+    "icon": "icons/potentiometer.svg",
+    "description": "손잡이를 돌려 아날로그 값을 입력합니다. 속도·밝기 조절에 씁니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "한쪽 끝 (보드 로직 전압)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 1,
+        "maxVoltage": 5.5,
+        "typicalMa": 1,
+        "peakMa": 1,
+        "logicSupply": true
+      },
+      {
+        "id": "wiper",
+        "name": "OUT",
+        "role": "signal",
+        "description": "가운데 단자 (0 V – VCC)",
+        "requires": [
+          "analog"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "저항값",
+        "value": "10 kΩ",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "potentiometer",
+      "가변저항",
+      "볼륨",
+      "knob",
+      "analog",
+      "아날로그"
+    ],
+    "notes": [],
+    "code": {
+      "template": "analog-read",
+      "base": "pot",
+      "pins": {
+        "value": "wiper"
+      }
+    }
+  },
+  {
+    "id": "joystick-ky023",
+    "name": "조이스틱 모듈",
+    "nameEn": "KY-023 Joystick Module",
+    "category": "input",
+    "icon": "icons/joystick.svg",
+    "description": "X·Y 두 축의 아날로그 값과 누름 버튼을 입력합니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 2,
+        "peakMa": 2,
+        "logicSupply": true
+      },
+      {
+        "id": "vrx",
+        "name": "VRx",
+        "role": "signal",
+        "description": "X 축",
+        "requires": [
+          "analog"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "vry",
+        "name": "VRy",
+        "role": "signal",
+        "description": "Y 축",
+        "requires": [
+          "analog"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "sw",
+        "name": "SW",
+        "role": "signal",
+        "description": "누름 버튼 (누르면 LOW)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in",
+        "pull": "up"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "joystick",
+      "조이스틱",
+      "ky-023",
+      "analog",
+      "게임"
+    ],
+    "notes": [],
+    "code": {
+      "template": "joystick",
+      "base": "stick",
+      "pins": {
+        "x": "vrx",
+        "y": "vry",
+        "button": "sw"
+      }
+    }
+  },
+  {
+    "id": "rotary-encoder",
+    "name": "로터리 엔코더",
+    "nameEn": "KY-040 Rotary Encoder",
+    "category": "input",
+    "icon": "icons/rotary-encoder.svg",
+    "description": "돌린 방향과 양을 입력합니다. 메뉴 선택이나 값 조절에 씁니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 2,
+        "peakMa": 2,
+        "logicSupply": true
+      },
+      {
+        "id": "clk",
+        "name": "CLK",
+        "role": "signal",
+        "description": "회전 신호 A",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "dt",
+        "name": "DT",
+        "role": "signal",
+        "description": "회전 신호 B",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "sw",
+        "name": "SW",
+        "role": "signal",
+        "description": "누름 버튼 (누르면 LOW)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in",
+        "pull": "up"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "encoder",
+      "엔코더",
+      "로터리",
+      "rotary",
+      "ky-040"
+    ],
+    "notes": [],
+    "code": {
+      "template": "encoder",
+      "base": "encoder",
+      "pins": {
+        "a": "clk",
+        "b": "dt",
+        "button": "sw"
+      }
+    }
+  },
+  {
+    "id": "dht-sensor",
+    "name": "DHT 온습도 센서",
+    "nameEn": "DHT11 / DHT22 Temperature Humidity Sensor",
+    "category": "sensor",
+    "icon": "icons/dht.svg",
+    "description": "온도와 습도를 디지털로 읽습니다. 3핀 모듈 기준이며 풀업 저항이 달려 있습니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 3,
+        "peakMa": 3,
+        "logicSupply": true
+      },
+      {
+        "id": "data",
+        "name": "DATA",
+        "role": "signal",
+        "description": "단선 디지털 신호",
+        "requires": [
+          "digital"
+        ],
+        "direction": "inout",
+        "highLevel": "supply"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      }
+    ],
+    "parameters": [
+      {
+        "id": "model",
+        "label": "센서 종류",
+        "defaultValue": "DHT11",
+        "options": [
+          {
+            "value": "DHT11",
+            "label": "DHT11 (저가형)"
+          },
+          {
+            "value": "DHT22",
+            "label": "DHT22 (고정밀)"
+          }
+        ],
+        "bom": true
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5.5 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "측정 주기",
+        "value": "DHT11 1초, DHT22 2초",
+        "confidence": "official"
+      }
+    ],
+    "tags": [
+      "dht",
+      "dht11",
+      "dht22",
+      "온도",
+      "습도",
+      "temperature",
+      "humidity"
+    ],
+    "library": "DHT",
+    "notes": [],
+    "code": {
+      "template": "dht",
+      "base": "dht",
+      "pins": {
+        "data": "data"
+      }
+    }
+  },
+  {
+    "id": "pir-hc-sr501",
+    "name": "PIR 인체 감지 센서",
+    "nameEn": "HC-SR501 PIR Motion Sensor",
+    "category": "sensor",
+    "icon": "icons/pir.svg",
+    "description": "사람의 움직임을 감지하면 HIGH 를 냅니다. 출력은 3.3 V 라 3.3 V·5 V 보드에 모두 연결할 수 있습니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원 (4.5–20 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.5,
+        "maxVoltage": 20,
+        "typicalMa": 1,
+        "peakMa": 1
+      },
+      {
+        "id": "out",
+        "name": "OUT",
+        "role": "signal",
+        "description": "감지 출력 (3.3 V)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in"
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "4.5–20 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "출력",
+        "value": "HIGH 3.3 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "초기화",
+        "value": "전원 인가 후 약 1분 안정화",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "pir",
+      "인체",
+      "motion",
+      "움직임",
+      "hc-sr501",
+      "감지"
+    ],
+    "notes": [],
+    "code": {
+      "template": "digital-read",
+      "base": "pir",
+      "pins": {
+        "value": "out"
+      }
+    }
+  },
+  {
+    "id": "ldr-module",
+    "name": "조도 센서 모듈",
+    "nameEn": "Photoresistor (LDR) Module",
+    "category": "sensor",
+    "icon": "icons/ldr.svg",
+    "description": "주변 밝기를 아날로그 값으로 읽습니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 2,
+        "peakMa": 2,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "ao",
+        "name": "AO",
+        "role": "signal",
+        "description": "아날로그 출력",
+        "requires": [
+          "analog"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "do",
+        "name": "DO",
+        "role": "passive",
+        "description": "비교기 출력 (필요할 때만 디지털 핀에 연결)",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "ldr",
+      "조도",
+      "빛",
+      "light",
+      "cds",
+      "photoresistor"
+    ],
+    "notes": [],
+    "code": {
+      "template": "analog-read",
+      "base": "light",
+      "pins": {
+        "value": "ao"
+      }
+    }
+  },
+  {
+    "id": "soil-moisture",
+    "name": "토양 수분 센서",
+    "nameEn": "Soil Moisture Sensor",
+    "category": "sensor",
+    "icon": "icons/soil.svg",
+    "description": "흙의 수분을 아날로그 값으로 읽습니다. 자동 화분에 씁니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 15,
+        "peakMa": 35,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "ao",
+        "name": "AO",
+        "role": "signal",
+        "description": "아날로그 출력",
+        "requires": [
+          "analog"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "do",
+        "name": "DO",
+        "role": "passive",
+        "description": "비교기 출력 (필요할 때만 디지털 핀에 연결)",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 15–35 mA",
+        "confidence": "varies"
+      }
+    ],
+    "tags": [
+      "soil",
+      "토양",
+      "수분",
+      "moisture",
+      "화분"
+    ],
+    "notes": [
+      "전원을 계속 넣어 두면 전극이 빨리 부식됩니다. 측정할 때만 켜는 것이 좋습니다."
+    ],
+    "code": {
+      "template": "analog-read",
+      "base": "soil",
+      "pins": {
+        "value": "ao"
+      }
+    }
+  },
+  {
+    "id": "mq2-gas",
+    "name": "MQ-2 가스 센서",
+    "nameEn": "MQ-2 Gas Sensor",
+    "category": "sensor",
+    "icon": "icons/gas.svg",
+    "description": "가연성 가스와 연기를 감지합니다. 히터가 있어 전류가 큽니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원 (5 V, 히터 포함)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5,
+        "typicalMa": 150,
+        "peakMa": 180
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "ao",
+        "name": "AO",
+        "role": "signal",
+        "description": "아날로그 출력 (0–VCC)",
+        "requires": [
+          "analog"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "do",
+        "name": "DO",
+        "role": "passive",
+        "description": "비교기 출력 (필요할 때만 디지털 핀에 연결)",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "히터 전류",
+        "value": "약 150 mA",
+        "confidence": "typical"
+      },
+      {
+        "label": "예열",
+        "value": "수 분 이상 필요",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "mq2",
+      "mq-2",
+      "가스",
+      "gas",
+      "연기",
+      "smoke"
+    ],
+    "notes": [
+      "ESP32 처럼 3.3 V 보드에는 AO 를 전압 분배기로 낮춰 연결하세요."
+    ],
+    "code": {
+      "template": "analog-read",
+      "base": "gas",
+      "pins": {
+        "value": "ao"
+      }
+    }
+  },
+  {
+    "id": "mpu6050",
+    "name": "MPU-6050 가속도·자이로",
+    "nameEn": "MPU-6050 IMU Module (GY-521)",
+    "category": "sensor",
+    "icon": "icons/imu.svg",
+    "description": "3축 가속도와 3축 자이로를 I²C 로 읽습니다. 균형 로봇과 자세 측정에 씁니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원 (모듈 레귤레이터 포함)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 4,
+        "peakMa": 5,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "scl",
+        "name": "SCL",
+        "role": "signal",
+        "description": "I²C 클록",
+        "requires": [
+          "i2c-scl"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "sda",
+        "name": "SDA",
+        "role": "signal",
+        "description": "I²C 데이터",
+        "requires": [
+          "i2c-sda"
+        ],
+        "direction": "inout"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "I²C 주소",
+        "value": "0x68 (AD0 HIGH 이면 0x69)",
+        "confidence": "official"
+      },
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V (GY-521 모듈)",
+        "confidence": "typical"
+      }
+    ],
+    "i2cAddress": "0x68",
+    "tags": [
+      "mpu6050",
+      "gy-521",
+      "imu",
+      "가속도",
+      "자이로",
+      "gyro",
+      "i2c"
+    ],
+    "notes": [],
+    "code": {
+      "template": "mpu6050",
+      "base": "imu",
+      "pins": {
+        "sda": "sda",
+        "scl": "scl"
+      }
+    }
+  },
+  {
+    "id": "line-tracker",
+    "name": "라인 트레이서 센서",
+    "nameEn": "TCRT5000 Line Tracking Sensor",
+    "category": "sensor",
+    "icon": "icons/line-sensor.svg",
+    "description": "바닥의 검은 선을 적외선 반사로 감지합니다. 로봇카에 씁니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 20,
+        "peakMa": 25,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "out",
+        "name": "DO",
+        "role": "signal",
+        "description": "감지 출력",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in",
+        "highLevel": "supply"
+      },
+      {
+        "id": "ao",
+        "name": "AO",
+        "role": "passive",
+        "description": "아날로그 출력 (있는 제품만)",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 20 mA",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "line",
+      "라인",
+      "tcrt5000",
+      "적외선",
+      "ir",
+      "로봇카"
+    ],
+    "notes": [],
+    "code": {
+      "template": "digital-read",
+      "base": "line",
+      "pins": {
+        "value": "out"
+      }
+    }
+  },
+  {
+    "id": "oled-ssd1306",
+    "name": "OLED 0.96인치 (SSD1306)",
+    "nameEn": "0.96 inch I2C OLED SSD1306",
+    "category": "display",
+    "icon": "icons/oled.svg",
+    "description": "128×64 그래픽 OLED 입니다. I²C 두 선으로 연결합니다.",
+    "pins": [
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 20,
+        "peakMa": 30,
+        "logicSupply": true
+      },
+      {
+        "id": "scl",
+        "name": "SCL",
+        "role": "signal",
+        "description": "I²C 클록",
+        "requires": [
+          "i2c-scl"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "sda",
+        "name": "SDA",
+        "role": "signal",
+        "description": "I²C 데이터",
+        "requires": [
+          "i2c-sda"
+        ],
+        "direction": "inout"
+      }
+    ],
+    "electrical": [
+      {
+        "label": "I²C 주소",
+        "value": "0x3C (일부 0x3D)",
+        "confidence": "varies"
+      },
+      {
+        "label": "해상도",
+        "value": "128×64",
+        "confidence": "official"
+      }
+    ],
+    "i2cAddress": "0x3C",
+    "tags": [
+      "oled",
+      "ssd1306",
+      "디스플레이",
+      "display",
+      "i2c",
+      "화면"
+    ],
+    "library": "Adafruit_SSD1306",
+    "notes": [],
+    "code": {
+      "template": "ssd1306",
+      "base": "oled",
+      "pins": {
+        "sda": "sda",
+        "scl": "scl"
+      }
+    }
+  },
+  {
+    "id": "tm1637-display",
+    "name": "7세그먼트 4자리 (TM1637)",
+    "nameEn": "TM1637 4-Digit Display",
+    "category": "display",
+    "icon": "icons/seven-segment.svg",
+    "description": "숫자 네 자리를 두 선으로 표시합니다.",
+    "pins": [
+      {
+        "id": "clk",
+        "name": "CLK",
+        "role": "signal",
+        "description": "클록",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "dio",
+        "name": "DIO",
+        "role": "signal",
+        "description": "데이터",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5,
+        "typicalMa": 30,
+        "peakMa": 80,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3–5 V",
+        "confidence": "typical"
+      },
+      {
+        "label": "최대 전류",
+        "value": "약 80 mA",
+        "confidence": "typical"
+      }
+    ],
+    "tags": [
+      "tm1637",
+      "7세그먼트",
+      "segment",
+      "숫자",
+      "display",
+      "디스플레이"
+    ],
+    "library": "TM1637Display",
+    "notes": [],
+    "code": {
+      "template": "tm1637",
+      "base": "seg",
+      "pins": {
+        "clk": "clk",
+        "dio": "dio"
+      }
+    }
+  },
+  {
+    "id": "hc-05",
+    "name": "HC-05 블루투스",
+    "nameEn": "HC-05 Bluetooth Module",
+    "category": "comm",
+    "icon": "icons/bluetooth.svg",
+    "description": "스마트폰과 시리얼로 통신하는 블루투스 모듈입니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원 (모듈 기준 3.6–6 V)",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 3.6,
+        "maxVoltage": 6,
+        "typicalMa": 40,
+        "peakMa": 50
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "txd",
+        "name": "TXD",
+        "role": "signal",
+        "description": "모듈 → 보드 (3.3 V)",
+        "requires": [
+          "digital"
+        ],
+        "direction": "in"
+      },
+      {
+        "id": "rxd",
+        "name": "RXD",
+        "role": "signal",
+        "description": "보드 → 모듈. 3.3 V 신호만 받습니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out",
+        "maxInputVoltage": 3.6
+      },
+      {
+        "id": "state",
+        "name": "STATE",
+        "role": "passive",
+        "description": "연결 상태 출력",
+        "requires": []
+      },
+      {
+        "id": "en",
+        "name": "EN",
+        "role": "passive",
+        "description": "AT 모드 진입",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "기본 통신 속도",
+        "value": "9600 bps",
+        "confidence": "typical"
+      },
+      {
+        "label": "신호 전압",
+        "value": "3.3 V",
+        "confidence": "official",
+        "note": "5 V 보드의 TX 는 전압 분배기로 낮춰 연결하세요."
+      }
+    ],
+    "tags": [
+      "bluetooth",
+      "블루투스",
+      "hc-05",
+      "hc05",
+      "uart",
+      "serial"
+    ],
+    "notes": [
+      "5 V 보드의 TX 를 RXD 에 바로 연결하면 모듈이 손상될 수 있습니다."
+    ],
+    "code": {
+      "template": "serial-module",
+      "base": "bt",
+      "pins": {
+        "rx": "txd",
+        "tx": "rxd"
+      }
+    }
+  },
+  {
+    "id": "rc522-rfid",
+    "name": "RC522 RFID 리더",
+    "nameEn": "MFRC522 RFID Reader",
+    "category": "comm",
+    "icon": "icons/rfid.svg",
+    "description": "13.56 MHz RFID 카드의 UID 를 읽습니다. SPI 로 연결하며 3.3 V 전용입니다.",
+    "pins": [
+      {
+        "id": "vcc",
+        "name": "3.3V",
+        "role": "power",
+        "description": "전원 (3.3 V 전용)",
+        "requires": [],
+        "supplyVoltage": 3.3,
+        "minVoltage": 2.5,
+        "maxVoltage": 3.6,
+        "typicalMa": 20,
+        "peakMa": 30
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "sda",
+        "name": "SDA",
+        "role": "signal",
+        "description": "SPI 칩 선택 (SS)",
+        "requires": [
+          "digital"
+        ],
+        "prefers": [
+          "spi-ss"
+        ],
+        "direction": "out",
+        "maxInputVoltage": 3.6
+      },
+      {
+        "id": "sck",
+        "name": "SCK",
+        "role": "signal",
+        "description": "SPI 클록",
+        "requires": [
+          "spi-sck"
+        ],
+        "direction": "out",
+        "maxInputVoltage": 3.6
+      },
+      {
+        "id": "mosi",
+        "name": "MOSI",
+        "role": "signal",
+        "description": "SPI 데이터 (보드 → 모듈)",
+        "requires": [
+          "spi-mosi"
+        ],
+        "direction": "out",
+        "maxInputVoltage": 3.6
+      },
+      {
+        "id": "miso",
+        "name": "MISO",
+        "role": "signal",
+        "description": "SPI 데이터 (모듈 → 보드)",
+        "requires": [
+          "spi-miso"
+        ],
+        "direction": "in"
+      },
+      {
+        "id": "rst",
+        "name": "RST",
+        "role": "signal",
+        "description": "리셋",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out",
+        "maxInputVoltage": 3.6
+      },
+      {
+        "id": "irq",
+        "name": "IRQ",
+        "role": "passive",
+        "description": "인터럽트 (쓰지 않아도 됩니다)",
+        "requires": []
+      }
+    ],
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "3.3 V",
+        "confidence": "official"
+      },
+      {
+        "label": "동작 전류",
+        "value": "약 13–26 mA",
+        "confidence": "official"
+      }
+    ],
+    "tags": [
+      "rfid",
+      "rc522",
+      "mfrc522",
+      "카드",
+      "nfc",
+      "spi"
+    ],
+    "library": "MFRC522",
+    "notes": [
+      "5 V 보드에서는 신호선이 3.3 V 를 넘습니다. 레벨 변환을 권장합니다."
+    ],
+    "code": {
+      "template": "rc522",
+      "base": "rfid",
+      "pins": {
+        "ss": "sda",
+        "rst": "rst",
+        "sck": "sck",
+        "mosi": "mosi",
+        "miso": "miso"
+      }
+    }
+  }
+]

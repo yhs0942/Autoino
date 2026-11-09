@@ -1,0 +1,109 @@
+.workspace-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.workspace-toolbar__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+
+.workspace-toolbar__actions {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.workspace-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.workspace-toolbar__route-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.workspace-toolbar__count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.workspace-toolbar__route-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.workspace-toolbar__count strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-toolbar__sep {
+  width: 1px;
+  height: 22px;
+  margin: 0 2px;
+  background: var(--border-strong);
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.segmented button {
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: none;
+  cursor: pointer;
+}
+
+.segmented button + button {
+  border-left: 1px solid var(--border-strong);
+}
+
+.segmented button[aria-pressed='true'] {
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+
+.segmented button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.button--icon {
+  min-width: 34px;
+  padding: 6px 8px;
+  font-size: 1rem;
+}
+
+/* 동작 버튼 줄은 한 줄에 들어가도록 조금 작게 */
+.workspace-toolbar__actions .button,
+.workspace-toolbar__actions .segmented button {
+  padding: 4px 9px;
+  font-size: 0.78rem;
+}
+
+.workspace-toolbar__actions .button--icon {
+  min-width: 30px;
+  padding: 4px 6px;
+  font-size: 0.95rem;
+}

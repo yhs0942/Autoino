@@ -1,0 +1,7 @@
+
+# 백엔드 서버에 저장한 프로젝트
+projects/*.autoino.json
+
+# 파이썬 캐시
+__pycache__/
+.pytest_cache/

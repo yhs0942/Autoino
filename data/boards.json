@@ -1,0 +1,2359 @@
+[
+  {
+    "id": "arduino-uno-r3",
+    "name": "Arduino Uno R3",
+    "core": "arduino-avr",
+    "logicVoltage": 5,
+    "ioPinCurrentLimitMa": 20,
+    "totalCurrentLimitMa": 200,
+    "servoPwmConflictPins": [
+      "D9",
+      "D10"
+    ],
+    "gpioInputHighMinVoltage": 3.0,
+    "microcontroller": "ATmega328P",
+    "clockSpeed": "16 MHz",
+    "digitalIoCount": 14,
+    "analogInputCount": 6,
+    "pwmPins": [
+      "D3",
+      "D5",
+      "D6",
+      "D9",
+      "D10",
+      "D11"
+    ],
+    "interruptPins": [
+      "D2",
+      "D3"
+    ],
+    "memory": {
+      "flash": "32 KB (부트로더 0.5 KB)",
+      "sram": "2 KB",
+      "eeprom": "1 KB"
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "5 V",
+        "confidence": "official"
+      },
+      {
+        "label": "권장 입력 전압 (DC 잭/VIN)",
+        "value": "7–12 V",
+        "confidence": "official"
+      },
+      {
+        "label": "I/O 핀당 DC 전류",
+        "value": "20 mA",
+        "confidence": "official"
+      },
+      {
+        "label": "3.3 V 핀 공급 전류",
+        "value": "50 mA",
+        "confidence": "official"
+      }
+    ],
+    "buses": [
+      {
+        "kind": "UART",
+        "name": "Serial",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "D0"
+          },
+          {
+            "role": "TX",
+            "pinId": "D1"
+          }
+        ]
+      },
+      {
+        "kind": "I2C",
+        "name": "Wire",
+        "pins": [
+          {
+            "role": "SDA",
+            "pinId": "A4"
+          },
+          {
+            "role": "SCL",
+            "pinId": "A5"
+          }
+        ]
+      },
+      {
+        "kind": "SPI",
+        "name": "SPI",
+        "pins": [
+          {
+            "role": "SS",
+            "pinId": "D10"
+          },
+          {
+            "role": "MOSI",
+            "pinId": "D11"
+          },
+          {
+            "role": "MISO",
+            "pinId": "D12"
+          },
+          {
+            "role": "SCK",
+            "pinId": "D13"
+          }
+        ]
+      }
+    ],
+    "pins": [
+      {
+        "id": "D0",
+        "label": "0",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-rx"
+        ],
+        "note": "USB 시리얼(업로드)과 공유됩니다."
+      },
+      {
+        "id": "D1",
+        "label": "1",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-tx"
+        ],
+        "note": "USB 시리얼(업로드)과 공유됩니다."
+      },
+      {
+        "id": "D2",
+        "label": "2",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D3",
+        "label": "3",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D4",
+        "label": "4",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D5",
+        "label": "5",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D6",
+        "label": "6",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D7",
+        "label": "7",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D8",
+        "label": "8",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D9",
+        "label": "9",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D10",
+        "label": "10",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "spi-ss"
+        ]
+      },
+      {
+        "id": "D11",
+        "label": "11",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "spi-mosi"
+        ]
+      },
+      {
+        "id": "D12",
+        "label": "12",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-miso"
+        ]
+      },
+      {
+        "id": "D13",
+        "label": "13",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-sck"
+        ],
+        "note": "보드 내장 LED(L)와 연결되어 있습니다."
+      },
+      {
+        "id": "A0",
+        "label": "A0",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A1",
+        "label": "A1",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A2",
+        "label": "A2",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A3",
+        "label": "A3",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A4",
+        "label": "A4",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital",
+          "i2c-sda"
+        ]
+      },
+      {
+        "id": "A5",
+        "label": "A5",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital",
+          "i2c-scl"
+        ]
+      },
+      {
+        "id": "5V",
+        "label": "5V",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "3.3V",
+        "label": "3.3V",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "VIN",
+        "label": "VIN",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "GND",
+        "label": "GND",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "AREF",
+        "label": "AREF",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "IOREF",
+        "label": "IOREF",
+        "group": "power",
+        "capabilities": []
+      }
+    ],
+    "footprint": {
+      "width": 320,
+      "height": 220
+    },
+    "notes": [
+      "A0–A5 는 디지털 핀(D14–D19)으로도 사용할 수 있습니다.",
+      "AREF 옆의 SDA/SCL 헤더는 A4/A5 와 같은 신호입니다."
+    ],
+    "sourceUrl": "https://docs.arduino.cc/hardware/uno-rev3/",
+    "powerInput": {
+      "pinId": "VIN",
+      "minVoltage": 7,
+      "maxVoltage": 12
+    }
+  },
+  {
+    "id": "arduino-mega-2560",
+    "name": "Arduino Mega 2560",
+    "core": "arduino-avr",
+    "logicVoltage": 5,
+    "ioPinCurrentLimitMa": 20,
+    "totalCurrentLimitMa": 200,
+    "servoPwmConflictPins": [],
+    "gpioInputHighMinVoltage": 3.0,
+    "microcontroller": "ATmega2560",
+    "clockSpeed": "16 MHz",
+    "digitalIoCount": 54,
+    "analogInputCount": 16,
+    "pwmPins": [
+      "D2",
+      "D3",
+      "D4",
+      "D5",
+      "D6",
+      "D7",
+      "D8",
+      "D9",
+      "D10",
+      "D11",
+      "D12",
+      "D13",
+      "D44",
+      "D45",
+      "D46"
+    ],
+    "interruptPins": [
+      "D2",
+      "D3",
+      "D18",
+      "D19",
+      "D20",
+      "D21"
+    ],
+    "memory": {
+      "flash": "256 KB (부트로더 8 KB)",
+      "sram": "8 KB",
+      "eeprom": "4 KB"
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "5 V",
+        "confidence": "official"
+      },
+      {
+        "label": "권장 입력 전압 (DC 잭/VIN)",
+        "value": "7–12 V",
+        "confidence": "official"
+      },
+      {
+        "label": "I/O 핀당 DC 전류",
+        "value": "20 mA",
+        "confidence": "official"
+      },
+      {
+        "label": "3.3 V 핀 공급 전류",
+        "value": "50 mA",
+        "confidence": "official"
+      }
+    ],
+    "buses": [
+      {
+        "kind": "UART",
+        "name": "Serial",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "D0"
+          },
+          {
+            "role": "TX",
+            "pinId": "D1"
+          }
+        ]
+      },
+      {
+        "kind": "UART",
+        "name": "Serial1",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "D19"
+          },
+          {
+            "role": "TX",
+            "pinId": "D18"
+          }
+        ]
+      },
+      {
+        "kind": "UART",
+        "name": "Serial2",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "D17"
+          },
+          {
+            "role": "TX",
+            "pinId": "D16"
+          }
+        ]
+      },
+      {
+        "kind": "UART",
+        "name": "Serial3",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "D15"
+          },
+          {
+            "role": "TX",
+            "pinId": "D14"
+          }
+        ]
+      },
+      {
+        "kind": "I2C",
+        "name": "Wire",
+        "pins": [
+          {
+            "role": "SDA",
+            "pinId": "D20"
+          },
+          {
+            "role": "SCL",
+            "pinId": "D21"
+          }
+        ]
+      },
+      {
+        "kind": "SPI",
+        "name": "SPI",
+        "pins": [
+          {
+            "role": "MISO",
+            "pinId": "D50"
+          },
+          {
+            "role": "MOSI",
+            "pinId": "D51"
+          },
+          {
+            "role": "SCK",
+            "pinId": "D52"
+          },
+          {
+            "role": "SS",
+            "pinId": "D53"
+          }
+        ]
+      }
+    ],
+    "pins": [
+      {
+        "id": "D0",
+        "label": "0",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-rx"
+        ],
+        "note": "USB 시리얼(업로드)과 공유됩니다."
+      },
+      {
+        "id": "D1",
+        "label": "1",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-tx"
+        ],
+        "note": "USB 시리얼(업로드)과 공유됩니다."
+      },
+      {
+        "id": "D2",
+        "label": "2",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D3",
+        "label": "3",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D4",
+        "label": "4",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D5",
+        "label": "5",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D6",
+        "label": "6",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D7",
+        "label": "7",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D8",
+        "label": "8",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D9",
+        "label": "9",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D10",
+        "label": "10",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D11",
+        "label": "11",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D12",
+        "label": "12",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D13",
+        "label": "13",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ],
+        "note": "보드 내장 LED(L)와 연결되어 있습니다."
+      },
+      {
+        "id": "D14",
+        "label": "14",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-tx"
+        ]
+      },
+      {
+        "id": "D15",
+        "label": "15",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-rx"
+        ]
+      },
+      {
+        "id": "D16",
+        "label": "16",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-tx"
+        ]
+      },
+      {
+        "id": "D17",
+        "label": "17",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-rx"
+        ]
+      },
+      {
+        "id": "D18",
+        "label": "18",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-tx",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D19",
+        "label": "19",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-rx",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D20",
+        "label": "20",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "i2c-sda",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D21",
+        "label": "21",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "i2c-scl",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D22",
+        "label": "22",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D23",
+        "label": "23",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D24",
+        "label": "24",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D25",
+        "label": "25",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D26",
+        "label": "26",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D27",
+        "label": "27",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D28",
+        "label": "28",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D29",
+        "label": "29",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D30",
+        "label": "30",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D31",
+        "label": "31",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D32",
+        "label": "32",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D33",
+        "label": "33",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D34",
+        "label": "34",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D35",
+        "label": "35",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D36",
+        "label": "36",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D37",
+        "label": "37",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D38",
+        "label": "38",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D39",
+        "label": "39",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D40",
+        "label": "40",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D41",
+        "label": "41",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D42",
+        "label": "42",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D43",
+        "label": "43",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D44",
+        "label": "44",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D45",
+        "label": "45",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D46",
+        "label": "46",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D47",
+        "label": "47",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D48",
+        "label": "48",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D49",
+        "label": "49",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D50",
+        "label": "50",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-miso"
+        ]
+      },
+      {
+        "id": "D51",
+        "label": "51",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-mosi"
+        ]
+      },
+      {
+        "id": "D52",
+        "label": "52",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-sck"
+        ]
+      },
+      {
+        "id": "D53",
+        "label": "53",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-ss"
+        ]
+      },
+      {
+        "id": "A0",
+        "label": "A0",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A1",
+        "label": "A1",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A2",
+        "label": "A2",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A3",
+        "label": "A3",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A4",
+        "label": "A4",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A5",
+        "label": "A5",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A6",
+        "label": "A6",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A7",
+        "label": "A7",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A8",
+        "label": "A8",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A9",
+        "label": "A9",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A10",
+        "label": "A10",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A11",
+        "label": "A11",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A12",
+        "label": "A12",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A13",
+        "label": "A13",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A14",
+        "label": "A14",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A15",
+        "label": "A15",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "5V",
+        "label": "5V",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "3.3V",
+        "label": "3.3V",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "VIN",
+        "label": "VIN",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "GND",
+        "label": "GND",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "AREF",
+        "label": "AREF",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "IOREF",
+        "label": "IOREF",
+        "group": "power",
+        "capabilities": []
+      }
+    ],
+    "footprint": {
+      "width": 460,
+      "height": 220
+    },
+    "notes": [
+      "A0–A15 는 디지털 핀(D54–D69)으로도 사용할 수 있습니다.",
+      "하드웨어 시리얼 포트가 4개(Serial, Serial1–3) 있습니다."
+    ],
+    "sourceUrl": "https://docs.arduino.cc/hardware/mega-2560/",
+    "powerInput": {
+      "pinId": "VIN",
+      "minVoltage": 7,
+      "maxVoltage": 12
+    }
+  },
+  {
+    "id": "arduino-nano",
+    "name": "Arduino Nano",
+    "core": "arduino-avr",
+    "logicVoltage": 5,
+    "ioPinCurrentLimitMa": 20,
+    "totalCurrentLimitMa": 200,
+    "servoPwmConflictPins": [
+      "D9",
+      "D10"
+    ],
+    "gpioInputHighMinVoltage": 3.0,
+    "microcontroller": "ATmega328P",
+    "clockSpeed": "16 MHz",
+    "digitalIoCount": 14,
+    "analogInputCount": 8,
+    "pwmPins": [
+      "D3",
+      "D5",
+      "D6",
+      "D9",
+      "D10",
+      "D11"
+    ],
+    "interruptPins": [
+      "D2",
+      "D3"
+    ],
+    "memory": {
+      "flash": "32 KB (부트로더 2 KB)",
+      "sram": "2 KB",
+      "eeprom": "1 KB"
+    },
+    "electrical": [
+      {
+        "label": "동작 전압",
+        "value": "5 V",
+        "confidence": "official"
+      },
+      {
+        "label": "권장 입력 전압 (VIN)",
+        "value": "7–12 V",
+        "confidence": "official"
+      },
+      {
+        "label": "I/O 핀당 DC 전류",
+        "value": "20 mA",
+        "confidence": "official"
+      },
+      {
+        "label": "3.3 V 핀 공급 전류",
+        "value": "제품별 상이",
+        "confidence": "varies",
+        "note": "3.3 V 는 USB-시리얼 칩에서 공급되며 호환 보드마다 다릅니다."
+      }
+    ],
+    "buses": [
+      {
+        "kind": "UART",
+        "name": "Serial",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "D0"
+          },
+          {
+            "role": "TX",
+            "pinId": "D1"
+          }
+        ]
+      },
+      {
+        "kind": "I2C",
+        "name": "Wire",
+        "pins": [
+          {
+            "role": "SDA",
+            "pinId": "A4"
+          },
+          {
+            "role": "SCL",
+            "pinId": "A5"
+          }
+        ]
+      },
+      {
+        "kind": "SPI",
+        "name": "SPI",
+        "pins": [
+          {
+            "role": "SS",
+            "pinId": "D10"
+          },
+          {
+            "role": "MOSI",
+            "pinId": "D11"
+          },
+          {
+            "role": "MISO",
+            "pinId": "D12"
+          },
+          {
+            "role": "SCK",
+            "pinId": "D13"
+          }
+        ]
+      }
+    ],
+    "pins": [
+      {
+        "id": "D0",
+        "label": "0",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-rx"
+        ],
+        "note": "USB 시리얼(업로드)과 공유됩니다."
+      },
+      {
+        "id": "D1",
+        "label": "1",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "uart-tx"
+        ],
+        "note": "USB 시리얼(업로드)과 공유됩니다."
+      },
+      {
+        "id": "D2",
+        "label": "2",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D3",
+        "label": "3",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt"
+        ]
+      },
+      {
+        "id": "D4",
+        "label": "4",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D5",
+        "label": "5",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D6",
+        "label": "6",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D7",
+        "label": "7",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D8",
+        "label": "8",
+        "group": "digital",
+        "capabilities": [
+          "digital"
+        ]
+      },
+      {
+        "id": "D9",
+        "label": "9",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm"
+        ]
+      },
+      {
+        "id": "D10",
+        "label": "10",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "spi-ss"
+        ]
+      },
+      {
+        "id": "D11",
+        "label": "11",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "spi-mosi"
+        ]
+      },
+      {
+        "id": "D12",
+        "label": "12",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-miso"
+        ]
+      },
+      {
+        "id": "D13",
+        "label": "13",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "spi-sck"
+        ],
+        "note": "보드 내장 LED(L)와 연결되어 있습니다."
+      },
+      {
+        "id": "A0",
+        "label": "A0",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A1",
+        "label": "A1",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A2",
+        "label": "A2",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A3",
+        "label": "A3",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital"
+        ]
+      },
+      {
+        "id": "A4",
+        "label": "A4",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital",
+          "i2c-sda"
+        ]
+      },
+      {
+        "id": "A5",
+        "label": "A5",
+        "group": "analog",
+        "capabilities": [
+          "analog",
+          "digital",
+          "i2c-scl"
+        ]
+      },
+      {
+        "id": "A6",
+        "label": "A6",
+        "group": "analog",
+        "capabilities": [
+          "analog"
+        ],
+        "note": "아날로그 입력 전용입니다."
+      },
+      {
+        "id": "A7",
+        "label": "A7",
+        "group": "analog",
+        "capabilities": [
+          "analog"
+        ],
+        "note": "아날로그 입력 전용입니다."
+      },
+      {
+        "id": "5V",
+        "label": "5V",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "3.3V",
+        "label": "3.3V",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "VIN",
+        "label": "VIN",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "GND",
+        "label": "GND",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "AREF",
+        "label": "AREF",
+        "group": "power",
+        "capabilities": []
+      }
+    ],
+    "footprint": {
+      "width": 280,
+      "height": 130
+    },
+    "notes": [
+      "A6, A7 은 아날로그 입력 전용이며 디지털 I/O 로 사용할 수 없습니다.",
+      "시중의 호환 보드는 USB 칩(CH340 등)과 일부 사양이 다를 수 있습니다."
+    ],
+    "sourceUrl": "https://docs.arduino.cc/hardware/nano/",
+    "powerInput": {
+      "pinId": "VIN",
+      "minVoltage": 7,
+      "maxVoltage": 12
+    }
+  },
+  {
+    "id": "esp32-devkit-v1",
+    "name": "ESP32 DevKit V1",
+    "core": "arduino-esp32",
+    "logicVoltage": 3.3,
+    "ioPinCurrentLimitMa": 20,
+    "totalCurrentLimitMa": 1200,
+    "servoPwmConflictPins": [],
+    "gpioInputHighMinVoltage": 2.48,
+    "gpioMaxInputVoltage": 3.6,
+    "supplyPins": [
+      {
+        "pinId": "3V3",
+        "voltage": 3.3
+      },
+      {
+        "pinId": "VIN",
+        "voltage": 5,
+        "note": "USB 로 전원을 공급할 때 VIN 에는 USB 5 V 계열 전압이 나옵니다. 보드 회로에 따라 5 V 보다 조금 낮을 수 있습니다."
+      }
+    ],
+    "groundPins": [
+      "GND",
+      "GND2"
+    ],
+    "reservedPins": [
+      {
+        "id": "GPIO6",
+        "label": "SCK/CLK",
+        "reason": "ESP32-WROOM-32 모듈 내부 SPI 플래시에 연결되어 있어 사용할 수 없습니다. 30핀 DevKit V1 헤더에는 나와 있지 않습니다."
+      },
+      {
+        "id": "GPIO7",
+        "label": "SDO/SD0",
+        "reason": "ESP32-WROOM-32 모듈 내부 SPI 플래시에 연결되어 있어 사용할 수 없습니다. 30핀 DevKit V1 헤더에는 나와 있지 않습니다."
+      },
+      {
+        "id": "GPIO8",
+        "label": "SDI/SD1",
+        "reason": "ESP32-WROOM-32 모듈 내부 SPI 플래시에 연결되어 있어 사용할 수 없습니다. 30핀 DevKit V1 헤더에는 나와 있지 않습니다."
+      },
+      {
+        "id": "GPIO9",
+        "label": "SHD/SD2",
+        "reason": "ESP32-WROOM-32 모듈 내부 SPI 플래시에 연결되어 있어 사용할 수 없습니다. 30핀 DevKit V1 헤더에는 나와 있지 않습니다."
+      },
+      {
+        "id": "GPIO10",
+        "label": "SWP/SD3",
+        "reason": "ESP32-WROOM-32 모듈 내부 SPI 플래시에 연결되어 있어 사용할 수 없습니다. 30핀 DevKit V1 헤더에는 나와 있지 않습니다."
+      },
+      {
+        "id": "GPIO11",
+        "label": "CSC/CMD",
+        "reason": "ESP32-WROOM-32 모듈 내부 SPI 플래시에 연결되어 있어 사용할 수 없습니다. 30핀 DevKit V1 헤더에는 나와 있지 않습니다."
+      },
+      {
+        "id": "GPIO0",
+        "label": "BOOT",
+        "reason": "스트래핑 핀(부팅 모드 선택)으로 보드의 BOOT 버튼에 연결되어 있으며, 30핀 DevKit V1 헤더에는 나와 있지 않습니다."
+      }
+    ],
+    "headers": [
+      {
+        "label": "J2 · EN – VIN",
+        "side": "top",
+        "pinIds": [
+          "EN",
+          "GPIO36",
+          "GPIO39",
+          "GPIO34",
+          "GPIO35",
+          "GPIO32",
+          "GPIO33",
+          "GPIO25",
+          "GPIO26",
+          "GPIO27",
+          "GPIO14",
+          "GPIO12",
+          "GPIO13",
+          "GND",
+          "VIN"
+        ]
+      },
+      {
+        "label": "J3 · D23 – 3V3",
+        "side": "bottom",
+        "pinIds": [
+          "GPIO23",
+          "GPIO22",
+          "GPIO1",
+          "GPIO3",
+          "GPIO21",
+          "GPIO19",
+          "GPIO18",
+          "GPIO5",
+          "GPIO17",
+          "GPIO16",
+          "GPIO4",
+          "GPIO2",
+          "GPIO15",
+          "GND2",
+          "3V3"
+        ]
+      }
+    ],
+    "microcontroller": "ESP32-WROOM-32 (ESP32-D0WD, Xtensa LX6 듀얼코어)",
+    "clockSpeed": "최대 240 MHz",
+    "digitalIoCount": 25,
+    "analogInputCount": 15,
+    "pwmPins": [
+      "GPIO32",
+      "GPIO33",
+      "GPIO25",
+      "GPIO26",
+      "GPIO27",
+      "GPIO14",
+      "GPIO12",
+      "GPIO13",
+      "GPIO23",
+      "GPIO22",
+      "GPIO1",
+      "GPIO3",
+      "GPIO21",
+      "GPIO19",
+      "GPIO18",
+      "GPIO5",
+      "GPIO17",
+      "GPIO16",
+      "GPIO4",
+      "GPIO2",
+      "GPIO15"
+    ],
+    "interruptPins": [
+      "GPIO36",
+      "GPIO39",
+      "GPIO34",
+      "GPIO35",
+      "GPIO32",
+      "GPIO33",
+      "GPIO25",
+      "GPIO26",
+      "GPIO27",
+      "GPIO14",
+      "GPIO12",
+      "GPIO13",
+      "GPIO23",
+      "GPIO22",
+      "GPIO1",
+      "GPIO3",
+      "GPIO21",
+      "GPIO19",
+      "GPIO18",
+      "GPIO5",
+      "GPIO17",
+      "GPIO16",
+      "GPIO4",
+      "GPIO2",
+      "GPIO15"
+    ],
+    "memory": {
+      "flash": "4 MB (모듈 외장 SPI 플래시, 제품별 상이)",
+      "sram": "520 KB",
+      "eeprom": "없음 (플래시 영역으로 에뮬레이션)"
+    },
+    "electrical": [
+      {
+        "label": "동작 전압 (I/O 논리)",
+        "value": "3.3 V",
+        "confidence": "official"
+      },
+      {
+        "label": "GPIO 최대 입력 전압",
+        "value": "3.6 V (VDD + 0.3 V)",
+        "confidence": "typical",
+        "note": "ESP32 데이터시트 절대 최대 정격 기준입니다. 5 V 신호를 직접 넣으면 안 됩니다."
+      },
+      {
+        "label": "GPIO 핀당 출력 전류",
+        "value": "최대 약 40 mA",
+        "confidence": "typical",
+        "note": "구동 세기를 최대로 설정했을 때의 데이터시트 값입니다. Autoino 는 20 mA 를 권장 상한으로 검사합니다."
+      },
+      {
+        "label": "입력 전원 (USB / VIN)",
+        "value": "5 V (USB)",
+        "confidence": "varies",
+        "note": "VIN 허용 범위는 보드에 실장된 레귤레이터에 따라 다릅니다."
+      },
+      {
+        "label": "3V3 핀 공급 가능 전류",
+        "value": "제품별 상이",
+        "confidence": "varies",
+        "note": "레귤레이터 용량에서 ESP32 자체 소비(Wi-Fi 송신 시 수백 mA 피크)를 뺀 값입니다."
+      }
+    ],
+    "buses": [
+      {
+        "kind": "UART",
+        "name": "Serial (UART0)",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "GPIO3"
+          },
+          {
+            "role": "TX",
+            "pinId": "GPIO1"
+          }
+        ]
+      },
+      {
+        "kind": "UART",
+        "name": "Serial2 (UART2)",
+        "pins": [
+          {
+            "role": "RX",
+            "pinId": "GPIO16"
+          },
+          {
+            "role": "TX",
+            "pinId": "GPIO17"
+          }
+        ]
+      },
+      {
+        "kind": "I2C",
+        "name": "Wire",
+        "pins": [
+          {
+            "role": "SDA",
+            "pinId": "GPIO21"
+          },
+          {
+            "role": "SCL",
+            "pinId": "GPIO22"
+          }
+        ]
+      },
+      {
+        "kind": "SPI",
+        "name": "SPI (VSPI)",
+        "pins": [
+          {
+            "role": "SS",
+            "pinId": "GPIO5"
+          },
+          {
+            "role": "MOSI",
+            "pinId": "GPIO23"
+          },
+          {
+            "role": "MISO",
+            "pinId": "GPIO19"
+          },
+          {
+            "role": "SCK",
+            "pinId": "GPIO18"
+          }
+        ]
+      },
+      {
+        "kind": "SPI",
+        "name": "HSPI",
+        "pins": [
+          {
+            "role": "SS",
+            "pinId": "GPIO15"
+          },
+          {
+            "role": "MOSI",
+            "pinId": "GPIO13"
+          },
+          {
+            "role": "MISO",
+            "pinId": "GPIO12"
+          },
+          {
+            "role": "SCK",
+            "pinId": "GPIO14"
+          }
+        ]
+      }
+    ],
+    "pins": [
+      {
+        "id": "EN",
+        "label": "EN",
+        "group": "control",
+        "capabilities": [],
+        "note": "칩 리셋(활성 HIGH). LOW 로 당기면 리셋되며 보드의 EN 버튼과 연결되어 있습니다."
+      },
+      {
+        "id": "GPIO36",
+        "label": "VP",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "analog",
+          "interrupt"
+        ],
+        "gpio": 36,
+        "note": "ADC1_CH0 (Arduino A0)",
+        "restrictions": [
+          {
+            "kind": "input-only",
+            "description": "입력 전용 핀입니다. 출력(LED·Trig 등)으로 사용할 수 없습니다."
+          },
+          {
+            "kind": "no-internal-pull",
+            "description": "내부 풀업/풀다운이 없습니다. 버튼 등은 외부 풀업 저항이 필요합니다."
+          },
+          {
+            "kind": "interrupt-caveat",
+            "description": "ADC 또는 Wi-Fi/Bluetooth 와 절전 모드를 함께 쓸 때 이 핀의 인터럽트를 사용하지 마세요 (ESP32 하드웨어 이슈 GPIO-3.11)."
+          }
+        ]
+      },
+      {
+        "id": "GPIO39",
+        "label": "VN",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "analog",
+          "interrupt"
+        ],
+        "gpio": 39,
+        "note": "ADC1_CH3 (Arduino A3)",
+        "restrictions": [
+          {
+            "kind": "input-only",
+            "description": "입력 전용 핀입니다. 출력(LED·Trig 등)으로 사용할 수 없습니다."
+          },
+          {
+            "kind": "no-internal-pull",
+            "description": "내부 풀업/풀다운이 없습니다. 버튼 등은 외부 풀업 저항이 필요합니다."
+          },
+          {
+            "kind": "interrupt-caveat",
+            "description": "ADC 또는 Wi-Fi/Bluetooth 와 절전 모드를 함께 쓸 때 이 핀의 인터럽트를 사용하지 마세요 (ESP32 하드웨어 이슈 GPIO-3.11)."
+          }
+        ]
+      },
+      {
+        "id": "GPIO34",
+        "label": "D34",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "analog",
+          "interrupt"
+        ],
+        "gpio": 34,
+        "note": "ADC1_CH6 (Arduino A6)",
+        "restrictions": [
+          {
+            "kind": "input-only",
+            "description": "입력 전용 핀입니다. 출력(LED·Trig 등)으로 사용할 수 없습니다."
+          },
+          {
+            "kind": "no-internal-pull",
+            "description": "내부 풀업/풀다운이 없습니다. 버튼 등은 외부 풀업 저항이 필요합니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO35",
+        "label": "D35",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "analog",
+          "interrupt"
+        ],
+        "gpio": 35,
+        "note": "ADC1_CH7 (Arduino A7)",
+        "restrictions": [
+          {
+            "kind": "input-only",
+            "description": "입력 전용 핀입니다. 출력(LED·Trig 등)으로 사용할 수 없습니다."
+          },
+          {
+            "kind": "no-internal-pull",
+            "description": "내부 풀업/풀다운이 없습니다. 버튼 등은 외부 풀업 저항이 필요합니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO32",
+        "label": "D32",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch"
+        ],
+        "gpio": 32,
+        "note": "ADC1_CH4 (A4) · 터치 T9"
+      },
+      {
+        "id": "GPIO33",
+        "label": "D33",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch"
+        ],
+        "gpio": 33,
+        "note": "ADC1_CH5 (A5) · 터치 T8"
+      },
+      {
+        "id": "GPIO25",
+        "label": "D25",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "dac"
+        ],
+        "gpio": 25,
+        "note": "ADC2_CH8 (A18) · DAC1 (ESP-IDF: DAC_CHAN_0)",
+        "restrictions": [
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO26",
+        "label": "D26",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "dac"
+        ],
+        "gpio": 26,
+        "note": "ADC2_CH9 (A19) · DAC2 (ESP-IDF: DAC_CHAN_1)",
+        "restrictions": [
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO27",
+        "label": "D27",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch"
+        ],
+        "gpio": 27,
+        "note": "ADC2_CH7 (A17) · 터치 T7",
+        "restrictions": [
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO14",
+        "label": "D14",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch",
+          "spi-sck"
+        ],
+        "gpio": 14,
+        "note": "ADC2_CH6 (A16) · 터치 T6 · HSPI SCK",
+        "restrictions": [
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          },
+          {
+            "kind": "jtag",
+            "description": "JTAG 디버그 핀(MTMS)입니다. 인라인 디버깅을 쓰면 사용할 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO12",
+        "label": "D12",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch",
+          "spi-miso"
+        ],
+        "gpio": 12,
+        "note": "ADC2_CH5 (A15) · 터치 T5 · HSPI MISO",
+        "restrictions": [
+          {
+            "kind": "strapping",
+            "description": "MTDI 스트래핑 핀입니다. 부팅 시 HIGH 이면 플래시 전압이 1.8 V 로 설정되어 3.3 V 플래시를 쓰는 이 보드는 업로드·부팅에 실패할 수 있습니다. 부팅 시 HIGH 로 당기는 회로(풀업 등)를 연결하지 마세요."
+          },
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          },
+          {
+            "kind": "jtag",
+            "description": "JTAG 디버그 핀(MTDI)입니다. 인라인 디버깅을 쓰면 사용할 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO13",
+        "label": "D13",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch",
+          "spi-mosi"
+        ],
+        "gpio": 13,
+        "note": "ADC2_CH4 (A14) · 터치 T4 · HSPI MOSI",
+        "restrictions": [
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          },
+          {
+            "kind": "jtag",
+            "description": "JTAG 디버그 핀(MTCK)입니다. 인라인 디버깅을 쓰면 사용할 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GND",
+        "label": "GND",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "VIN",
+        "label": "VIN",
+        "group": "power",
+        "capabilities": [],
+        "note": "USB 전원 사용 시 USB 5 V 계열 전압이 나오고, 외부 전원을 넣으면 입력 핀으로 동작합니다."
+      },
+      {
+        "id": "GPIO23",
+        "label": "D23",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "spi-mosi"
+        ],
+        "gpio": 23,
+        "note": "VSPI MOSI (Arduino 기본 MOSI)"
+      },
+      {
+        "id": "GPIO22",
+        "label": "D22",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "i2c-scl"
+        ],
+        "gpio": 22,
+        "note": "Arduino 기본 I²C SCL"
+      },
+      {
+        "id": "GPIO1",
+        "label": "TX0",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "uart-tx"
+        ],
+        "gpio": 1,
+        "note": "UART0 TXD",
+        "restrictions": [
+          {
+            "kind": "usb-serial",
+            "description": "UART0 TX 입니다. USB 시리얼(업로드·시리얼 모니터)과 공유되며 부팅 로그가 출력됩니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO3",
+        "label": "RX0",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "uart-rx"
+        ],
+        "gpio": 3,
+        "note": "UART0 RXD",
+        "restrictions": [
+          {
+            "kind": "usb-serial",
+            "description": "UART0 RX 입니다. USB 시리얼(업로드·시리얼 모니터)과 공유됩니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO21",
+        "label": "D21",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "i2c-sda"
+        ],
+        "gpio": 21,
+        "note": "Arduino 기본 I²C SDA"
+      },
+      {
+        "id": "GPIO19",
+        "label": "D19",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "spi-miso"
+        ],
+        "gpio": 19,
+        "note": "VSPI MISO (Arduino 기본 MISO)"
+      },
+      {
+        "id": "GPIO18",
+        "label": "D18",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "spi-sck"
+        ],
+        "gpio": 18,
+        "note": "VSPI SCK (Arduino 기본 SCK)"
+      },
+      {
+        "id": "GPIO5",
+        "label": "D5",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "spi-ss"
+        ],
+        "gpio": 5,
+        "note": "VSPI SS (Arduino 기본 SS)",
+        "restrictions": [
+          {
+            "kind": "strapping",
+            "description": "스트래핑 핀입니다(SDIO 슬레이브 타이밍). 부팅 시 레벨을 바꾸는 회로를 연결하지 마세요."
+          }
+        ]
+      },
+      {
+        "id": "GPIO17",
+        "label": "TX2",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "uart-tx"
+        ],
+        "gpio": 17,
+        "note": "UART2 TXD (보드 실크 TX2)"
+      },
+      {
+        "id": "GPIO16",
+        "label": "RX2",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "uart-rx"
+        ],
+        "gpio": 16,
+        "note": "UART2 RXD (보드 실크 RX2)"
+      },
+      {
+        "id": "GPIO4",
+        "label": "D4",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch"
+        ],
+        "gpio": 4,
+        "note": "ADC2_CH0 (A10) · 터치 T0",
+        "restrictions": [
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO2",
+        "label": "D2",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch"
+        ],
+        "gpio": 2,
+        "note": "ADC2_CH2 (A12) · 터치 T2",
+        "restrictions": [
+          {
+            "kind": "strapping",
+            "description": "스트래핑 핀입니다. 다운로드 모드 진입 시 LOW 이거나 연결되지 않아야 합니다. 부팅 시 HIGH 로 당기는 회로를 연결하지 마세요."
+          },
+          {
+            "kind": "onboard-led",
+            "description": "보드 내장 파란 LED 와 연결되어 있습니다 (LED_BUILTIN = 2)."
+          },
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GPIO15",
+        "label": "D15",
+        "group": "digital",
+        "capabilities": [
+          "digital",
+          "pwm",
+          "interrupt",
+          "analog",
+          "touch",
+          "spi-ss"
+        ],
+        "gpio": 15,
+        "note": "ADC2_CH3 (A13) · 터치 T3 · HSPI SS",
+        "restrictions": [
+          {
+            "kind": "strapping",
+            "description": "MTDO 스트래핑 핀입니다. 부팅 시 LOW 이면 부트 메시지 출력이 꺼집니다 (내부 풀업으로 기본 HIGH)."
+          },
+          {
+            "kind": "adc2-wifi",
+            "description": "ADC2 채널입니다. Wi-Fi 를 사용하는 동안에는 아날로그 입력으로 쓸 수 없습니다."
+          },
+          {
+            "kind": "jtag",
+            "description": "JTAG 디버그 핀(MTDO)입니다. 인라인 디버깅을 쓰면 사용할 수 없습니다."
+          }
+        ]
+      },
+      {
+        "id": "GND2",
+        "label": "GND",
+        "group": "power",
+        "capabilities": []
+      },
+      {
+        "id": "3V3",
+        "label": "3V3",
+        "group": "power",
+        "capabilities": [],
+        "note": "보드 레귤레이터의 3.3 V 출력입니다. ESP32 자체도 이 전원을 사용합니다."
+      }
+    ],
+    "footprint": {
+      "width": 400,
+      "height": 150
+    },
+    "notes": [
+      "I/O 논리 전압이 3.3 V 입니다. 5 V 로 동작하는 부품의 출력(예: HC-SR04 Echo, 5 V 풀업된 I²C)을 직접 연결하면 안 됩니다.",
+      "GPIO34–39(VP, VN, D34, D35)는 입력 전용이며 내부 풀업/풀다운이 없습니다.",
+      "GPIO6–11 은 모듈 내부 플래시용이라 사용할 수 없습니다.",
+      "GPIO0, 2, 5, 12, 15 는 스트래핑 핀입니다. 부팅 시 레벨을 바꾸는 회로를 연결하면 부팅·업로드에 실패할 수 있습니다.",
+      "보드 실크의 RX2/TX2 는 GPIO16/17 입니다. Arduino-ESP32 3.x 의 Serial2.begin() 기본 핀은 RX 4 / TX 25 이므로 코드에서 16, 17 을 지정해야 합니다.",
+      "GPIO 매트릭스로 UART·I²C·SPI·PWM 을 대부분의 핀에 재배치할 수 있으나, Autoino 는 Arduino-ESP32 기본 핀만 사용합니다.",
+      "표준 Arduino Servo 라이브러리는 ESP32 를 지원하지 않으므로 Autoino 코드 생성은 ESP32Servo 라이브러리를 사용합니다.",
+      "헤더 배열은 일반적인 DOIT 30핀 DevKit V1 기준입니다. 호환 보드마다 배열·실크 표기가 다를 수 있으니 실물을 확인하세요."
+    ],
+    "sourceUrl": "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/gpio.html",
+    "powerInput": {
+      "pinId": "VIN",
+      "minVoltage": 4.5,
+      "maxVoltage": 12
+    }
+  }
+]

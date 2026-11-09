@@ -1,0 +1,134 @@
+.power-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.power-need {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.power-need__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.power-need__figures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.power-need__figures > div {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.power-need__label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.power-need__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--accent);
+}
+
+.power-need__sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.power-need__consumers {
+  font-size: 0.75rem;
+}
+
+.power-need__consumers summary {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.power-need__consumers ul {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.power-need__consumers li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.power-need__subhead {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+}
+
+.power-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.power-example {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.power-example__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.power-example__title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 0.76rem;
+}
+
+.power-example__meta {
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.power-example__note {
+  margin: 2px 0 0;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.power-sources td {
+  vertical-align: top;
+}
+
+.power-sources tr.is-bad td {
+  background: var(--danger-soft);
+}

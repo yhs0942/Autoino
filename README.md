@@ -1,0 +1,107 @@
+# Autoino
+
+아두이노 메인 보드와 전자 모듈을 선택하고 연결하면, 핀 배정·저항 선정·배선을 자동으로 처리하는 것을 목표로 하는 회로 설계 프로그램입니다.
+
+> **현재 상태: 4단계 프로토타입 (프런트엔드 + 파이썬 백엔드 + Streamlit)**
+> 보드 선택, 부품 배치, 핀 단위 배선, 자동 핀 배정, LED 직렬 저항 자동 선정, 전기적 검증, 프로젝트 저장·불러오기,
+> CSV 내보내기, 여러 보드와 보드 간 통신(UART·I²C·SPI), 실행 취소·다시 실행, 레벨 변환 자동 삽입, 회로도 SVG/PNG,
+> Arduino 코드 생성, DC 시뮬레이션, 서버 저장에 더해 **부품 47종(모터·모터 드라이버 포함), 배선도 위 브레드보드와 전선별 경로 선택,
+> 외부 전원 계산과 전원 예시 적용, Streamlit 실행**이 동작합니다.
+> 코드 생성·시뮬레이션·서버 저장은 파이썬 백엔드(`backend/`)가 필요하며, 백엔드 없이도 나머지 기능은 그대로 동작합니다.
+> 지원 보드: Arduino Uno R3, Mega 2560, Nano, ESP32 DevKit V1 (ESP32-WROOM-32, 3.3 V 로직).
+> 자세한 내용은 [docs/phase-1-ui.md](docs/phase-1-ui.md), [docs/phase-2-wiring.md](docs/phase-2-wiring.md),
+> [docs/esp32-board.md](docs/esp32-board.md), [docs/phase-3-backend.md](docs/phase-3-backend.md),
+> [docs/phase-4-motors-power.md](docs/phase-4-motors-power.md), [backend/README.md](backend/README.md) 를 참고하세요.
+
+## Streamlit 으로 실행
+
+명령 하나로 화면과 백엔드를 함께 띄웁니다. Python 3.11 이상과 Node.js 20 이상이 필요합니다.
+
+```bash
+# 처음 한 번만
+python -m venv .venv
+.venv\Scripts\activate            # macOS·Linux: source .venv/bin/activate
+pip install -r requirements.txt
+cd frontend && npm install && npm run build && cd ..
+
+# 실행 (브라우저가 http://localhost:8501 로 열립니다)
+streamlit run streamlit_app.py
+```
+
+- 처음 실행할 때 터미널에서 이메일을 물으면 그냥 Enter 를 누르면 됩니다.
+- 화면 코드를 고친 뒤에는 `frontend` 에서 `npm run build` 를 다시 실행하세요.
+- 같은 네트워크의 다른 PC 에서는 터미널에 나오는 Network URL 로 접속합니다. 포트는 8501 하나만 쓰고, 다른 포트는 `--server.port 8600` 처럼 바꿉니다.
+- Streamlit Community Cloud 에 올릴 때는 저장소에 `frontend/dist` 도 함께 올리고(현재 `.gitignore` 대상) 시작 파일을 `streamlit_app.py` 로 지정하세요. 이 구성은 로컬에서만 시험했습니다.
+
+## 개발 서버로 실행
+
+Node.js 20 이상이 필요합니다.
+
+```bash
+cd frontend
+npm install
+npm run dev      # 개발 서버 (기본 http://localhost:5173)
+npm test         # 단위 테스트 (Vitest)
+npm run lint     # 린트 (oxlint)
+npm run build    # 타입 검사 + 프로덕션 빌드 (frontend/dist)
+```
+
+백엔드 (Python 3.11 이상). 개발 서버(5173)의 `/api` 요청은 Vite 가 `http://127.0.0.1:8000` 으로 넘깁니다.
+`frontend/dist` 가 있으면 백엔드가 `http://127.0.0.1:8000` 에서 프런트엔드도 함께 제공합니다.
+
+```bash
+cd backend
+python -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m autoino serve   # API 서버 (문서: http://127.0.0.1:8000/docs)
+.venv/bin/python -m pytest          # 백엔드 테스트
+```
+
+## 폴더 구조
+
+```
+Autoino/
+├── frontend/                 React + TypeScript + Vite 프런트엔드
+│   ├── public/icons/         부품 아이콘 (SVG)
+│   └── src/
+│       ├── api/              백엔드 API 클라이언트, 서버 연결 확인
+│       ├── components/       BoardSelector, ModuleLibrary, CircuitCanvas, PropertyPanel, PowerPanel,
+│       │                     ValidationPanel, PinTable, WorkspaceToolbar, ConnectionPanel, common
+│       ├── data/             data/*.json 로더와 구조 검증
+│       ├── engine/           자동 핀 배정, 저항 선정, 전기적 검증, 전원 분석, 브레드보드 배치, 내보내기, 프로젝트 파일
+│       ├── state/            작업 공간 상태 리듀서, 브라우저 자동 저장
+│       ├── types/            공통 타입
+│       └── utils/            검색 필터, 배치 위치 계산
+├── backend/                  파이썬 백엔드 (FastAPI): API, 엔진 포팅, 코드 생성, DC 시뮬레이션, CLI
+├── streamlit_app.py          Streamlit 실행 파일 (API·화면을 /autoino 에 얹음)
+├── streamlit_page.py         Streamlit 페이지 (화면을 창 가득 띄움)
+├── shared/fixtures/          TypeScript ↔ Python 엔진 결과 비교용 픽스처
+├── data/                     부품·보드·전원 예시 JSON 데이터베이스
+├── assets/                   원본 디자인 자료
+├── projects/                 저장한 프로젝트 파일을 둘 위치
+└── docs/                     개발 문서
+```
+
+## 사용법
+
+- 왼쪽 라이브러리에서 부품을 작업 공간으로 끌어다 놓거나 **추가** 버튼을 누릅니다.
+- 배치된 부품은 끌어서 옮길 수 있고, 클릭하면 오른쪽에 속성이 표시됩니다. 보드를 클릭하면 보드 사양이 표시됩니다.
+- 부품 카드 아래의 **핀을 끌어 보드 핀에 놓으면** 전선이 연결됩니다. 끄는 동안 연결 가능한 핀이 초록색으로 표시됩니다.
+- 전선을 끌기 전에 툴바의 **새 전선** 에서 **보드 직결** 또는 **브레드보드 경유** 를 고릅니다. 브레드보드는 배선도에 항상 있으며 끌어서 옮길 수 있습니다.
+  브레드보드 경유 전선은 구멍이 자동으로 정해지고, 전선을 브레드보드 위에 놓으면 맞는 핀도 자동으로 고릅니다. 이미 만든 전선은 선택해서 경로를 바꿀 수 있습니다.
+- 브레드보드를 클릭하면 레일과 구멍별 배선표가 나옵니다.
+- **자동 핀 배정**은 미연결 핀을 규칙에 따라 연결하고, 잘못되었거나 충돌하는 연결을 재배치합니다(직접 연결한 올바른 전선은 유지).
+  모터는 드라이버 채널에, 드라이버 전원은 외부 전원에 연결하며 쓰는 채널의 제어 핀만 보드에 연결합니다.
+- 오른쪽 **전원** 탭은 이 회로에 필요한 외부 전원의 전압·전류와 맞는 전원 예시를 보여 줍니다. **적용** 을 누르면 외부 전원을 놓고 전원·GND 를 연결합니다.
+- LED 를 선택하면 색상·목표 전류를 바꿀 수 있고, 필요한 직렬 저항이 자동으로 계산됩니다.
+- 오른쪽 **검사** 탭에서 오류·경고를, **핀 배정표** 탭에서 전체 배정 현황을 확인합니다. 항목을 누르면 해당 부품·전선이 선택됩니다.
+- 선택한 부품·전선은 **삭제** 버튼 또는 `Delete` 키로 삭제합니다. `Esc` 는 선택 해제입니다.
+- **저장**은 `.autoino.json` 파일을 내려받고, **열기**로 다시 불러옵니다. 작업 내용은 브라우저에도 자동 저장됩니다.
+- **내보내기**에서 부품 목록(BOM)과 핀 배정표를 CSV 로 받을 수 있습니다.
+- **코드**는 보드마다 Arduino 스케치(.ino)를 만들고, **시뮬레이션**은 핀 상태·버튼 입력을 바꿔 가며 전압·전류를 계산합니다(백엔드 필요).
+- **서버**에서 백엔드의 `projects/` 폴더에 프로젝트를 저장하고 엽니다. 헤더의 배지가 서버 연결 상태를 보여 줍니다.
+- `Ctrl+Z` / `Ctrl+Shift+Z`(또는 `Ctrl+Y`)로 실행 취소·다시 실행합니다.
+- **초기화**는 확인 후 부품과 전선을 모두 제거합니다(보드 선택·프로젝트 이름은 유지).
+
+> 전기적 검증은 부품 데이터의 규칙과 대표값을 기준으로 하며 실제 회로의 안전을 보장하지 않습니다.
+> 실제 제품 사양은 데이터시트로 확인하세요.

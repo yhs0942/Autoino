@@ -1,0 +1,101 @@
+/* 전역 디자인 토큰과 기본 스타일 */
+:root {
+  --font-sans: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --accent: #0e7490;
+  --accent-hover: #155e75;
+  --accent-contrast: #ffffff;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --selection: #f59e0b;
+  --selection-soft: rgb(245 158 11 / 0.25);
+  --canvas-bg: #f8fafc;
+  --canvas-dot: #cbd5e1;
+  --pin-power: #dc2626;
+  --wire-power: #dc2626;
+  --wire-ground: #334155;
+
+  --ok-soft: #dcfce7;
+  --ok-text: #166534;
+  --info-soft: #e0f2fe;
+  --info-text: #075985;
+  --warning-soft: #fef3c7;
+  --warning-text: #92400e;
+  --danger-soft: #fee2e2;
+  --danger-text: #991b1b;
+
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.08);
+  --shadow-md: 0 4px 12px rgb(15 23 42 / 0.12);
+  --shadow-lg: 0 20px 40px rgb(15 23 42 / 0.25);
+
+  color-scheme: light dark;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-muted: #1f2937;
+    --text: #e5e7eb;
+    --text-muted: #9ca3af;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --accent: #22d3ee;
+    --accent-hover: #67e8f9;
+    --accent-contrast: #0b1120;
+    --danger: #f87171;
+    --danger-hover: #fca5a5;
+    --canvas-bg: #0f172a;
+    --canvas-dot: #1e293b;
+    --pin-power: #f87171;
+    --wire-power: #f87171;
+    --wire-ground: #94a3b8;
+
+    --ok-soft: rgb(34 197 94 / 0.15);
+    --ok-text: #86efac;
+    --info-soft: rgb(56 189 248 / 0.15);
+    --info-text: #7dd3fc;
+    --warning-soft: rgb(245 158 11 / 0.15);
+    --warning-text: #fcd34d;
+    --danger-soft: rgb(248 113 113 / 0.15);
+    --danger-text: #fca5a5;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+}

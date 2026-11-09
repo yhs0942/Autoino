@@ -1,0 +1,503 @@
+.circuit-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.circuit-canvas__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--canvas-bg);
+}
+
+.circuit-canvas__surface {
+  position: relative;
+  background-image: radial-gradient(var(--canvas-dot) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.circuit-canvas__board {
+  position: absolute;
+  z-index: 1;
+}
+
+.circuit-canvas__breadboard {
+  position: absolute;
+  z-index: 1;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.circuit-canvas__breadboard svg {
+  display: block;
+}
+
+.circuit-canvas__breadboard.is-selected,
+.circuit-canvas__breadboard:focus-visible {
+  outline: 3px solid var(--selection);
+  outline-offset: 3px;
+}
+
+.circuit-canvas__breadboard.is-active {
+  box-shadow: 0 0 0 2px var(--accent), var(--shadow-sm);
+}
+
+.circuit-canvas__breadboard.is-drop-target.is-active {
+  box-shadow: 0 0 0 3px var(--selection), var(--shadow-md);
+}
+
+.circuit-canvas__empty {
+  position: absolute;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.circuit-canvas__empty strong {
+  color: var(--text);
+}
+
+/* ---------- 보드 그래픽 ---------- */
+.board-graphic {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  color: #e0f2fe;
+  background: linear-gradient(160deg, #0e7490, #155e75);
+  border: 2px solid #0c4a6e;
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  cursor: grab;
+  user-select: none;
+}
+
+.board-graphic.is-selected {
+  outline: 3px solid var(--selection);
+  outline-offset: 3px;
+}
+
+.board-graphic:focus-visible {
+  outline: 3px solid var(--selection);
+  outline-offset: 3px;
+}
+
+.board-graphic__header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.board-graphic__header-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.board-graphic__pins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.board-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 2px;
+  background: #0f172a;
+  border-radius: 2px;
+  font-size: 0.5rem;
+  font-family: var(--font-mono);
+  color: #cbd5e1;
+}
+
+.board-pin--pwm {
+  color: #fde68a;
+}
+
+.board-graphic__center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.board-graphic__chip {
+  padding: 8px 10px;
+  background: #111827;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #9ca3af;
+}
+
+.board-graphic__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.board-graphic__bottom {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- 배치된 모듈 ---------- */
+.placed-module {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.placed-module:active {
+  cursor: grabbing;
+}
+
+.placed-module.is-selected {
+  border-color: var(--selection);
+  box-shadow: 0 0 0 3px var(--selection-soft), var(--shadow-md);
+  z-index: 4;
+}
+
+.placed-module:focus-visible {
+  outline: 3px solid var(--selection);
+  outline-offset: 2px;
+}
+
+.placed-module__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.placed-module__top img {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  pointer-events: none;
+}
+
+.placed-module__titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.placed-module__label {
+  font-weight: 600;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.placed-module__sub {
+  font-size: 0.7rem;
+  color: var(--warning-text);
+}
+
+.placed-module__pins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.module-pin {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.62rem;
+  font-family: var(--font-mono);
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.module-pin--power {
+  color: var(--pin-power);
+  border-color: currentColor;
+}
+
+.module-pin--ground {
+  color: var(--text);
+}
+
+.module-pin--signal {
+  color: var(--accent);
+  border-color: currentColor;
+}
+
+.module-pin--source {
+  color: #fff;
+  background: var(--pin-power);
+  border-color: var(--pin-power);
+}
+
+.module-pin--load,
+.module-pin--drive {
+  color: #7c3aed;
+  border-color: currentColor;
+}
+
+.module-pin.is-compatible {
+  background: #15803d;
+  border-color: #15803d;
+  color: #fff;
+  box-shadow: 0 0 0 2px #86efac;
+}
+
+.module-pin.module-pin--load.is-connected,
+.module-pin.module-pin--drive.is-connected {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #fff;
+}
+
+/* ---------- 배선 ---------- */
+.circuit-canvas__hint {
+  margin: 0;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.wire-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.wire-layer--overlay {
+  z-index: 5;
+}
+
+.wire__hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.wire__line {
+  fill: none;
+  stroke: var(--wire-color);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.wire.is-selected .wire__line {
+  stroke-width: 5;
+  filter: drop-shadow(0 0 3px var(--selection));
+}
+
+.wire.has-error .wire__line {
+  stroke-dasharray: 8 5;
+}
+
+.wire__end {
+  fill: var(--wire-color);
+  stroke: #fff;
+  stroke-width: 1;
+}
+
+.wire--lead { --wire-color: #2563eb; }
+.wire--power { --wire-color: var(--wire-power); }
+.wire--ground { --wire-color: var(--wire-ground); }
+.wire--signal-0 { --wire-color: #2563eb; }
+.wire--signal-1 { --wire-color: #16a34a; }
+.wire--signal-2 { --wire-color: #ea580c; }
+.wire--signal-3 { --wire-color: #9333ea; }
+.wire--signal-4 { --wire-color: #0891b2; }
+.wire--signal-5 { --wire-color: #ca8a04; }
+
+.wire__resistor rect {
+  fill: #f5e6c8;
+  stroke: #92400e;
+  stroke-width: 1;
+}
+
+.wire__resistor text {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  fill: #78350f;
+  pointer-events: none;
+}
+
+.wire-preview {
+  fill: none;
+  stroke: var(--selection);
+  stroke-width: 3;
+  stroke-dasharray: 6 4;
+}
+
+.board-pin,
+.module-pin {
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.board-pin.is-used {
+  background: #0369a1;
+  color: #fff;
+  box-shadow: 0 0 0 1px #7dd3fc;
+}
+
+.board-pin.is-compatible {
+  background: #15803d;
+  color: #fff;
+  box-shadow: 0 0 0 2px #86efac;
+}
+
+.board-pin.is-incompatible {
+  opacity: 0.35;
+}
+
+.module-pin.is-connected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.module-pin.module-pin--power.is-connected {
+  background: var(--pin-power);
+  border-color: var(--pin-power);
+  color: #fff;
+}
+
+.module-pin.module-pin--ground.is-connected {
+  background: var(--wire-ground);
+  border-color: var(--wire-ground);
+  color: #fff;
+}
+
+.placed-module__sub.is-done {
+  color: var(--ok-text);
+}
+
+.placed-module.has-error {
+  border-color: var(--danger);
+}
+
+.placed-module.has-error .placed-module__sub {
+  color: var(--danger);
+}
+
+/* ---------- 핀 제약 표시 (헤더 배열이 정의된 보드) ---------- */
+.board-pin--input-only {
+  box-shadow: inset 0 0 0 1px #38bdf8;
+  color: #7dd3fc;
+}
+
+.board-pin--strapping {
+  box-shadow: inset 0 -2px 0 #f59e0b;
+}
+
+.board-pin--power {
+  color: #fca5a5;
+}
+
+.board-graphic__legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.6rem;
+  opacity: 0.85;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-left: 6px;
+  border-radius: 2px;
+  background: #0f172a;
+}
+
+.legend-swatch:first-child {
+  margin-left: 0;
+}
+
+.legend-swatch--input-only {
+  box-shadow: inset 0 0 0 1px #38bdf8;
+}
+
+.legend-swatch--strapping {
+  box-shadow: inset 0 -2px 0 #f59e0b;
+}
+
+.board-graphic__logic {
+  margin-left: 8px;
+  padding: 0 5px;
+  border-radius: 3px;
+  background: #fbbf24;
+  color: #422006;
+  font-weight: 700;
+}
+
+.wire--link { --wire-color: #db2777; }
+
+.wire--link .wire__line {
+  stroke-width: 3.5;
+}
+
+.circuit-canvas__board.is-dragging {
+  cursor: grabbing;
+}
+
+.board-graphic__instance {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  padding: 1px 8px;
+  border-radius: 4px 4px 0 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: #0c4a6e;
+}
+
+/* 핀이 많은 부품(레벨 시프터 등)은 칩을 작게 해서 카드 안에 넣는다 */
+.placed-module--dense .placed-module__pins {
+  gap: 2px;
+}
+
+.placed-module--dense .module-pin {
+  padding: 1px 3px;
+  font-size: 0.55rem;
+}

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autoino-backend"
+version = "0.3.0"
+description = "Autoino 회로 분석·코드 생성·시뮬레이션 백엔드 (FastAPI)"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.34,<1",
+  "pydantic>=2.9,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<9", "httpx>=0.28,<1"]
+
+[project.scripts]
+autoino = "autoino.__main__:main"
+
+[tool.setuptools]
+packages = ["autoino", "autoino.engine"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,130 @@
+/* 백엔드 기능 대화상자: 서버 프로젝트 · 코드 생성 · 시뮬레이션 */
+.backend-list {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.callout.backend-list {
+  padding-left: 28px;
+}
+
+.backend-boards {
+  margin-bottom: 10px;
+}
+
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.code-toolbar__buttons,
+.server-actions,
+.server-row-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.server-actions {
+  margin-bottom: 12px;
+}
+
+.server-row-buttons {
+  justify-content: flex-end;
+}
+
+.code-block {
+  margin: 0 0 12px;
+  padding: 12px;
+  max-height: 46vh;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: pre;
+  color: var(--text);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  tab-size: 2;
+}
+
+.code-block--small {
+  max-height: none;
+  font-size: 0.75rem;
+}
+
+.sim__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0 0 12px;
+  padding: 8px 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.sim__controls legend {
+  padding: 0 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.sim__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.sim__table select {
+  font: inherit;
+  font-size: 0.8rem;
+  max-width: 100%;
+}
+
+.pin-table tr.is-bad td,
+.pin-table tr.is-current td {
+  background: var(--warning-soft);
+}
+
+.pin-table tr.is-current td {
+  background: var(--info-soft);
+}
+
+.is-bad-cell {
+  font-weight: 700;
+  color: var(--danger-text);
+}
+
+.sim__meter {
+  display: inline-block;
+  width: 56px;
+  height: 8px;
+  vertical-align: middle;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sim__meter span {
+  display: block;
+  height: 100%;
+  background: var(--selection);
+}
+
+.sim__assumptions {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+
+.sim__assumptions summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+

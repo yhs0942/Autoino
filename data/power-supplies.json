@@ -1,0 +1,181 @@
+[
+  {
+    "id": "usb-charger-5v2a",
+    "name": "USB 충전기 5 V 2 A",
+    "kind": "usb",
+    "voltage": 5,
+    "maxCurrentMa": 2000,
+    "note": "USB 전원 분기 모듈이나 브레드보드 전원 모듈로 + · − 를 꺼내 씁니다."
+  },
+  {
+    "id": "powerbank-5v2a",
+    "name": "보조배터리 5 V 2.4 A",
+    "kind": "battery",
+    "voltage": 5,
+    "maxCurrentMa": 2400,
+    "capacityMah": 6000,
+    "note": "10000 mAh 제품 기준. 부하가 작으면 자동으로 꺼지는 제품이 있습니다."
+  },
+  {
+    "id": "adapter-5v3a",
+    "name": "DC 어댑터 5 V 3 A",
+    "kind": "adapter",
+    "voltage": 5,
+    "maxCurrentMa": 3000,
+    "note": "5.5×2.1 mm 배럴잭 + 터미널 어댑터로 연결합니다."
+  },
+  {
+    "id": "smps-5v10a",
+    "name": "SMPS 5 V 10 A",
+    "kind": "adapter",
+    "voltage": 5,
+    "maxCurrentMa": 10000,
+    "note": "서보 여러 개나 LED 스트립에 알맞습니다. AC 쪽 배선은 감전에 주의하세요."
+  },
+  {
+    "id": "aa4-nimh",
+    "name": "AA 니켈수소 4개 (4.8 V)",
+    "kind": "battery",
+    "voltage": 4.8,
+    "maxCurrentMa": 2000,
+    "capacityMah": 2000,
+    "note": "충전식이라 전류 공급이 알칼라인보다 좋습니다."
+  },
+  {
+    "id": "aa4-alkaline",
+    "name": "AA 알칼라인 4개 (6 V)",
+    "kind": "battery",
+    "voltage": 6,
+    "maxCurrentMa": 1000,
+    "capacityMah": 2000,
+    "note": "구하기 쉽지만 큰 전류에서 전압이 빨리 떨어집니다."
+  },
+  {
+    "id": "adapter-6v3a",
+    "name": "DC 어댑터 6 V 3 A",
+    "kind": "adapter",
+    "voltage": 6,
+    "maxCurrentMa": 3000,
+    "note": "서보용으로 알맞습니다."
+  },
+  {
+    "id": "liion-2s",
+    "name": "18650 리튬이온 2개 (7.4 V)",
+    "kind": "battery",
+    "voltage": 7.4,
+    "maxCurrentMa": 5000,
+    "capacityMah": 2600,
+    "note": "보호회로(BMS) 있는 배터리를 쓰고 전용 충전기로 충전하세요."
+  },
+  {
+    "id": "lipo-2s",
+    "name": "리튬폴리머 2S 7.4 V 2200 mAh",
+    "kind": "battery",
+    "voltage": 7.4,
+    "maxCurrentMa": 30000,
+    "capacityMah": 2200,
+    "note": "방전율 20C 기준. 과방전하면 망가지므로 전압 경보기를 쓰세요."
+  },
+  {
+    "id": "adapter-7v5-2a",
+    "name": "DC 어댑터 7.5 V 2 A",
+    "kind": "adapter",
+    "voltage": 7.5,
+    "maxCurrentMa": 2000,
+    "note": "보드 VIN 입력에도 알맞은 전압입니다."
+  },
+  {
+    "id": "battery-9v",
+    "name": "9 V 건전지 (6F22)",
+    "kind": "battery",
+    "voltage": 9,
+    "maxCurrentMa": 300,
+    "capacityMah": 500,
+    "note": "내부 저항이 커서 모터용으로는 맞지 않습니다. 작은 회로에만 쓰세요."
+  },
+  {
+    "id": "aa6-alkaline",
+    "name": "AA 알칼라인 6개 (9 V)",
+    "kind": "battery",
+    "voltage": 9,
+    "maxCurrentMa": 1000,
+    "capacityMah": 2000,
+    "note": "9 V 건전지보다 훨씬 오래 갑니다."
+  },
+  {
+    "id": "adapter-9v2a",
+    "name": "DC 어댑터 9 V 2 A",
+    "kind": "adapter",
+    "voltage": 9,
+    "maxCurrentMa": 2000,
+    "note": "보드 VIN 입력에도 알맞은 전압입니다."
+  },
+  {
+    "id": "liion-3s",
+    "name": "18650 리튬이온 3개 (11.1 V)",
+    "kind": "battery",
+    "voltage": 11.1,
+    "maxCurrentMa": 5000,
+    "capacityMah": 2600,
+    "note": "보호회로(BMS) 있는 배터리를 쓰세요."
+  },
+  {
+    "id": "lipo-3s",
+    "name": "리튬폴리머 3S 11.1 V 2200 mAh",
+    "kind": "battery",
+    "voltage": 11.1,
+    "maxCurrentMa": 30000,
+    "capacityMah": 2200,
+    "note": "방전율 25C 기준. BLDC·드론용으로 흔합니다."
+  },
+  {
+    "id": "adapter-12v2a",
+    "name": "DC 어댑터 12 V 2 A",
+    "kind": "adapter",
+    "voltage": 12,
+    "maxCurrentMa": 2000,
+    "note": "5.5×2.1 mm 배럴잭 + 터미널 어댑터로 연결합니다."
+  },
+  {
+    "id": "adapter-12v5a",
+    "name": "DC 어댑터 12 V 5 A",
+    "kind": "adapter",
+    "voltage": 12,
+    "maxCurrentMa": 5000,
+    "note": "모터 여러 개를 함께 쓸 때 알맞습니다."
+  },
+  {
+    "id": "smps-12v10a",
+    "name": "SMPS 12 V 10 A",
+    "kind": "adapter",
+    "voltage": 12,
+    "maxCurrentMa": 10000,
+    "note": "스테퍼·큰 DC 모터용. AC 쪽 배선은 감전에 주의하세요."
+  },
+  {
+    "id": "sla-12v7ah",
+    "name": "납축전지 12 V 7 Ah",
+    "kind": "battery",
+    "voltage": 12,
+    "maxCurrentMa": 10000,
+    "capacityMah": 7000,
+    "note": "무겁지만 큰 전류를 안정적으로 냅니다."
+  },
+  {
+    "id": "lipo-4s",
+    "name": "리튬폴리머 4S 14.8 V 2200 mAh",
+    "kind": "battery",
+    "voltage": 14.8,
+    "maxCurrentMa": 30000,
+    "capacityMah": 2200,
+    "note": "방전율 25C 기준."
+  },
+  {
+    "id": "smps-24v5a",
+    "name": "SMPS 24 V 5 A",
+    "kind": "adapter",
+    "voltage": 24,
+    "maxCurrentMa": 5000,
+    "note": "스테퍼를 빠르게 돌릴 때 씁니다. AC 쪽 배선은 감전에 주의하세요."
+  }
+]

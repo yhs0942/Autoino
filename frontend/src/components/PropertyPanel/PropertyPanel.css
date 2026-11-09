@@ -1,0 +1,360 @@
+.property-panel__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 14px 20px;
+}
+
+.property-panel__empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.property-panel__empty strong {
+  color: var(--text);
+}
+
+.prop-route {
+  margin-top: 8px;
+}
+
+.prop-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.prop-hero__icon,
+.prop-hero__board-icon {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  padding: 6px;
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.prop-hero__board-icon {
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  color: #fff;
+  background: #0e7490;
+}
+
+.prop-hero__title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.prop-section {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.prop-section h3 {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.prop-desc {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.kv {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+}
+
+.kv div {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 8px;
+}
+
+.kv dt {
+  color: var(--text-muted);
+}
+
+.kv dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.pin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.pin-table th,
+.pin-table td {
+  padding: 5px 4px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.pin-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.spec-list,
+.note-list,
+.bus-list,
+.not-implemented {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.spec-list li {
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.spec-list li:last-child {
+  border-bottom: none;
+}
+
+.spec-list__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spec-list__label {
+  color: var(--text-muted);
+}
+
+.spec-list__value {
+  font-weight: 600;
+  text-align: right;
+}
+
+.spec-list__note {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.confidence {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.confidence--official {
+  background: var(--ok-soft);
+  color: var(--ok-text);
+}
+
+.confidence--typical {
+  background: var(--info-soft);
+  color: var(--info-text);
+}
+
+.confidence--varies {
+  background: var(--warning-soft);
+  color: var(--warning-text);
+}
+
+.note-list li {
+  position: relative;
+  padding: 2px 0 2px 14px;
+  line-height: 1.5;
+}
+
+.note-list li::before {
+  content: '•';
+  position: absolute;
+  left: 2px;
+  color: var(--text-muted);
+}
+
+.bus-list li {
+  padding: 3px 0;
+}
+
+.not-implemented li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.source-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.prop-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ---------- 탭 ---------- */
+.panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 8px 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.panel-tab[aria-selected='true'] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.panel-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.panel-tab__badge {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  color: var(--warning-text);
+  background: var(--warning-soft);
+}
+
+.panel-tab__badge.is-error {
+  color: #fff;
+  background: var(--danger);
+}
+
+/* ---------- 파라미터 · 저항 ---------- */
+.param-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+}
+
+.param-field select {
+  padding: 6px 8px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.resistor-card {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.resistor-card__value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.resistor-card__meta {
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.resistor-card .kv div {
+  grid-template-columns: 90px 1fr;
+}
+
+.resistor-card p {
+  margin: 8px 0 0;
+}
+
+.prop-hero__wire-icon {
+  background: #475569;
+}
+
+/* ---------- 보드 핀 제약 ---------- */
+.restriction-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.restriction-list > li {
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.restriction-list > li:last-child {
+  border-bottom: none;
+}
+
+.restriction-list .note-list {
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.restriction-tag {
+  display: inline-block;
+  margin: 0 3px 2px 0;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+}
+
+.restriction-tag--input-only { color: var(--info-text); background: var(--info-soft); }
+.restriction-tag--strapping { color: var(--warning-text); background: var(--warning-soft); }
+.restriction-tag--no-internal-pull { color: var(--info-text); background: var(--info-soft); }
+
+.pin-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.pin-details[open] summary {
+  margin-bottom: 8px;
+}
