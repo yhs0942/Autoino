@@ -29,4 +29,10 @@ st.html(
     </style>
     """
 )
-st.iframe("/autoino/", height=900)
+# Streamlit Community Cloud 는 앱을 /~/+/ 아래 경로에서 서비스한다. "/autoino/" 처럼 루트 기준 경로를 쓰면
+# 앱 서버가 아니라 Cloud 의 바깥 페이지가 열려 로딩 화면만 계속 보이므로, 브라우저에서 지금 앱 주소를 기준으로
+# autoino/ 경로를 만들어 이동한다 (로컬: /autoino/, Cloud: /~/+/autoino/).
+st.iframe(
+    '<script>location.replace(new URL("autoino/", window.parent.location.href).href)</script>',
+    height=900,
+)
