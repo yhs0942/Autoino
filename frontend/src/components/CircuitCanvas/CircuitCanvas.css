@@ -304,6 +304,57 @@
   z-index: 5;
 }
 
+/* 가리키거나 고른 전선: 부품 카드 위에 다시 그려 어느 핀 칩에 물렸는지 끝까지 보인다 */
+.wire-layer--raised {
+  z-index: 5;
+}
+
+.wire.is-raised .wire__line {
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 3px var(--wire-color));
+}
+
+/* 카드 안에서 칩까지 가는 구간: 다른 칩 이름이 비쳐 보이도록 얇은 점선 */
+.wire__inner {
+  fill: none;
+  stroke: var(--wire-color);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2;
+  opacity: 0.9;
+}
+
+.wire__tip {
+  fill: var(--wire-color);
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+/* 전선이 물린 핀 칩: 오른쪽 위에 그 전선 색 점 */
+.module-pin {
+  position: relative;
+}
+
+.module-pin.has-wire::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--wire-color);
+  box-shadow: 0 0 0 1.5px var(--surface);
+  pointer-events: none;
+}
+
+/* 가리킨 핀·전선의 반대쪽 끝 */
+.module-pin.is-wire-end {
+  outline: 2px solid var(--selection);
+  outline-offset: 1px;
+  box-shadow: 0 0 8px 2px var(--selection-soft);
+  z-index: 1;
+}
+
 .wire__hit {
   fill: none;
   stroke: transparent;

@@ -19,6 +19,8 @@ interface BoardGraphicProps {
   /** 보드 본체를 눌렀을 때 (선택 + 이동 시작) */
   onBodyPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => void
   onPinPointerDown: (e: ReactPointerEvent, pinId: string) => void
+  /** 핀 위에 포인터가 올라가거나(핀 ID) 벗어날 때(null) */
+  onPinHover?: (pinId: string | null) => void
 }
 
 function pinTitle(pin: BoardPin): string {
@@ -43,6 +45,7 @@ export function BoardGraphic({
   onSelect,
   onBodyPointerDown,
   onPinPointerDown,
+  onPinHover,
 }: BoardGraphicProps) {
   const digital = board.pins.filter((p) => p.group === 'digital')
   const analog = board.pins.filter((p) => p.group === 'analog')
@@ -72,6 +75,8 @@ export function BoardGraphic({
               data-endpoint={`board:${boardInstanceId}:${pin.id}`}
               data-dir={dir}
               onPointerDown={(e) => onPinPointerDown(e, pin.id)}
+              onPointerEnter={() => onPinHover?.(pin.id)}
+              onPointerLeave={() => onPinHover?.(null)}
             >
               <span className="board-pin__label">
                 {!board.headers && pin.capabilities.includes('pwm') ? `~${pin.label}` : pin.label}

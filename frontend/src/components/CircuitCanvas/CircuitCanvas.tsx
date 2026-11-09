@@ -5,13 +5,14 @@ import {
   useReducer,
   useRef,
   useState,
+  type CSSProperties,
   type DragEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react'
 import { getModule } from '../../data/modules'
 import { checkLeadMove, holeLabel, type BreadboardRouting, type Hole } from '../../engine/breadboard'
 import { holeAt, holeXY, nodeBox, renderBreadboardBody } from '../../engine/breadboardSvg'
-import { endpointKey, isPinConnected, moduleEndpoint, parseEndpointKey, requiredPins, resolveModulePin } from '../../engine/connections'
+import { describeEndpoint, endpointKey, isPinConnected, moduleEndpoint, parseEndpointKey, requiredPins, resolveModulePin } from '../../engine/connections'
 import { compatiblePins, sourceLimitMa, sourceVoltage } from '../../engine/electrical'
 import { isServo, motorDriverOf, driverUsage, planMotorAttach, recommendDriver, type AttachPlan } from '../../engine/motorAttach'
 import { focusOf } from '../../engine/focus'
@@ -28,6 +29,7 @@ import { MODULE_DRAG_TYPE } from '../ModuleLibrary/ModuleLibrary'
 import { BoardGraphic } from './BoardGraphic'
 import { WireLayer, type Grip } from './WireLayer'
 import { wirePath, type Anchor, type WireStyle } from './wireGeometry'
+import { wireTones } from './wireTones'
 import './CircuitCanvas.css'
 
 export interface CanvasBoard {
@@ -111,8 +113,13 @@ interface GripDrag {
 function sameAnchors(a: Record<string, Anchor>, b: Record<string, Anchor>): boolean {
   const ka = Object.keys(a)
   if (ka.length !== Object.keys(b).length) return false
-  return ka.every((k) => b[k] && a[k].x === b[k].x && a[k].y === b[k].y && a[k].dir === b[k].dir)
+  const sameCard = (p: Anchor['card'], q: Anchor['card']) =>
+    p === q || (!!p && !!q && p.id === q.id && p.left === q.left && p.top === q.top && p.right === q.right && p.bottom === q.bottom)
+  return ka.every((k) => b[k] && a[k].x === b[k].x && a[k].y === b[k].y && a[k].dir === b[k].dir && a[k].half === b[k].half && sameCard(a[k].card, b[k].card))
 }
+
+/** 핀을 가리키는 중(끝점 키) 또는 전선을 가리키는 중(연결 ID 들) */
+type Hover = { kind: 'pin'; key: string } | { kind: 'wire'; ids: string[] } | null
 
 /** 전선 끝 등이 겹쳐 있어도 그 아래의 핀을 찾는다. */
 function endpointAt(clientX: number, clientY: number): Endpoint | null {
@@ -183,6 +190,7 @@ export function CircuitCanvas({
   const [anchors, setAnchors] = useState<Record<string, Anchor>>({})
   const [wireDrag, setWireDrag] = useState<WireDrag | null>(null)
   const [gripDrag, setGripDrag] = useState<GripDrag | null>(null)
+  const [hover, setHover] = useState<Hover>(null)
   /** 모터 카드를 드라이버 카드 위로 끄는 중 */
   const [attach, setAttach] = useState<{ motorId: string; driverId: string; plan: AttachPlan } | null>(null)
   /** 카드 옆에 띄운 전원·드라이버 안내 */
@@ -216,11 +224,25 @@ export function CircuitCanvas({
     const next: Record<string, Anchor> = {}
     surface.querySelectorAll<HTMLElement>('[data-endpoint]').forEach((el) => {
       const r = el.getBoundingClientRect()
-      next[el.dataset.endpoint!] = {
+      const anchor: Anchor = {
         x: Math.round(r.left - origin.left + r.width / 2),
         y: Math.round(r.top - origin.top + r.height / 2),
         dir: Number(el.dataset.dir ?? 1),
       }
+      // 부품 카드의 핀 칩: 전선이 칩 가장자리에서 시작해 반대쪽 끝을 향한 카드 가장자리로 나가게 한다
+      const card = el.closest<HTMLElement>('.placed-module')
+      if (card) {
+        const c = card.getBoundingClientRect()
+        anchor.half = Math.round(r.height / 2)
+        anchor.card = {
+          id: card.dataset.instanceId ?? '',
+          left: Math.round(c.left - origin.left),
+          top: Math.round(c.top - origin.top),
+          right: Math.round(c.right - origin.left),
+          bottom: Math.round(c.bottom - origin.top),
+        }
+      }
+      next[el.dataset.endpoint!] = anchor
     })
     setAnchors((prev) => (sameAnchors(prev, next) ? prev : next))
   }, [boards, placed, layoutTick])
@@ -471,6 +493,45 @@ export function CircuitCanvas({
     return { lit: f.wires, path: f.path, pins }
   }, [selection, circuit])
 
+  /** 전선 색 (전선과 핀 칩의 색 점이 같은 색을 쓴다) */
+  const tones = useMemo(() => wireTones(connections, placed, routing), [connections, placed, routing])
+
+  /** 가리키는 핀·전선과 고른 전선: 카드 위로 올려 보여 줄 전선과, 반대쪽 끝에서 함께 표시할 핀 */
+  const selectedWire = selection.kind === 'connection' ? selection.connectionId : null
+  const hoverView = useMemo(() => {
+    const raised = new Set<string>()
+    const ends = new Set<string>()
+    if (hover && !wireDrag && !gripDrag) {
+      const ids = hover.kind === 'wire' ? hover.ids : connections.filter((c) => endpointKey(c.from) === hover.key || endpointKey(c.to) === hover.key).map((c) => c.id)
+      for (const c of connections) {
+        if (!ids.includes(c.id)) continue
+        raised.add(c.id)
+        for (const e of [c.from, c.to]) if (hover.kind === 'wire' || endpointKey(e) !== hover.key) ends.add(endpointKey(e))
+      }
+    }
+    const picked = selectedWire ? connections.find((c) => c.id === selectedWire) : undefined
+    if (picked) {
+      raised.add(picked.id)
+      ends.add(endpointKey(picked.from))
+      ends.add(endpointKey(picked.to))
+    }
+    return { raised, ends }
+  }, [hover, wireDrag, gripDrag, connections, selectedWire])
+  /** 보드마다 빛낼 핀: 고른 부품의 경로 끝 + 가리킨 전선의 끝 */
+  const litBoardPins = (boardInstanceId: string) => {
+    const pins = new Set(focus?.pins.get(boardInstanceId) ?? [])
+    for (const key of hoverView.ends) {
+      const e = parseEndpointKey(key)
+      if (e?.kind === 'board' && e.boardInstanceId === boardInstanceId) pins.add(e.pinId)
+    }
+    return pins.size ? pins : undefined
+  }
+  /** 핀 칩 설명에 붙일 연결 상대 */
+  const peersOf = (key: string) =>
+    connections
+      .filter((c) => endpointKey(c.from) === key || endpointKey(c.to) === key)
+      .map((c) => describeEndpoint(endpointKey(c.from) === key ? c.to : c.from, circuit))
+
   const errorConnections = new Set(issues.filter((i) => i.severity === 'error' && i.connectionId).map((i) => i.connectionId!))
   const errorCount = (instanceId: string) =>
     issues.filter((i) => i.severity === 'error' && i.instanceId === instanceId).length
@@ -498,7 +559,6 @@ export function CircuitCanvas({
             width={CANVAS_SIZE.width}
             height={CANVAS_SIZE.height}
             connections={connections}
-            placed={placed}
             anchors={anchors}
             selectedId={selection.kind === 'connection' ? selection.connectionId : null}
             errorIds={errorConnections}
@@ -508,6 +568,9 @@ export function CircuitCanvas({
             breadboard={breadboard}
             dragging={gripDrag?.moved ? gripDrag.grip : null}
             focus={focus}
+            tones={tones}
+            raised={hoverView.raised}
+            onHoverWire={(ids) => setHover(ids ? { kind: 'wire', ids } : null)}
             onDeleteWire={onDeleteWire}
             onPressWire={pressWire}
             onPressGrip={pressGrip}
@@ -554,7 +617,8 @@ export function CircuitCanvas({
                 selected={selection.kind === 'board' && selection.boardInstanceId === instance.instanceId}
                 usedPins={usedBoardPins.get(instance.instanceId) ?? new Set()}
                 compatiblePins={highlight?.get(instance.instanceId) ?? null}
-                litPins={focus?.pins.get(instance.instanceId)}
+                litPins={litBoardPins(instance.instanceId)}
+                onPinHover={(pinId) => setHover(pinId ? { kind: 'pin', key: `board:${instance.instanceId}:${pinId}` } : null)}
                 onSelect={() => onSelect({ kind: 'board', boardInstanceId: instance.instanceId })}
                 onBodyPointerDown={(e) => startMove(e, 'board', instance.instanceId, instance)}
                 onPinPointerDown={(e, pinId) => startWire(e, { kind: 'board', boardInstanceId: instance.instanceId, pinId })}
@@ -648,17 +712,24 @@ export function CircuitCanvas({
                     const share = shareOf(circuit, key)
                     const sharedAt = share ? shareBoardPin(circuit, share)?.pinId : undefined
                     const sharable = !!shareDrag && dragInstance !== item.instanceId && shareRole(module, pin) === shareDrag
-                    const title = share
-                      ? `${pin.name}: 핀 공유 그룹${sharedAt ? ` (${sharedAt})` : ''} — ${share.members.map((k) => placed.find((p) => k.startsWith(`module:${p.instanceId}:`))?.label ?? k).join(', ')}`
-                      : `${pin.name}: ${pin.description} (끌어서 연결${shareRole(module, pin) ? ' · 같은 종류 부품 핀에 놓으면 핀 공유' : ''})`
+                    const peers = connected ? peersOf(key) : []
+                    const title =
+                      (share
+                        ? `${pin.name}: 핀 공유 그룹${sharedAt ? ` (${sharedAt})` : ''} — ${share.members.map((k) => placed.find((p) => k.startsWith(`module:${p.instanceId}:`))?.label ?? k).join(', ')}`
+                        : `${pin.name}: ${pin.description} (끌어서 연결${shareRole(module, pin) ? ' · 같은 종류 부품 핀에 놓으면 핀 공유' : ''})`) +
+                      (peers.length ? `\n연결: ${peers.join(', ')}` : '')
+                    const wireColor = tones.ends.get(key)
                     return (
                       <span
                         key={pin.id}
-                        className={`module-pin module-pin--${pin.role}${connected ? ' is-connected' : ''}${peerRole === pin.role || sharable ? ' is-compatible' : ''}${share ? ' is-shared' : ''}`}
+                        className={`module-pin module-pin--${pin.role}${connected ? ' is-connected' : ''}${peerRole === pin.role || sharable ? ' is-compatible' : ''}${share ? ' is-shared' : ''}${wireColor ? ' has-wire' : ''}${hoverView.ends.has(key) ? ' is-wire-end' : ''}`}
+                        style={wireColor ? ({ '--wire-color': wireColor } as CSSProperties) : undefined}
                         title={title}
-                        data-endpoint={endpointKey(moduleEndpoint(item.instanceId, pin.id))}
+                        data-endpoint={key}
                         data-dir={1}
                         onPointerDown={(e) => startWire(e, moduleEndpoint(item.instanceId, pin.id))}
+                        onPointerEnter={() => setHover({ kind: 'pin', key })}
+                        onPointerLeave={() => setHover(null)}
                       >
                         {pin.name.split(' ')[0]}
                       </span>
