@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 from pathlib import Path
 
@@ -32,7 +33,9 @@ st.html(
 # Streamlit Community Cloud 는 앱을 /~/+/ 아래 경로에서 서비스한다. "/autoino/" 처럼 루트 기준 경로를 쓰면
 # 앱 서버가 아니라 Cloud 의 바깥 페이지가 열려 로딩 화면만 계속 보이므로, 브라우저에서 지금 앱 주소를 기준으로
 # autoino/ 경로를 만들어 이동한다 (로컬: /autoino/, Cloud: /~/+/autoino/).
+# 주소 끝에 빌드 버전(?v=)을 붙여, 새 버전을 올리면 브라우저가 예전 index.html 대신 새 화면을 받게 한다.
+VERSION = hashlib.sha256((DIST / "index.html").read_bytes()).hexdigest()[:12]
 st.iframe(
-    '<script>location.replace(new URL("autoino/", window.parent.location.href).href)</script>',
+    f'<script>location.replace(new URL("autoino/?v={VERSION}", window.parent.location.href).href)</script>',
     height=900,
 )

@@ -101,3 +101,16 @@ def test_frontend_is_served_when_built(tmp_path, monkeypatch):
     c = TestClient(create_app(ProjectStore(tmp_path / "p")))
     assert "Autoino" in c.get("/").text
     assert c.get("/api/health").json()["status"] == "ok"
+
+
+def test_frontend_html_is_not_cached(tmp_path, monkeypatch):
+    """새 버전을 올렸을 때 브라우저가 예전 화면을 쓰지 않도록 index.html 은 매번 확인하게 한다"""
+    dist = tmp_path / "dist"
+    (dist / "assets").mkdir(parents=True)
+    (dist / "index.html").write_text("<!doctype html><title>Autoino</title>", encoding="utf-8")
+    (dist / "assets" / "index-abc.js").write_text("1", encoding="utf-8")
+    monkeypatch.setenv("AUTOINO_FRONTEND_DIST", str(dist))
+    c = TestClient(create_app(ProjectStore(tmp_path / "p")))
+    for path in ("/", "/index.html", "/?v=1"):
+        assert "no-cache" in c.get(path).headers.get("cache-control", ""), path
+    assert "immutable" in c.get("/assets/index-abc.js").headers.get("cache-control", "")

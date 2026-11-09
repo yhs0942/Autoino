@@ -24,6 +24,18 @@ FEATURES = ["catalog", "projects", "analyze", "auto-assign", "codegen", "simulat
 DEV_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"]
 
 
+class FrontendFiles(StaticFiles):
+    """빌드된 화면 파일. index.html 은 매번 새 버전을 확인하게 하고, 이름에 해시가 붙은 assets 는 오래 캐시한다."""
+
+    async def get_response(self, path: str, scope):  # type: ignore[override]
+        response = await super().get_response(path, scope)
+        if path.replace("\\", "/").startswith("assets/"):  # Windows 는 경로 구분자가 \
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 def create_app(store: ProjectStore | None = None, serve_frontend: bool = True) -> FastAPI:
     app = FastAPI(title="Autoino API", version=__version__, description="Arduino 회로 자동 설계 도구 Autoino 의 백엔드")
     app.add_middleware(CORSMiddleware, allow_origins=DEV_ORIGINS, allow_methods=["*"], allow_headers=["*"])
@@ -126,7 +138,7 @@ def create_app(store: ProjectStore | None = None, serve_frontend: bool = True) -
 
     dist = frontend_dist()
     if serve_frontend and (dist / "index.html").is_file():
-        app.mount("/", StaticFiles(directory=dist, html=True), name="frontend")
+        app.mount("/", FrontendFiles(directory=dist, html=True), name="frontend")
     return app
 
 
