@@ -6,6 +6,7 @@ frontend/dist 가 있으면 같은 주소에서 프런트엔드도 제공한다.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from fastapi import Body, FastAPI, HTTPException, Request
@@ -19,6 +20,8 @@ from .paths import frontend_dist
 from .project import ProjectFileError
 from .simulate import SimulationError
 from .storage import ProjectNotFound, ProjectStore
+
+log = logging.getLogger("autoino.api")
 
 FEATURES = ["catalog", "projects", "analyze", "auto-assign", "codegen", "simulate"]
 DEV_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"]
@@ -52,6 +55,13 @@ def create_app(store: ProjectStore | None = None, serve_frontend: bool = True) -
     @app.exception_handler(ProjectNotFound)
     async def not_found(_: Request, exc: ProjectNotFound) -> JSONResponse:
         return JSONResponse(status_code=404, content={"detail": f"프로젝트를 찾을 수 없습니다: {exc.args[0]}"})
+
+    # 예상하지 못한 예외: 기본 응답(본문 'Internal Server Error')은 화면에 '서버 오류 (500)' 으로만 보여 원인을 알 수 없다.
+    # 예외 종류와 메시지를 detail 로 돌려주고, 전체 traceback 은 서버 로그(터미널·Streamlit Cloud 로그)에 남긴다.
+    @app.exception_handler(Exception)
+    async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+        log.error("%s %s 처리 중 예외", request.method, request.url.path, exc_info=exc)
+        return JSONResponse(status_code=500, content={"detail": f"서버 내부 오류 ({type(exc).__name__}): {exc}"})
 
     # ---------------- 상태 · 카탈로그
     @app.get("/api/health")

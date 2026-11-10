@@ -88,6 +88,23 @@ def test_analyze_auto_assign_codegen_simulate(client):
     assert bad.status_code == 422 and "GPIO" in bad.json()["detail"]
 
 
+def test_unexpected_error_returns_json_detail(tmp_path, monkeypatch):
+    """예상하지 못한 예외도 화면이 원인을 보여 줄 수 있게 JSON detail 로 답한다 (맨 '서버 오류 (500)' 대신)"""
+    from autoino import service
+
+    def boom(*_args, **_kwargs):
+        raise RuntimeError("시험용 내부 오류")
+
+    monkeypatch.setattr(service, "run_simulation", boom)
+    store = ProjectStore(tmp_path / "projects")
+    monkeypatch.setattr(store, "list", boom)
+    client = TestClient(create_app(store, serve_frontend=False), raise_server_exceptions=False)
+    for r in (client.post("/api/simulate", json={"project": led_project()}), client.get("/api/projects")):
+        assert r.status_code == 500
+        detail = r.json()["detail"]
+        assert "RuntimeError" in detail and "시험용 내부 오류" in detail
+
+
 def test_cors_allows_vite_dev_server(client):
     r = client.options("/api/health", headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET"})
     assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
