@@ -8,6 +8,7 @@ import { buildNetlist } from './netlist'
 import { routeToBoard } from './paths'
 import { computeSeriesResistors, formatOhms } from './resistor'
 import { computeLadderResistors, shareBoardPin, shareOf } from './shares'
+import { muxChannelOf } from './mux'
 
 // 부품 목록(BOM)과 핀 배정표 생성. 화면 표시와 CSV 내보내기가 같은 데이터를 사용한다.
 
@@ -50,7 +51,12 @@ export function buildPinTable(circuit: Circuit): PinTableRow[] {
       if (route?.via.length) notes.push(`${route.via.join(', ')} 경유`)
       const optional = !required.includes(pin)
       if (!connected && optional) notes.push(isInternalPin(module, pin.id) ? '연결 불필요 (내부 연결)' : '연결 불필요')
-      else if (connected && !route) notes.push('다른 부품에 연결')
+      else if (connected && !route) {
+        const ch = muxChannelOf(circuit, `module:${item.instanceId}:${pin.id}`)
+        const mux = ch && circuit.placed.find((p) => p.instanceId === ch.muxId)
+        const sig = mux && routeToBoard(circuit, mux.instanceId, getModule(mux.moduleId).mux!.common, traced)
+        notes.push(mux ? `${mux.label} C${ch.channel} (SIG → ${sig?.pinId ?? '미연결'})` : '다른 부품에 연결')
+      }
       rows.push({
         instanceId: item.instanceId,
         moduleLabel: item.label,

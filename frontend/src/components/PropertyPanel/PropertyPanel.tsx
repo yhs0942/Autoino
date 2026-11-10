@@ -16,7 +16,8 @@ import { PinTable } from '../PinTable/PinTable'
 import { NeedQuick, PowerPanel } from '../PowerPanel/PowerPanel'
 import { placedSupplies, SUPPLY_PARAM } from '../../engine/supplyInfo'
 import { capacityLabel, MOTOR_KIND_LABELS, motorDriverOf, planMotorAttach, recommendDriver } from '../../engine/motorAttach'
-import { shareBoardPin, shareRole } from '../../engine/shares'
+import { describeRole, roleOfKey, shareBoardPin, shareOf, shareRefusal, shareRole } from '../../engine/shares'
+import { muxChannelOf, muxUsers } from '../../engine/mux'
 import { IssueList, ValidationPanel } from '../ValidationPanel/ValidationPanel'
 import './PropertyPanel.css'
 
@@ -52,6 +53,33 @@ interface PropertyPanelProps {
   onResetModuleWiring: (instanceId: string) => void
   onAutoAssignModule: (instanceId: string) => void
   onUnshare: (key: string) => void
+  /** 핀 공유: from 핀을 to 핀과 함께 쓰게 한다 (아날로그 센서는 멀티플렉서로) */
+  onSharePins: (fromKey: string, toKey: string) => void
+}
+
+/** 끝점 키의 이름 (같은 부품이면 핀 이름만) */
+function pinLabel(circuit: Circuit, key: string, self?: string): string {
+  const item = circuit.placed.find((p) => key.startsWith(`module:${p.instanceId}:`))
+  const pin = item && getModule(item.moduleId).pins.find((p) => key === `module:${item.instanceId}:${p.id}`)
+  if (!item || !pin) return key
+  return item.instanceId === self ? pin.name : `${item.label} · ${pin.name}`
+}
+
+/** 이 부품 핀과 함께 쓸 수 있는 다른 핀들 (같은 부품의 다른 핀 포함) */
+function shareCandidates(circuit: Circuit, key: string): string[] {
+  const role = roleOfKey(circuit, key)
+  if (!role) return []
+  const group = shareOf(circuit, key)
+  const mux = muxChannelOf(circuit, key)?.muxId
+  const out: string[] = []
+  for (const item of circuit.placed)
+    for (const pin of getModule(item.moduleId).pins) {
+      const k = `module:${item.instanceId}:${pin.id}`
+      if (k === key || roleOfKey(circuit, k) !== role || shareRefusal(circuit, [key, k])) continue
+      if (role === 'analog' ? mux && muxChannelOf(circuit, k)?.muxId === mux : group && group.members.includes(k)) continue
+      out.push(k)
+    }
+  return out
 }
 
 /** 부품 속성에서 바로 하는 외부 전원·모터 드라이버 연결 */
@@ -67,6 +95,8 @@ function ModuleHookups({ item, circuit, props }: { item: PlacedModule; circuit: 
   const wired = circuit.connections.some((c) => [c.from, c.to].some((e) => e.kind === 'module' && e.instanceId === item.instanceId))
   const myShares = (circuit.shares ?? []).flatMap((s) => s.members.filter((k) => k.startsWith(`module:${item.instanceId}:`)).map((k) => ({ s, key: k })))
   const sharable = module.pins.some((p) => shareRole(module, p))
+  const myMux = module.pins.map((p) => ({ pin: p, ch: muxChannelOf(circuit, `module:${item.instanceId}:${p.id}`) })).filter((x) => x.ch)
+  const muxInUse = module.mux ? muxUsers(circuit, item.instanceId) : []
   return (
     <>
       <section className="prop-section" data-testid="module-wiring">
@@ -81,28 +111,85 @@ function ModuleHookups({ item, circuit, props }: { item: PlacedModule; circuit: 
           </button>
         </div>
       </section>
-      {(myShares.length > 0 || sharable) && (
+      {module.mux && (
+        <section className="prop-section" data-testid="mux-section">
+          <h3>멀티플렉서 채널</h3>
+          {muxInUse.length ? (
+            <ul className="mux-list">
+              {muxInUse.map((u) => (
+                <li key={u.key}>
+                  <strong>C{u.channel}</strong> {pinLabel(circuit, u.key)}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted small">아직 채널에 이어진 센서가 없습니다. 아날로그 센서 핀을 C0… 에 끌어 놓거나, 센서 핀끼리 끌어 놓으세요.</p>
+          )}
+        </section>
+      )}
+      {(myShares.length > 0 || sharable || myMux.length > 0) && (
         <section className="prop-section" data-testid="share-section">
           <h3>핀 공유</h3>
-          {myShares.length ? (
-            myShares.map(({ s, key }) => {
-              const pin = module.pins.find((p) => key.endsWith(`:${p.id}`))
-              const at = shareBoardPin(circuit, s)
-              const others = s.members.filter((k) => k !== key).map((k) => circuit.placed.find((p) => k.startsWith(`module:${p.instanceId}:`))?.label ?? k)
+          {myShares.map(({ s, key }) => {
+            const at = shareBoardPin(circuit, s)
+            const others = s.members.filter((k) => k !== key).map((k) => pinLabel(circuit, k, item.instanceId))
+            const role = roleOfKey(circuit, key)
+            return (
+              <div key={key} className="share-row">
+                <p className="small">
+                  <strong>{pinLabel(circuit, key, item.instanceId)}</strong> 를 {others.join(', ')}와(과) {at ? `${at.pinId} 에서 ` : ''}함께 씁니다
+                  {role ? ` (${describeRole(role)})` : ''}.
+                </p>
+                <button type="button" className="button button--small" onClick={() => props.onUnshare(key)} data-testid="unshare">
+                  공유 풀기
+                </button>
+              </div>
+            )
+          })}
+          {myMux.map(({ pin, ch }) => {
+            const mux = circuit.placed.find((p) => p.instanceId === ch!.muxId)
+            return (
+              <div key={pin.id} className="share-row">
+                <p className="small">
+                  <strong>{pin.name}</strong> 를 {mux?.label} C{ch!.channel} 로 다른 아날로그 센서와 함께 읽습니다.
+                </p>
+                <button type="button" className="button button--small" onClick={() => props.onUnshare(`module:${item.instanceId}:${pin.id}`)} data-testid="unmux">
+                  멀티플렉서에서 빼기
+                </button>
+              </div>
+            )
+          })}
+          {module.pins
+            .filter((p) => shareRole(module, p))
+            .map((p) => {
+              const key = `module:${item.instanceId}:${p.id}`
+              const role = shareRole(module, p)!
+              const candidates = shareCandidates(circuit, key)
               return (
-                <div key={key} className="share-row">
-                  <p className="small">
-                    <strong>{pin?.name}</strong> 를 {others.join(', ')}와(과) {at ? `${at.pinId} 에서 ` : ''}함께 씁니다.
-                  </p>
-                  <button type="button" className="button button--small" onClick={() => props.onUnshare(key)} data-testid="unshare">
-                    공유 풀기
-                  </button>
-                </div>
+                <label key={p.id} className="share-pick">
+                  <span>
+                    <strong>{p.name}</strong> <span className="muted">({describeRole(role)})</span>
+                  </span>
+                  <select
+                    value=""
+                    disabled={!candidates.length}
+                    onChange={(e) => e.target.value && props.onSharePins(key, e.target.value)}
+                    data-testid={`share-pick-${p.id}`}
+                  >
+                    <option value="">{candidates.length ? (role === 'analog' ? '함께 읽을 아날로그 센서 핀…' : '함께 쓸 핀 고르기…') : '함께 쓸 수 있는 핀이 없습니다'}</option>
+                    {candidates.map((k) => (
+                      <option key={k} value={k}>
+                        {pinLabel(circuit, k, item.instanceId)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               )
-            })
-          ) : (
-            <p className="muted small">이 부품의 핀을 같은 종류 부품(출력끼리·버튼끼리)의 핀에 끌어 놓으면 한 보드 핀을 함께 쓰는 그룹이 됩니다. Uno·Nano·Mega 아날로그 핀의 버튼은 저항 사다리로 구분됩니다.</p>
-          )}
+            })}
+          <p className="muted small">
+            핀 칩을 같은 종류의 다른 핀(이 부품의 다른 핀 포함)에 끌어 놓거나, 같은 신호가 쓰는 보드 핀에 놓아도 묶입니다. 아날로그 센서는 한 핀에 바로 묶으면 전압이 부딪치므로 아날로그 멀티플렉서(CD74HC4067)를 넣어 아날로그 핀 하나로 차례로 읽습니다.
+            Uno·Nano·Mega 아날로그 핀의 버튼은 저항 사다리로 구분합니다.
+          </p>
         </section>
       )}
       {module.motor && (

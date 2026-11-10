@@ -18,7 +18,8 @@ import { isServo, motorDriverOf, driverUsage, planMotorAttach, recommendDriver, 
 import { focusOf } from '../../engine/focus'
 import { supplyOf } from '../../engine/supplyInfo'
 import { SUPPLY_KIND_LABELS } from '../../data/supplies'
-import { roleOfKey, shareBoardPin, shareOf, shareRole } from '../../engine/shares'
+import { describeRole, roleOfKey, shareBoardPin, shareOf, shareRefusal, shareRole } from '../../engine/shares'
+import { muxChannelOf } from '../../engine/mux'
 import { formatCurrent, type PowerNeed, type PowerReport, type SupplyExample } from '../../engine/power'
 import type { Circuit } from '../../engine/circuit'
 import { NeedQuick } from '../PowerPanel/PowerPanel'
@@ -29,6 +30,8 @@ import { assetUrl } from '../../utils/assetUrl'
 import { BREADBOARD_SIZE, CANVAS_SIZE, MODULE_SIZE } from '../../utils/placement'
 import { MODULE_DRAG_TYPE } from '../ModuleLibrary/ModuleLibrary'
 import { BoardGraphic } from './BoardGraphic'
+import { SimBoardLeds, SimCard } from '../Simulation/SimCard'
+import type { SimStore } from '../Simulation/simStore'
 import { WireLayer, type Grip } from './WireLayer'
 import { wirePath, type Anchor, type WireStyle } from './wireGeometry'
 import { wireTones } from './wireTones'
@@ -81,6 +84,8 @@ interface CircuitCanvasProps {
   /** 핀에서 끈 전선을 브레드보드 구멍에 놓았을 때 */
   onConnectToHole: (endpoint: Endpoint, hole: Hole) => void
   onDeleteWire: (connectionId: string) => void
+  /** 시뮬레이션 중이면 그 상태 (카드에 동작 모습을 그리고 배선 편집을 잠근다) */
+  sim?: SimStore | null
 }
 
 interface MoveState {
@@ -188,6 +193,7 @@ export function CircuitCanvas({
   onShowPower,
   onConnectToHole,
   onDeleteWire,
+  sim = null,
 }: CircuitCanvasProps) {
   const surfaceRef = useRef<HTMLDivElement>(null)
   const moveRef = useRef<MoveState | null>(null)
@@ -350,7 +356,7 @@ export function CircuitCanvas({
   }, [isGripping])
 
   const pressGrip = (e: ReactPointerEvent, grip: Grip) => {
-    if (e.button !== 0) return
+    if (e.button !== 0 || sim) return
     e.stopPropagation()
     e.preventDefault()
     const p = toCanvasPoint(e.clientX, e.clientY)
@@ -359,7 +365,7 @@ export function CircuitCanvas({
 
   /** 전선을 누르면 선택한다. 단, 전선 끝이 핀 위에 있으면 그 핀에서 새 전선을 시작한다. */
   const pressWire = (e: ReactPointerEvent, connectionId: string) => {
-    const pin = endpointAt(e.clientX, e.clientY)
+    const pin = sim ? null : endpointAt(e.clientX, e.clientY)
     if (pin) startWire(e, pin)
     else {
       e.stopPropagation()
@@ -368,7 +374,7 @@ export function CircuitCanvas({
   }
 
   const startWire = (e: ReactPointerEvent, from: Endpoint) => {
-    if (e.button !== 0) return
+    if (e.button !== 0 || sim) return
     e.stopPropagation()
     e.preventDefault()
     const p = toCanvasPoint(e.clientX, e.clientY)
@@ -384,7 +390,7 @@ export function CircuitCanvas({
 
   const handleDrop = (e: DragEvent) => {
     const moduleId = e.dataTransfer.getData(MODULE_DRAG_TYPE)
-    if (!moduleId) return
+    if (!moduleId || sim) return
     e.preventDefault()
     const p = toCanvasPoint(e.clientX, e.clientY)
     onDropModule(moduleId, { x: p.x - MODULE_SIZE.width / 2, y: p.y - MODULE_SIZE.height / 2 }, cardAt(e.clientX, e.clientY, '') ?? undefined)
@@ -394,6 +400,8 @@ export function CircuitCanvas({
     if (e.button !== 0) return
     e.stopPropagation()
     onSelect(kind === 'module' ? { kind: 'module', instanceId: id } : kind === 'board' ? { kind: 'board', boardInstanceId: id } : { kind: 'breadboard' })
+    // 시뮬레이션 중에는 고르기만 하고 옮기지 않는다
+    if (sim) return
     const p = toCanvasPoint(e.clientX, e.clientY)
     moveRef.current = { kind, id, origin: { x: at.x, y: at.y }, offsetX: p.x - at.x, offsetY: p.y - at.y, startX: p.x, startY: p.y, recorded: false }
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -443,7 +451,7 @@ export function CircuitCanvas({
   const peerRole = wireDrag?.from.kind === 'module' ? PEER_ROLE[resolveModulePin(placed, wireDrag.from)?.pin.role ?? 'signal'] : undefined
   /** 끄는 핀이 핀 공유에 쓸 수 있는 종류면 같은 종류의 다른 부품 핀을 강조한다 */
   const shareDrag = wireDrag?.from.kind === 'module' ? roleOfKey(circuit, endpointKey(wireDrag.from)) : null
-  const dragInstance = wireDrag?.from.kind === 'module' ? wireDrag.from.instanceId : null
+  const dragKey = wireDrag ? endpointKey(wireDrag.from) : null
 
   /** 보드 인스턴스별로 연결된 보드 핀 */
   const usedBoardPins = useMemo(() => {
@@ -627,6 +635,7 @@ export function CircuitCanvas({
                 onBodyPointerDown={(e) => startMove(e, 'board', instance.instanceId, instance)}
                 onPinPointerDown={(e, pinId) => startWire(e, { kind: 'board', boardInstanceId: instance.instanceId, pinId })}
               />
+              {sim && <SimBoardLeds store={sim} boardInstanceId={instance.instanceId} />}
             </div>
           ))}
 
@@ -645,7 +654,7 @@ export function CircuitCanvas({
             return (
               <div
                 key={item.instanceId}
-                className={`placed-module${isSelected ? ' is-selected' : ''}${errors ? ' has-error' : ''}${module.pins.length > 6 ? ' placed-module--dense' : ''}${module.pins.length > 16 ? ' placed-module--xdense' : ''}${target}`}
+                className={`placed-module${sim ? ' is-sim' : ''}${isSelected ? ' is-selected' : ''}${errors ? ' has-error' : ''}${module.pins.length > 6 ? ' placed-module--dense' : ''}${module.pins.length > 16 ? ' placed-module--xdense' : ''}${target}`}
                 style={{ left: item.x, top: item.y, width: MODULE_SIZE.width, height: MODULE_SIZE.height }}
                 role="button"
                 tabIndex={0}
@@ -715,12 +724,27 @@ export function CircuitCanvas({
                     const key = endpointKey(moduleEndpoint(item.instanceId, pin.id))
                     const share = shareOf(circuit, key)
                     const sharedAt = share ? shareBoardPin(circuit, share)?.pinId : undefined
-                    const sharable = !!shareDrag && dragInstance !== item.instanceId && shareRole(module, pin) === shareDrag
+                    // 같은 종류의 다른 핀(같은 부품의 다른 핀 포함), 아날로그 센서면 비어 있는 멀티플렉서 채널도 받을 수 있다
+                    const sharable =
+                      !!shareDrag &&
+                      key !== dragKey &&
+                      ((shareRole(module, pin) === shareDrag && !shareRefusal(circuit, [dragKey!, key])) ||
+                        (shareDrag === 'analog' && !!module.mux?.channels.includes(pin.id) && !connected))
+                    const role = shareRole(module, pin)
+                    const onMux = role === 'analog' ? muxChannelOf(circuit, key) : null
                     const peers = connected ? peersOf(key) : []
                     const title =
                       (share
                         ? `${pin.name}: 핀 공유 그룹${sharedAt ? ` (${sharedAt})` : ''} — ${share.members.map((k) => placed.find((p) => k.startsWith(`module:${p.instanceId}:`))?.label ?? k).join(', ')}`
-                        : `${pin.name}: ${pin.description} (끌어서 연결${shareRole(module, pin) ? ' · 같은 종류 부품 핀에 놓으면 핀 공유' : ''})`) +
+                        : `${pin.name}: ${pin.description} (끌어서 연결${
+                            role === 'analog'
+                              ? ' · 다른 아날로그 센서 핀에 놓으면 멀티플렉서로 함께 읽기'
+                              : role
+                                ? ` · 같은 종류(${describeRole(role)}) 핀이나 그 신호가 쓰는 보드 핀에 놓으면 핀 공유`
+                                : ''
+                          })`) +
+                      (onMux ? `
+멀티플렉서: ${placed.find((p) => p.instanceId === onMux.muxId)?.label} C${onMux.channel}` : '') +
                       (peers.length ? `\n연결: ${peers.join(', ')}` : '')
                     const wireColor = tones.ends.get(key)
                     return (
@@ -740,6 +764,7 @@ export function CircuitCanvas({
                     )
                   })}
                 </div>
+                {sim && <SimCard store={sim} instanceId={item.instanceId} moduleId={item.moduleId} />}
               </div>
             )
           })}

@@ -247,6 +247,14 @@ class PowerSupply(Model):
     note: str
 
 
+class MuxSpec(Model):
+    """아날로그 멀티플렉서: 선택선으로 고른 채널이 공통 핀에 이어진다"""
+
+    common: str
+    select: list[str]
+    channels: list[str]
+
+
 class Module(Model):
     id: str
     name: str
@@ -269,6 +277,7 @@ class Module(Model):
     library_by_core: dict[BoardCore, str] | None = None
     internal_connections: list[tuple[str, str]] | None = None
     pass_through: list[tuple[str, str]] | None = None
+    mux: MuxSpec | None = None
     motor: MotorSpec | None = None
     driver: DriverSpec | None = None
     regulator: RegulatorSpec | None = None

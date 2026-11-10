@@ -1165,15 +1165,12 @@
       "hostBoardId": "board-1"
      },
      {
-      "instanceId": "led-5mm#4",
-      "moduleId": "led-5mm",
-      "label": "LED 2",
+      "instanceId": "push-button#4",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
       "x": 960,
       "y": 40,
-      "params": {
-       "color": "red",
-       "current": "10"
-      },
+      "params": {},
       "hostBoardId": "board-1"
      }
     ],
@@ -1252,8 +1249,8 @@
       "id": "w6",
       "from": {
        "kind": "module",
-       "instanceId": "led-5mm#4",
-       "pinId": "anode"
+       "instanceId": "push-button#4",
+       "pinId": "pin2a"
       },
       "to": {
        "kind": "board",
@@ -1275,7 +1272,8 @@
     "labelCounters": {
      "i2c-lcd-1602": 1,
      "hc-sr04": 1,
-     "led-5mm": 2
+     "led-5mm": 1,
+     "push-button": 1
     }
    },
    "autoAssign": {
@@ -1326,20 +1324,6 @@
       "id": "w9",
       "from": {
        "kind": "module",
-       "instanceId": "led-5mm#4",
-       "pinId": "anode"
-      },
-      "to": {
-       "kind": "board",
-       "boardInstanceId": "board-1",
-       "pinId": "D5"
-      },
-      "auto": true
-     },
-     {
-      "id": "w10",
-      "from": {
-       "kind": "module",
        "instanceId": "hc-sr04#2",
        "pinId": "trig"
       },
@@ -1351,7 +1335,7 @@
       "auto": true
      },
      {
-      "id": "w11",
+      "id": "w10",
       "from": {
        "kind": "module",
        "instanceId": "hc-sr04#2",
@@ -1361,6 +1345,20 @@
        "kind": "board",
        "boardInstanceId": "board-1",
        "pinId": "D7"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "push-button#4",
+       "pinId": "pin2a"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D8"
       },
       "auto": true
      },
@@ -1438,8 +1436,8 @@
       "id": "w17",
       "from": {
        "kind": "module",
-       "instanceId": "led-5mm#4",
-       "pinId": "cathode"
+       "instanceId": "push-button#4",
+       "pinId": "pin1a"
       },
       "to": {
        "kind": "board",
@@ -1519,15 +1517,12 @@
       "hostBoardId": "board-1"
      },
      {
-      "instanceId": "led-5mm#4",
-      "moduleId": "led-5mm",
-      "label": "LED 2",
+      "instanceId": "push-button#4",
+      "moduleId": "push-button",
+      "label": "푸시 버튼 1",
       "x": 960,
       "y": 40,
-      "params": {
-       "color": "red",
-       "current": "10"
-      },
+      "params": {},
       "hostBoardId": "board-1"
      }
     ],
@@ -1606,8 +1601,8 @@
       "id": "w6",
       "from": {
        "kind": "module",
-       "instanceId": "led-5mm#4",
-       "pinId": "anode"
+       "instanceId": "push-button#4",
+       "pinId": "pin2a"
       },
       "to": {
        "kind": "board",
@@ -1629,7 +1624,8 @@
     "labelCounters": {
      "i2c-lcd-1602": 1,
      "hc-sr04": 1,
-     "led-5mm": 2
+     "led-5mm": 1,
+     "push-button": 1
     }
    },
    "issues": [
@@ -1672,8 +1668,8 @@
     {
      "code": "pin-conflict",
      "severity": "error",
-     "message": "핀 충돌: D0 에 신호 2개가 연결되어 있습니다 (LED 1 · 애노드 (+), LED 2 · 애노드 (+)).",
-     "hint": "같은 핀을 일부러 함께 쓰려면 한 부품의 핀을 다른 부품의 핀에 끌어 놓아 핀 공유 그룹으로 묶으세요. 아니면 [자동 핀 배정]으로 빈 핀에 다시 배치합니다.",
+     "message": "핀 충돌: D0 에 신호 2개가 연결되어 있습니다 (LED 1 · 애노드 (+), 푸시 버튼 1 · 2A).",
+     "hint": "[자동 핀 배정]을 누르면 나중에 연결된 신호를 빈 핀으로 재배치합니다.",
      "connectionId": "w6",
      "boardInstanceId": "board-1"
     },
@@ -1688,9 +1684,9 @@
     {
      "code": "usb-serial",
      "severity": "warning",
-     "message": "LED 2 · 애노드 (+) → D0: USB 시리얼(스케치 업로드·시리얼 모니터)과 공유되는 핀입니다.",
+     "message": "푸시 버튼 1 · 2A → D0: USB 시리얼(스케치 업로드·시리얼 모니터)과 공유되는 핀입니다.",
      "hint": "업로드가 실패하거나 시리얼 통신이 방해받을 수 있습니다.",
-     "instanceId": "led-5mm#4",
+     "instanceId": "push-button#4",
      "connectionId": "w6"
     },
     {
@@ -1717,32 +1713,15 @@
     {
      "code": "unconnected",
      "severity": "warning",
-     "message": "LED 2: 캐소드 (−) 미연결",
+     "message": "푸시 버튼 1: 1A 미연결",
      "hint": "핀을 끌어 보드 핀에 연결하거나 [자동 핀 배정]을 사용하세요.",
-     "instanceId": "led-5mm#4"
+     "instanceId": "push-button#4"
     }
    ],
    "resistors": [
     {
      "status": "ok",
      "instanceId": "led-5mm#3",
-     "pinId": "anode",
-     "boardInstanceId": "board-1",
-     "boardPinId": "D0",
-     "choice": {
-      "supplyVoltage": 5,
-      "forwardVoltage": 2,
-      "targetMa": 10,
-      "calculatedOhms": 300,
-      "standardOhms": 330,
-      "actualMa": 9.09090909090909,
-      "powerMw": 27.27272727272727,
-      "ratingLabel": "1/4 W"
-     }
-    },
-    {
-     "status": "ok",
-     "instanceId": "led-5mm#4",
      "pinId": "anode",
      "boardInstanceId": "board-1",
      "boardPinId": "D0",
@@ -1870,26 +1849,48 @@
      "note": ""
     },
     {
-     "instanceId": "led-5mm#4",
-     "moduleLabel": "LED 2",
-     "pinName": "애노드 (+)",
-     "role": "신호",
-     "optional": false,
-     "boardName": "",
-     "boardPin": "D0",
-     "boardPinFeatures": "디지털, UART RX",
-     "note": "직렬 저항 330 Ω"
-    },
-    {
-     "instanceId": "led-5mm#4",
-     "moduleLabel": "LED 2",
-     "pinName": "캐소드 (−)",
+     "instanceId": "push-button#4",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1A",
      "role": "GND",
      "optional": false,
      "boardName": "",
      "boardPin": "",
      "boardPinFeatures": "",
      "note": ""
+    },
+    {
+     "instanceId": "push-button#4",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "1B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
+    },
+    {
+     "instanceId": "push-button#4",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2A",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D0",
+     "boardPinFeatures": "디지털, UART RX",
+     "note": ""
+    },
+    {
+     "instanceId": "push-button#4",
+     "moduleLabel": "푸시 버튼 1",
+     "pinName": "2B",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요 (내부 연결)"
     }
    ],
    "bom": [
@@ -1914,14 +1915,20 @@
     {
      "item": "LED",
      "spec": "LED",
-     "quantity": 2,
-     "note": "LED 1, LED 2"
+     "quantity": 1,
+     "note": "LED 1"
+    },
+    {
+     "item": "푸시 버튼",
+     "spec": "Push Button",
+     "quantity": 1,
+     "note": "푸시 버튼 1"
     },
     {
      "item": "저항",
      "spec": "330 Ω 1/4 W (E12)",
-     "quantity": 2,
-     "note": "LED 1, LED 2 직렬 저항"
+     "quantity": 1,
+     "note": "LED 1 직렬 저항"
     },
     {
      "item": "점퍼 와이어",
@@ -27572,6 +27579,20 @@
        "pinId": "GND"
       },
       "auto": true
+     },
+     {
+      "id": "w36",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
      }
     ],
     "added": [
@@ -27595,7 +27616,8 @@
      "w32",
      "w33",
      "w34",
-     "w35"
+     "w35",
+     "w36"
     ],
     "removed": [
      "w1",
@@ -27608,7 +27630,7 @@
     "failed": [
      "TT 기어드 모터 1 (맞는 모터 드라이버 없음)"
     ],
-    "nextConnSeq": 36
+    "nextConnSeq": 37
    },
    "after": {
     "format": "autoino-project",
@@ -34399,14 +34421,29 @@
        "pinId": "GND"
       },
       "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
      }
     ],
     "added": [
-     "w5"
+     "w5",
+     "w6"
     ],
     "removed": [],
     "failed": [],
-    "nextConnSeq": 6
+    "nextConnSeq": 7
    },
    "after": {
     "format": "autoino-project",
@@ -34784,6 +34821,7226 @@
       ]
      }
     ]
+   }
+  },
+  {
+   "name": "share-servos",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "sg90#1",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "sg90#2",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#3",
+      "moduleId": "led-5mm",
+      "label": "LED 1",
+      "x": 776,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "10"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#1",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D9"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D9"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:sg90#1:signal",
+       "module:sg90#2:signal"
+      ]
+     }
+    ],
+    "nextSeq": 4,
+    "nextConnSeq": 3,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "sg90": 2,
+     "led-5mm": 1
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#1",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D9"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D9"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "added": [
+     "w3",
+     "w4",
+     "w5",
+     "w6",
+     "w7",
+     "w8"
+    ],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 9
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "sg90#1",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "sg90#2",
+      "moduleId": "sg90",
+      "label": "SG90 서보 모터 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "led-5mm#3",
+      "moduleId": "led-5mm",
+      "label": "LED 1",
+      "x": 776,
+      "y": 40,
+      "params": {
+       "color": "red",
+       "current": "10"
+      },
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#1",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D9"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "signal"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D9"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "anode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "sg90#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "led-5mm#3",
+       "pinId": "cathode"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:sg90#1:signal",
+       "module:sg90#2:signal"
+      ]
+     }
+    ],
+    "nextSeq": 4,
+    "nextConnSeq": 9,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "sg90": 2,
+     "led-5mm": 1
+    }
+   },
+   "issues": [
+    {
+     "code": "board-power-warning",
+     "severity": "warning",
+     "message": "SG90 서보 모터 1: 서보는 움직일 때 순간 전류가 커서 보드 5V 핀으로 구동하면 보드가 리셋될 수 있습니다. 외부 5 V 전원(GND 공통)을 권장합니다.",
+     "instanceId": "sg90#1",
+     "connectionId": "w5"
+    },
+    {
+     "code": "board-power-warning",
+     "severity": "warning",
+     "message": "SG90 서보 모터 2: 서보는 움직일 때 순간 전류가 커서 보드 5V 핀으로 구동하면 보드가 리셋될 수 있습니다. 외부 5 V 전원(GND 공통)을 권장합니다.",
+     "instanceId": "sg90#2",
+     "connectionId": "w7"
+    },
+    {
+     "code": "usb-budget",
+     "severity": "warning",
+     "message": "보드 5V 사용 전류가 약 500 mA 로 USB 전원 여유(약 400 mA)를 넘을 수 있습니다.",
+     "boardInstanceId": "board-1"
+    },
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D9 을(를) SG90 서보 모터 1 · Signal (주황), SG90 서보 모터 2 · Signal (주황) 이(가) 함께 씁니다. 같은 신호(서보 신호)를 받아 같이 움직입니다.",
+     "connectionId": "w2",
+     "boardInstanceId": "board-1"
+    }
+   ],
+   "resistors": [
+    {
+     "status": "ok",
+     "instanceId": "led-5mm#3",
+     "pinId": "anode",
+     "boardInstanceId": "board-1",
+     "boardPinId": "D5",
+     "choice": {
+      "supplyVoltage": 5,
+      "forwardVoltage": 2,
+      "targetMa": 10,
+      "calculatedOhms": 300,
+      "standardOhms": 330,
+      "actualMa": 9.09090909090909,
+      "powerMw": 27.27272727272727,
+      "ratingLabel": "1/4 W"
+     }
+    }
+   ],
+   "pinTable": [
+    {
+     "instanceId": "sg90#1",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "GND (갈색)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "sg90#1",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "VCC (빨강)",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "sg90#1",
+     "moduleLabel": "SG90 서보 모터 1",
+     "pinName": "Signal (주황)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D9",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 2",
+     "pinName": "GND (갈색)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 2",
+     "pinName": "VCC (빨강)",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "sg90#2",
+     "moduleLabel": "SG90 서보 모터 2",
+     "pinName": "Signal (주황)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D9",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "led-5mm#3",
+     "moduleLabel": "LED 1",
+     "pinName": "애노드 (+)",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "직렬 저항 330 Ω"
+    },
+    {
+     "instanceId": "led-5mm#3",
+     "moduleLabel": "LED 1",
+     "pinName": "캐소드 (−)",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "SG90 서보 모터",
+     "spec": "SG90 Micro Servo",
+     "quantity": 2,
+     "note": "SG90 서보 모터 1, SG90 서보 모터 2"
+    },
+    {
+     "item": "LED",
+     "spec": "LED",
+     "quantity": 1,
+     "note": "LED 1"
+    },
+    {
+     "item": "저항",
+     "spec": "330 Ω 1/4 W (E12)",
+     "quantity": 1,
+     "note": "LED 1 직렬 저항"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 8,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:5V",
+      "kind": "board",
+      "label": "보드 5V",
+      "voltage": 5,
+      "limitMa": 400,
+      "loads": [
+       {
+        "key": "module:sg90#1:vcc",
+        "instanceId": "sg90#1",
+        "label": "SG90 서보 모터 1",
+        "pinName": "VCC (빨강)",
+        "typicalMa": 250,
+        "peakMa": 650,
+        "minVoltage": 4.8,
+        "maxVoltage": 6
+       },
+       {
+        "key": "module:sg90#2:vcc",
+        "instanceId": "sg90#2",
+        "label": "SG90 서보 모터 2",
+        "pinName": "VCC (빨강)",
+        "typicalMa": 250,
+        "peakMa": 650,
+        "minVoltage": 4.8,
+        "maxVoltage": 6
+       }
+      ],
+      "typicalMa": 500,
+      "peakMa": 1300,
+      "unknown": [],
+      "status": "overload",
+      "parallel": []
+     }
+    ],
+    "needs": [
+     {
+      "pins": [
+       "module:sg90#1:vcc",
+       "module:sg90#2:vcc"
+      ],
+      "consumers": [
+       {
+        "instanceId": "sg90#1",
+        "label": "SG90 서보 모터 1",
+        "typicalMa": 250,
+        "peakMa": 650
+       },
+       {
+        "instanceId": "sg90#2",
+        "label": "SG90 서보 모터 2",
+        "typicalMa": 250,
+        "peakMa": 650
+       }
+      ],
+      "minVoltage": 4.8,
+      "maxVoltage": 6,
+      "targetVoltage": 5,
+      "typicalMa": 500,
+      "peakMa": 1300,
+      "conflict": false,
+      "servedBy": null,
+      "id": "need-1",
+      "minimumMa": 700,
+      "recommendedMa": 1300,
+      "examples": [
+       {
+        "id": "usb-charger-5v2a",
+        "name": "USB 충전기 5 V 2 A",
+        "kind": "usb",
+        "voltage": 5,
+        "maxCurrentMa": 2000,
+        "note": "USB 전원 분기 모듈이나 브레드보드 전원 모듈로 + · − 를 꺼내 씁니다.",
+        "level": "recommended"
+       },
+       {
+        "id": "powerbank-5v2a",
+        "name": "보조배터리 5 V 2.4 A",
+        "kind": "battery",
+        "voltage": 5,
+        "maxCurrentMa": 2400,
+        "capacityMah": 6000,
+        "note": "10000 mAh 제품 기준. 부하가 작으면 자동으로 꺼지는 제품이 있습니다.",
+        "level": "recommended",
+        "runtimeHours": 12
+       },
+       {
+        "id": "adapter-5v3a",
+        "name": "DC 어댑터 5 V 3 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 3000,
+        "note": "5.5×2.1 mm 배럴잭 + 터미널 어댑터로 연결합니다.",
+        "level": "recommended"
+       },
+       {
+        "id": "smps-5v10a",
+        "name": "SMPS 5 V 10 A",
+        "kind": "adapter",
+        "voltage": 5,
+        "maxCurrentMa": 10000,
+        "note": "서보 여러 개나 LED 스트립에 알맞습니다. AC 쪽 배선은 감전에 주의하세요.",
+        "level": "recommended"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "share-l298n-inside",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "external-power#1",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 408,
+      "y": 40,
+      "params": {
+       "supply": "custom",
+       "voltage": "7.4",
+       "current": "5000"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "l298n#2",
+      "moduleId": "l298n",
+      "label": "L298N 모터 드라이버 1",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "dc-gear-tt#3",
+      "moduleId": "dc-gear-tt",
+      "label": "TT 기어드 모터 1",
+      "x": 792,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "dc-gear-tt#4",
+      "moduleId": "dc-gear-tt",
+      "label": "TT 기어드 모터 2",
+      "x": 792,
+      "y": 160,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#3",
+       "pinId": "m1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#3",
+       "pinId": "m2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "ena"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "vs"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#4",
+       "pinId": "m1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out3"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#4",
+       "pinId": "m2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "enb"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in4"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:l298n#2:ena",
+       "module:l298n#2:enb"
+      ]
+     },
+     {
+      "id": "share-2",
+      "members": [
+       "module:l298n#2:in1",
+       "module:l298n#2:in3"
+      ]
+     },
+     {
+      "id": "share-3",
+      "members": [
+       "module:l298n#2:in2",
+       "module:l298n#2:in4"
+      ]
+     }
+    ],
+    "nextSeq": 5,
+    "nextConnSeq": 17,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "external-power": 1,
+     "l298n": 1,
+     "dc-gear-tt": 2
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#3",
+       "pinId": "m1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#3",
+       "pinId": "m2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "ena"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "vs"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#4",
+       "pinId": "m1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out3"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#4",
+       "pinId": "m2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "enb"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in4"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     }
+    ],
+    "added": [],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 17
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "external-power#1",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 408,
+      "y": 40,
+      "params": {
+       "supply": "custom",
+       "voltage": "7.4",
+       "current": "5000"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "l298n#2",
+      "moduleId": "l298n",
+      "label": "L298N 모터 드라이버 1",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "dc-gear-tt#3",
+      "moduleId": "dc-gear-tt",
+      "label": "TT 기어드 모터 1",
+      "x": 792,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "dc-gear-tt#4",
+      "moduleId": "dc-gear-tt",
+      "label": "TT 기어드 모터 2",
+      "x": 792,
+      "y": 160,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#3",
+       "pinId": "m1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#3",
+       "pinId": "m2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "ena"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "vs"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#4",
+       "pinId": "m1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out3"
+      },
+      "auto": false
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "dc-gear-tt#4",
+       "pinId": "m2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "out4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "enb"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "l298n#2",
+       "pinId": "in4"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:l298n#2:ena",
+       "module:l298n#2:enb"
+      ]
+     },
+     {
+      "id": "share-2",
+      "members": [
+       "module:l298n#2:in1",
+       "module:l298n#2:in3"
+      ]
+     },
+     {
+      "id": "share-3",
+      "members": [
+       "module:l298n#2:in2",
+       "module:l298n#2:in4"
+      ]
+     }
+    ],
+    "nextSeq": 5,
+    "nextConnSeq": 17,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "external-power": 1,
+     "l298n": 1,
+     "dc-gear-tt": 2
+    }
+   },
+   "issues": [
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D5 을(를) L298N 모터 드라이버 1 · ENA, L298N 모터 드라이버 1 · ENB 이(가) 함께 씁니다. 같은 신호(모터 속도(EN·PWM))를 받아 같이 움직입니다.",
+     "connectionId": "w14",
+     "boardInstanceId": "board-1"
+    },
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D4 을(를) L298N 모터 드라이버 1 · IN1, L298N 모터 드라이버 1 · IN3 이(가) 함께 씁니다. 같은 신호(모터 방향(IN))를 받아 같이 움직입니다.",
+     "connectionId": "w15",
+     "boardInstanceId": "board-1"
+    },
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D7 을(를) L298N 모터 드라이버 1 · IN2, L298N 모터 드라이버 1 · IN4 이(가) 함께 씁니다. 같은 신호(모터 방향(IN))를 받아 같이 움직입니다.",
+     "connectionId": "w16",
+     "boardInstanceId": "board-1"
+    },
+    {
+     "code": "setup-note",
+     "severity": "info",
+     "message": "L298N 모터 드라이버 1: 쓰는 채널의 ENA·ENB 점퍼를 빼야 PWM 으로 속도를 조절할 수 있습니다.",
+     "instanceId": "l298n#2"
+    }
+   ],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "external-power#1",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "+ 출력",
+     "role": "전원 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "external-power#1",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "− GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "12V",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "5V",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "ENA",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "IN1",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "IN2",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D7",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "IN3",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "IN4",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D7",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "ENB",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "OUT1",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "OUT2",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "OUT3",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "l298n#2",
+     "moduleLabel": "L298N 모터 드라이버 1",
+     "pinName": "OUT4",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "dc-gear-tt#3",
+     "moduleLabel": "TT 기어드 모터 1",
+     "pinName": "M+ 단자",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "dc-gear-tt#3",
+     "moduleLabel": "TT 기어드 모터 1",
+     "pinName": "M− 단자",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "dc-gear-tt#4",
+     "moduleLabel": "TT 기어드 모터 2",
+     "pinName": "M+ 단자",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "dc-gear-tt#4",
+     "moduleLabel": "TT 기어드 모터 2",
+     "pinName": "M− 단자",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "외부 전원",
+     "spec": "External DC Power Supply · 7.4 V (리튬 2셀) 5 A",
+     "quantity": 1,
+     "note": "외부 전원 1"
+    },
+    {
+     "item": "L298N 모터 드라이버",
+     "spec": "L298N Dual H-Bridge Motor Driver",
+     "quantity": 1,
+     "note": "L298N 모터 드라이버 1"
+    },
+    {
+     "item": "TT 기어드 모터",
+     "spec": "TT Gearbox DC Motor",
+     "quantity": 2,
+     "note": "TT 기어드 모터 1, TT 기어드 모터 2"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 13,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "module:external-power#1:plus",
+      "kind": "external",
+      "label": "외부 전원 1",
+      "voltage": 7.4,
+      "limitMa": 5000,
+      "loads": [
+       {
+        "key": "module:l298n#2:vs",
+        "instanceId": "l298n#2",
+        "label": "L298N 모터 드라이버 1",
+        "pinName": "12V",
+        "typicalMa": 360,
+        "peakMa": 3060,
+        "minVoltage": 7,
+        "maxVoltage": 35
+       }
+      ],
+      "typicalMa": 360,
+      "peakMa": 3060,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": [
+     {
+      "pins": [
+       "module:l298n#2:vs"
+      ],
+      "consumers": [
+       {
+        "instanceId": "l298n#2",
+        "label": "L298N 모터 드라이버 1",
+        "typicalMa": 40,
+        "peakMa": 60
+       },
+       {
+        "instanceId": "dc-gear-tt#3",
+        "label": "TT 기어드 모터 1",
+        "typicalMa": 160,
+        "peakMa": 1500
+       },
+       {
+        "instanceId": "dc-gear-tt#4",
+        "label": "TT 기어드 모터 2",
+        "typicalMa": 160,
+        "peakMa": 1500
+       }
+      ],
+      "minVoltage": 7,
+      "maxVoltage": 8,
+      "targetVoltage": 8,
+      "typicalMa": 360,
+      "peakMa": 3060,
+      "conflict": false,
+      "servedBy": "외부 전원 1",
+      "id": "need-1",
+      "minimumMa": 500,
+      "recommendedMa": 3100,
+      "examples": [
+       {
+        "id": "liion-2s",
+        "name": "18650 리튬이온 2개 (7.4 V)",
+        "kind": "battery",
+        "voltage": 7.4,
+        "maxCurrentMa": 5000,
+        "capacityMah": 2600,
+        "note": "보호회로(BMS) 있는 배터리를 쓰고 전용 충전기로 충전하세요.",
+        "level": "recommended",
+        "runtimeHours": 7.2
+       },
+       {
+        "id": "lipo-2s",
+        "name": "리튬폴리머 2S 7.4 V 2200 mAh",
+        "kind": "battery",
+        "voltage": 7.4,
+        "maxCurrentMa": 30000,
+        "capacityMah": 2200,
+        "note": "방전율 20C 기준. 과방전하면 망가지므로 전압 경보기를 쓰세요.",
+        "level": "recommended",
+        "runtimeHours": 6.1
+       },
+       {
+        "id": "adapter-7v5-2a",
+        "name": "DC 어댑터 7.5 V 2 A",
+        "kind": "adapter",
+        "voltage": 7.5,
+        "maxCurrentMa": 2000,
+        "note": "보드 VIN 입력에도 알맞은 전압입니다.",
+        "level": "minimum"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "share-trig",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "hc-sr04#1",
+      "moduleId": "hc-sr04",
+      "label": "HC-SR04 초음파 센서 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "hc-sr04#2",
+      "moduleId": "hc-sr04",
+      "label": "HC-SR04 초음파 센서 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "hc-sr04#3",
+      "moduleId": "hc-sr04",
+      "label": "HC-SR04 초음파 센서 3",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:hc-sr04#1:trig",
+       "module:hc-sr04#2:trig",
+       "module:hc-sr04#3:trig"
+      ]
+     }
+    ],
+    "nextSeq": 4,
+    "nextConnSeq": 4,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "hc-sr04": 3
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "echo"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "echo"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D8"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "echo"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D2"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "added": [
+     "w4",
+     "w5",
+     "w6",
+     "w7",
+     "w8",
+     "w9",
+     "w10",
+     "w11",
+     "w12"
+    ],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 13
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "hc-sr04#1",
+      "moduleId": "hc-sr04",
+      "label": "HC-SR04 초음파 센서 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "hc-sr04#2",
+      "moduleId": "hc-sr04",
+      "label": "HC-SR04 초음파 센서 2",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "hc-sr04#3",
+      "moduleId": "hc-sr04",
+      "label": "HC-SR04 초음파 센서 3",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "trig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "echo"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "echo"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D8"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "echo"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D2"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "hc-sr04#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:hc-sr04#1:trig",
+       "module:hc-sr04#2:trig",
+       "module:hc-sr04#3:trig"
+      ]
+     }
+    ],
+    "nextSeq": 4,
+    "nextConnSeq": 13,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "hc-sr04": 3
+    }
+   },
+   "issues": [
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D7 을(를) HC-SR04 초음파 센서 1 · Trig, HC-SR04 초음파 센서 2 · Trig, HC-SR04 초음파 센서 3 · Trig 이(가) 함께 씁니다. 같은 신호(초음파 TRIG)를 받아 같이 움직입니다.",
+     "connectionId": "w3",
+     "boardInstanceId": "board-1"
+    }
+   ],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "hc-sr04#1",
+     "moduleLabel": "HC-SR04 초음파 센서 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#1",
+     "moduleLabel": "HC-SR04 초음파 센서 1",
+     "pinName": "Trig",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D7",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (3개)"
+    },
+    {
+     "instanceId": "hc-sr04#1",
+     "moduleLabel": "HC-SR04 초음파 센서 1",
+     "pinName": "Echo",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#1",
+     "moduleLabel": "HC-SR04 초음파 센서 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#2",
+     "moduleLabel": "HC-SR04 초음파 센서 2",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#2",
+     "moduleLabel": "HC-SR04 초음파 센서 2",
+     "pinName": "Trig",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D7",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (3개)"
+    },
+    {
+     "instanceId": "hc-sr04#2",
+     "moduleLabel": "HC-SR04 초음파 센서 2",
+     "pinName": "Echo",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D8",
+     "boardPinFeatures": "디지털",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#2",
+     "moduleLabel": "HC-SR04 초음파 센서 2",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#3",
+     "moduleLabel": "HC-SR04 초음파 센서 3",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#3",
+     "moduleLabel": "HC-SR04 초음파 센서 3",
+     "pinName": "Trig",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D7",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (3개)"
+    },
+    {
+     "instanceId": "hc-sr04#3",
+     "moduleLabel": "HC-SR04 초음파 센서 3",
+     "pinName": "Echo",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D2",
+     "boardPinFeatures": "디지털, 인터럽트",
+     "note": ""
+    },
+    {
+     "instanceId": "hc-sr04#3",
+     "moduleLabel": "HC-SR04 초음파 센서 3",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "HC-SR04 초음파 센서",
+     "spec": "HC-SR04 Ultrasonic Sensor",
+     "quantity": 3,
+     "note": "HC-SR04 초음파 센서 1, HC-SR04 초음파 센서 2, HC-SR04 초음파 센서 3"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 12,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:5V",
+      "kind": "board",
+      "label": "보드 5V",
+      "voltage": 5,
+      "limitMa": 400,
+      "loads": [
+       {
+        "key": "module:hc-sr04#1:vcc",
+        "instanceId": "hc-sr04#1",
+        "label": "HC-SR04 초음파 센서 1",
+        "pinName": "VCC",
+        "typicalMa": 15,
+        "peakMa": 15,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5
+       },
+       {
+        "key": "module:hc-sr04#2:vcc",
+        "instanceId": "hc-sr04#2",
+        "label": "HC-SR04 초음파 센서 2",
+        "pinName": "VCC",
+        "typicalMa": 15,
+        "peakMa": 15,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5
+       },
+       {
+        "key": "module:hc-sr04#3:vcc",
+        "instanceId": "hc-sr04#3",
+        "label": "HC-SR04 초음파 센서 3",
+        "pinName": "VCC",
+        "typicalMa": 15,
+        "peakMa": 15,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 45,
+      "peakMa": 45,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": []
+   }
+  },
+  {
+   "name": "share-steppers",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "external-power#1",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 408,
+      "y": 40,
+      "params": {
+       "supply": "custom",
+       "voltage": "12",
+       "current": "5000"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "a4988#2",
+      "moduleId": "a4988",
+      "label": "A4988 스테퍼 드라이버 1",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "a4988#3",
+      "moduleId": "a4988",
+      "label": "A4988 스테퍼 드라이버 2",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "stepper-nema17#4",
+      "moduleId": "stepper-nema17",
+      "label": "NEMA 17 스테퍼 모터 1",
+      "x": 792,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "stepper-nema17#5",
+      "moduleId": "stepper-nema17",
+      "label": "NEMA 17 스테퍼 모터 2",
+      "x": 976,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "a1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o1a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "a2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o1b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "b1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o2a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "b2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o2b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "step"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "dir"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "vmot"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "vdd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "gnd2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "a1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o1a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "a2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o1b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "b1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o2a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "b2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o2b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w18",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "vmot"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w19",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w20",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "vdd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w21",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "gnd2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w22",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "step"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w23",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "dir"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:a4988#2:step",
+       "module:a4988#3:step"
+      ]
+     },
+     {
+      "id": "share-2",
+      "members": [
+       "module:a4988#2:dir",
+       "module:a4988#3:dir"
+      ]
+     }
+    ],
+    "nextSeq": 6,
+    "nextConnSeq": 24,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "external-power": 1,
+     "a4988": 2,
+     "stepper-nema17": 2
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "a1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o1a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "a2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o1b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "b1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o2a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "b2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o2b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "step"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "dir"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "vmot"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "vdd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "gnd2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "a1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o1a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "a2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o1b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "b1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o2a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "b2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o2b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w18",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "vmot"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w19",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w20",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "vdd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w21",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "gnd2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w22",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "step"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w23",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "dir"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     }
+    ],
+    "added": [],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 24
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "external-power#1",
+      "moduleId": "external-power",
+      "label": "외부 전원 1",
+      "x": 408,
+      "y": 40,
+      "params": {
+       "supply": "custom",
+       "voltage": "12",
+       "current": "5000"
+      },
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "a4988#2",
+      "moduleId": "a4988",
+      "label": "A4988 스테퍼 드라이버 1",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "a4988#3",
+      "moduleId": "a4988",
+      "label": "A4988 스테퍼 드라이버 2",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "stepper-nema17#4",
+      "moduleId": "stepper-nema17",
+      "label": "NEMA 17 스테퍼 모터 1",
+      "x": 792,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "stepper-nema17#5",
+      "moduleId": "stepper-nema17",
+      "label": "NEMA 17 스테퍼 모터 2",
+      "x": 976,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w1",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "a1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o1a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w2",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "a2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o1b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "b1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o2a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#4",
+       "pinId": "b2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "o2b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "step"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": true
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "dir"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "vmot"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "vdd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#2",
+       "pinId": "gnd2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "a1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o1a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "a2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o1b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "b1"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o2a"
+      },
+      "auto": false
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "stepper-nema17#5",
+       "pinId": "b2"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "o2b"
+      },
+      "auto": false
+     },
+     {
+      "id": "w18",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "vmot"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "plus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w19",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "external-power#1",
+       "pinId": "minus"
+      },
+      "auto": true
+     },
+     {
+      "id": "w20",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "vdd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w21",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "gnd2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w22",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "step"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D5"
+      },
+      "auto": false
+     },
+     {
+      "id": "w23",
+      "from": {
+       "kind": "module",
+       "instanceId": "a4988#3",
+       "pinId": "dir"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": false
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "shares": [
+     {
+      "id": "share-1",
+      "members": [
+       "module:a4988#2:step",
+       "module:a4988#3:step"
+      ]
+     },
+     {
+      "id": "share-2",
+      "members": [
+       "module:a4988#2:dir",
+       "module:a4988#3:dir"
+      ]
+     }
+    ],
+    "nextSeq": 6,
+    "nextConnSeq": 24,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "external-power": 1,
+     "a4988": 2,
+     "stepper-nema17": 2
+    }
+   },
+   "issues": [
+    {
+     "code": "board-power-warning",
+     "severity": "warning",
+     "message": "A4988 스테퍼 드라이버 1: 스테퍼 모터 전원을 보드 5V 에서 가져올 수 없습니다. 8 V 이상의 외부 전원을 연결하세요.",
+     "instanceId": "a4988#2",
+     "connectionId": "w9"
+    },
+    {
+     "code": "board-power-warning",
+     "severity": "warning",
+     "message": "A4988 스테퍼 드라이버 2: 스테퍼 모터 전원을 보드 5V 에서 가져올 수 없습니다. 8 V 이상의 외부 전원을 연결하세요.",
+     "instanceId": "a4988#3",
+     "connectionId": "w20"
+    },
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D5 을(를) A4988 스테퍼 드라이버 1 · STEP, A4988 스테퍼 드라이버 2 · STEP 이(가) 함께 씁니다. 같은 신호(스텝 펄스(STEP))를 받아 같이 움직입니다.",
+     "connectionId": "w22",
+     "boardInstanceId": "board-1"
+    },
+    {
+     "code": "pin-shared",
+     "severity": "info",
+     "message": "핀 공유: D4 을(를) A4988 스테퍼 드라이버 1 · DIR, A4988 스테퍼 드라이버 2 · DIR 이(가) 함께 씁니다. 같은 신호(방향(DIR))를 받아 같이 움직입니다.",
+     "connectionId": "w23",
+     "boardInstanceId": "board-1"
+    },
+    {
+     "code": "setup-note",
+     "severity": "info",
+     "message": "A4988 스테퍼 드라이버 1: RST 와 SLP 를 서로 연결해야 동작합니다. 전류 제한 가변저항도 모터 정격에 맞추세요.",
+     "instanceId": "a4988#2"
+    },
+    {
+     "code": "setup-note",
+     "severity": "info",
+     "message": "A4988 스테퍼 드라이버 2: RST 와 SLP 를 서로 연결해야 동작합니다. 전류 제한 가변저항도 모터 정격에 맞추세요.",
+     "instanceId": "a4988#3"
+    }
+   ],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "external-power#1",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "+ 출력",
+     "role": "전원 출력",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "external-power#1",
+     "moduleLabel": "외부 전원 1",
+     "pinName": "− GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "VMOT",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "VDD",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "GND2",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "STEP",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "DIR",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "EN",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "MS1",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "MS2",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "MS3",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "RST",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "SLP",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "1A",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "1B",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "2A",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#2",
+     "moduleLabel": "A4988 스테퍼 드라이버 1",
+     "pinName": "2B",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "VMOT",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "VDD",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "GND2",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "STEP",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D5",
+     "boardPinFeatures": "디지털, PWM",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "DIR",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": "핀 공유 (2개)"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "EN",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "MS1",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "MS2",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "MS3",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "RST",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "SLP",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "1A",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "1B",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "2A",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "a4988#3",
+     "moduleLabel": "A4988 스테퍼 드라이버 2",
+     "pinName": "2B",
+     "role": "모터 출력",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#4",
+     "moduleLabel": "NEMA 17 스테퍼 모터 1",
+     "pinName": "A+ 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#4",
+     "moduleLabel": "NEMA 17 스테퍼 모터 1",
+     "pinName": "A− 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#4",
+     "moduleLabel": "NEMA 17 스테퍼 모터 1",
+     "pinName": "B+ 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#4",
+     "moduleLabel": "NEMA 17 스테퍼 모터 1",
+     "pinName": "B− 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#5",
+     "moduleLabel": "NEMA 17 스테퍼 모터 2",
+     "pinName": "A+ 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#5",
+     "moduleLabel": "NEMA 17 스테퍼 모터 2",
+     "pinName": "A− 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#5",
+     "moduleLabel": "NEMA 17 스테퍼 모터 2",
+     "pinName": "B+ 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "stepper-nema17#5",
+     "moduleLabel": "NEMA 17 스테퍼 모터 2",
+     "pinName": "B− 코일",
+     "role": "모터 단자",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "외부 전원",
+     "spec": "External DC Power Supply · 12 V 5 A",
+     "quantity": 1,
+     "note": "외부 전원 1"
+    },
+    {
+     "item": "A4988 스테퍼 드라이버",
+     "spec": "A4988 Stepper Driver",
+     "quantity": 2,
+     "note": "A4988 스테퍼 드라이버 1, A4988 스테퍼 드라이버 2"
+    },
+    {
+     "item": "NEMA 17 스테퍼 모터",
+     "spec": "NEMA 17 Bipolar Stepper (17HS4401)",
+     "quantity": 2,
+     "note": "NEMA 17 스테퍼 모터 1, NEMA 17 스테퍼 모터 2"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 21,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:5V",
+      "kind": "board",
+      "label": "보드 5V",
+      "voltage": 5,
+      "limitMa": 400,
+      "loads": [
+       {
+        "key": "module:a4988#2:vdd",
+        "instanceId": "a4988#2",
+        "label": "A4988 스테퍼 드라이버 1",
+        "pinName": "VDD",
+        "typicalMa": 5,
+        "peakMa": 8,
+        "minVoltage": 3,
+        "maxVoltage": 5.5
+       },
+       {
+        "key": "module:a4988#3:vdd",
+        "instanceId": "a4988#3",
+        "label": "A4988 스테퍼 드라이버 2",
+        "pinName": "VDD",
+        "typicalMa": 5,
+        "peakMa": 8,
+        "minVoltage": 3,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 10,
+      "peakMa": 16,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     },
+     {
+      "key": "module:external-power#1:plus",
+      "kind": "external",
+      "label": "외부 전원 1",
+      "voltage": 12,
+      "limitMa": 5000,
+      "loads": [
+       {
+        "key": "module:a4988#2:vmot",
+        "instanceId": "a4988#2",
+        "label": "A4988 스테퍼 드라이버 1",
+        "pinName": "VMOT",
+        "typicalMa": 1005,
+        "peakMa": 2010,
+        "minVoltage": 8,
+        "maxVoltage": 35
+       },
+       {
+        "key": "module:a4988#3:vmot",
+        "instanceId": "a4988#3",
+        "label": "A4988 스테퍼 드라이버 2",
+        "pinName": "VMOT",
+        "typicalMa": 1005,
+        "peakMa": 2010,
+        "minVoltage": 8,
+        "maxVoltage": 35
+       }
+      ],
+      "typicalMa": 2010,
+      "peakMa": 4020,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": [
+     {
+      "pins": [
+       "module:a4988#2:vmot",
+       "module:a4988#3:vmot"
+      ],
+      "consumers": [
+       {
+        "instanceId": "a4988#2",
+        "label": "A4988 스테퍼 드라이버 1",
+        "typicalMa": 5,
+        "peakMa": 10
+       },
+       {
+        "instanceId": "stepper-nema17#4",
+        "label": "NEMA 17 스테퍼 모터 1",
+        "typicalMa": 1000,
+        "peakMa": 2000
+       },
+       {
+        "instanceId": "a4988#3",
+        "label": "A4988 스테퍼 드라이버 2",
+        "typicalMa": 5,
+        "peakMa": 10
+       },
+       {
+        "instanceId": "stepper-nema17#5",
+        "label": "NEMA 17 스테퍼 모터 2",
+        "typicalMa": 1000,
+        "peakMa": 2000
+       }
+      ],
+      "minVoltage": 8,
+      "maxVoltage": 35,
+      "targetVoltage": 12,
+      "typicalMa": 2010,
+      "peakMa": 4020,
+      "conflict": false,
+      "servedBy": "외부 전원 1",
+      "id": "need-1",
+      "minimumMa": 2600,
+      "recommendedMa": 4100,
+      "examples": [
+       {
+        "id": "adapter-12v5a",
+        "name": "DC 어댑터 12 V 5 A",
+        "kind": "adapter",
+        "voltage": 12,
+        "maxCurrentMa": 5000,
+        "note": "모터 여러 개를 함께 쓸 때 알맞습니다.",
+        "level": "recommended"
+       },
+       {
+        "id": "sla-12v7ah",
+        "name": "납축전지 12 V 7 Ah",
+        "kind": "battery",
+        "voltage": 12,
+        "maxCurrentMa": 10000,
+        "capacityMah": 7000,
+        "note": "무겁지만 큰 전류를 안정적으로 냅니다.",
+        "level": "recommended",
+        "runtimeHours": 3.5
+       },
+       {
+        "id": "smps-12v10a",
+        "name": "SMPS 12 V 10 A",
+        "kind": "adapter",
+        "voltage": 12,
+        "maxCurrentMa": 10000,
+        "note": "스테퍼·큰 DC 모터용. AC 쪽 배선은 감전에 주의하세요.",
+        "level": "recommended"
+       },
+       {
+        "id": "liion-3s",
+        "name": "18650 리튬이온 3개 (11.1 V)",
+        "kind": "battery",
+        "voltage": 11.1,
+        "maxCurrentMa": 5000,
+        "capacityMah": 2600,
+        "note": "보호회로(BMS) 있는 배터리를 쓰세요.",
+        "level": "recommended",
+        "runtimeHours": 1.3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "mux-analog",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "potentiometer#1",
+      "moduleId": "potentiometer",
+      "label": "가변저항 10 kΩ 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "ldr-module#2",
+      "moduleId": "ldr-module",
+      "label": "조도 센서 모듈 1",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "soil-moisture#3",
+      "moduleId": "soil-moisture",
+      "label": "토양 수분 센서 1",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "joystick-ky023#4",
+      "moduleId": "joystick-ky023",
+      "label": "조이스틱 모듈 1",
+      "x": 960,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "cd74hc4067#5",
+      "moduleId": "cd74hc4067",
+      "label": "아날로그 멀티플렉서 (16채널) 1",
+      "x": 608,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "sw"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "wiper"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w19",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false
+     },
+     {
+      "id": "w20",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "sig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": true
+     },
+     {
+      "id": "w21",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s0"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": true
+     },
+     {
+      "id": "w22",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "en"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w23",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w24",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w25",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w26",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D8"
+      },
+      "auto": true
+     },
+     {
+      "id": "w27",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vrx"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c3"
+      },
+      "auto": false
+     },
+     {
+      "id": "w28",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vry"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w29",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D2"
+      },
+      "auto": true
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 6,
+    "nextConnSeq": 30,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "potentiometer": 1,
+     "ldr-module": 1,
+     "soil-moisture": 1,
+     "joystick-ky023": 1,
+     "cd74hc4067": 1
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "sw"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "wiper"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w19",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false
+     },
+     {
+      "id": "w20",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "sig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": true
+     },
+     {
+      "id": "w21",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s0"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": true
+     },
+     {
+      "id": "w22",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "en"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w23",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w24",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w25",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w26",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D8"
+      },
+      "auto": true
+     },
+     {
+      "id": "w27",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vrx"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c3"
+      },
+      "auto": false
+     },
+     {
+      "id": "w28",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vry"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w29",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D2"
+      },
+      "auto": true
+     }
+    ],
+    "added": [],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 30
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "arduino-uno-r3",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "arduino-uno-r3",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "potentiometer#1",
+      "moduleId": "potentiometer",
+      "label": "가변저항 10 kΩ 1",
+      "x": 408,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "ldr-module#2",
+      "moduleId": "ldr-module",
+      "label": "조도 센서 모듈 1",
+      "x": 592,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "soil-moisture#3",
+      "moduleId": "soil-moisture",
+      "label": "토양 수분 센서 1",
+      "x": 776,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "joystick-ky023#4",
+      "moduleId": "joystick-ky023",
+      "label": "조이스틱 모듈 1",
+      "x": 960,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "cd74hc4067#5",
+      "moduleId": "cd74hc4067",
+      "label": "아날로그 멀티플렉서 (16채널) 1",
+      "x": 608,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "sw"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D4"
+      },
+      "auto": true
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "wiper"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c0"
+      },
+      "auto": false
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "ldr-module#2",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c1"
+      },
+      "auto": false
+     },
+     {
+      "id": "w19",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false
+     },
+     {
+      "id": "w20",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "sig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "A0"
+      },
+      "auto": true
+     },
+     {
+      "id": "w21",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s0"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D7"
+      },
+      "auto": true
+     },
+     {
+      "id": "w22",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "en"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w23",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "5V"
+      },
+      "auto": true
+     },
+     {
+      "id": "w24",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true
+     },
+     {
+      "id": "w25",
+      "from": {
+       "kind": "module",
+       "instanceId": "soil-moisture#3",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c2"
+      },
+      "auto": false
+     },
+     {
+      "id": "w26",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D8"
+      },
+      "auto": true
+     },
+     {
+      "id": "w27",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vrx"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c3"
+      },
+      "auto": false
+     },
+     {
+      "id": "w28",
+      "from": {
+       "kind": "module",
+       "instanceId": "joystick-ky023#4",
+       "pinId": "vry"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "c4"
+      },
+      "auto": false
+     },
+     {
+      "id": "w29",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#5",
+       "pinId": "s2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "D2"
+      },
+      "auto": true
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 6,
+    "nextConnSeq": 30,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "potentiometer": 1,
+     "ldr-module": 1,
+     "soil-moisture": 1,
+     "joystick-ky023": 1,
+     "cd74hc4067": 1
+    }
+   },
+   "issues": [],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "potentiometer#1",
+     "moduleLabel": "가변저항 10 kΩ 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "potentiometer#1",
+     "moduleLabel": "가변저항 10 kΩ 1",
+     "pinName": "OUT",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "아날로그 멀티플렉서 (16채널) 1 C0 (SIG → A0)"
+    },
+    {
+     "instanceId": "potentiometer#1",
+     "moduleLabel": "가변저항 10 kΩ 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "ldr-module#2",
+     "moduleLabel": "조도 센서 모듈 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "ldr-module#2",
+     "moduleLabel": "조도 센서 모듈 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "ldr-module#2",
+     "moduleLabel": "조도 센서 모듈 1",
+     "pinName": "AO",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "아날로그 멀티플렉서 (16채널) 1 C1 (SIG → A0)"
+    },
+    {
+     "instanceId": "ldr-module#2",
+     "moduleLabel": "조도 센서 모듈 1",
+     "pinName": "DO",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "soil-moisture#3",
+     "moduleLabel": "토양 수분 센서 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "soil-moisture#3",
+     "moduleLabel": "토양 수분 센서 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "soil-moisture#3",
+     "moduleLabel": "토양 수분 센서 1",
+     "pinName": "AO",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "아날로그 멀티플렉서 (16채널) 1 C2 (SIG → A0)"
+    },
+    {
+     "instanceId": "soil-moisture#3",
+     "moduleLabel": "토양 수분 센서 1",
+     "pinName": "DO",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "joystick-ky023#4",
+     "moduleLabel": "조이스틱 모듈 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "joystick-ky023#4",
+     "moduleLabel": "조이스틱 모듈 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "joystick-ky023#4",
+     "moduleLabel": "조이스틱 모듈 1",
+     "pinName": "VRx",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "아날로그 멀티플렉서 (16채널) 1 C3 (SIG → A0)"
+    },
+    {
+     "instanceId": "joystick-ky023#4",
+     "moduleLabel": "조이스틱 모듈 1",
+     "pinName": "VRy",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "아날로그 멀티플렉서 (16채널) 1 C4 (SIG → A0)"
+    },
+    {
+     "instanceId": "joystick-ky023#4",
+     "moduleLabel": "조이스틱 모듈 1",
+     "pinName": "SW",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D4",
+     "boardPinFeatures": "디지털",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "SIG",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "A0",
+     "boardPinFeatures": "아날로그, 디지털",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S0",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D7",
+     "boardPinFeatures": "디지털",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S1",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D8",
+     "boardPinFeatures": "디지털",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S2",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "D2",
+     "boardPinFeatures": "디지털, 인터럽트",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S3",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "EN",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "5V",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C0",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C1",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C2",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C3",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C4",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C5",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C6",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C7",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C8",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C9",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C10",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C11",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C12",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C13",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C14",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#5",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C15",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    }
+   ],
+   "bom": [
+    {
+     "item": "Arduino Uno R3",
+     "spec": "ATmega328P",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "가변저항 10 kΩ",
+     "spec": "10 kΩ Potentiometer",
+     "quantity": 1,
+     "note": "가변저항 10 kΩ 1"
+    },
+    {
+     "item": "조도 센서 모듈",
+     "spec": "Photoresistor (LDR) Module",
+     "quantity": 1,
+     "note": "조도 센서 모듈 1"
+    },
+    {
+     "item": "토양 수분 센서",
+     "spec": "Soil Moisture Sensor",
+     "quantity": 1,
+     "note": "토양 수분 센서 1"
+    },
+    {
+     "item": "조이스틱 모듈",
+     "spec": "KY-023 Joystick Module",
+     "quantity": 1,
+     "note": "조이스틱 모듈 1"
+    },
+    {
+     "item": "아날로그 멀티플렉서 (16채널)",
+     "spec": "CD74HC4067 16-Channel Analog Multiplexer",
+     "quantity": 1,
+     "note": "아날로그 멀티플렉서 (16채널) 1"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 22,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:5V",
+      "kind": "board",
+      "label": "보드 5V",
+      "voltage": 5,
+      "limitMa": 400,
+      "loads": [
+       {
+        "key": "module:cd74hc4067#5:vcc",
+        "instanceId": "cd74hc4067#5",
+        "label": "아날로그 멀티플렉서 (16채널) 1",
+        "pinName": "VCC",
+        "typicalMa": 0.1,
+        "peakMa": 1,
+        "minVoltage": 2,
+        "maxVoltage": 6
+       },
+       {
+        "key": "module:joystick-ky023#4:vcc",
+        "instanceId": "joystick-ky023#4",
+        "label": "조이스틱 모듈 1",
+        "pinName": "VCC",
+        "typicalMa": 2,
+        "peakMa": 2,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5
+       },
+       {
+        "key": "module:ldr-module#2:vcc",
+        "instanceId": "ldr-module#2",
+        "label": "조도 센서 모듈 1",
+        "pinName": "VCC",
+        "typicalMa": 2,
+        "peakMa": 2,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5
+       },
+       {
+        "key": "module:potentiometer#1:vcc",
+        "instanceId": "potentiometer#1",
+        "label": "가변저항 10 kΩ 1",
+        "pinName": "VCC",
+        "typicalMa": 1,
+        "peakMa": 1,
+        "minVoltage": 1,
+        "maxVoltage": 5.5
+       },
+       {
+        "key": "module:soil-moisture#3:vcc",
+        "instanceId": "soil-moisture#3",
+        "label": "토양 수분 센서 1",
+        "pinName": "VCC",
+        "typicalMa": 15,
+        "peakMa": 35,
+        "minVoltage": 3.3,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 20.1,
+      "peakMa": 41,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": []
+   }
+  },
+  {
+   "name": "mux-esp32",
+   "route": "breadboard",
+   "before": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "esp32-devkit-v1",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "esp32-devkit-v1",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "potentiometer#1",
+      "moduleId": "potentiometer",
+      "label": "가변저항 10 kΩ 1",
+      "x": 488,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "mq2-gas#2",
+      "moduleId": "mq2-gas",
+      "label": "MQ-2 가스 센서 1",
+      "x": 672,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "cd74hc4067#3",
+      "moduleId": "cd74hc4067",
+      "label": "아날로그 멀티플렉서 (16채널) 1",
+      "x": 688,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "VIN"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "wiper"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "c0"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "c1"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "sig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO36"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s0"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "en"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 4,
+    "nextConnSeq": 17,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "potentiometer": 1,
+     "mq2-gas": 1,
+     "cd74hc4067": 1
+    }
+   },
+   "autoAssign": {
+    "connections": [
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "VIN"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "wiper"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "c0"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "c1"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "sig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO36"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s0"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "en"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     }
+    ],
+    "added": [],
+    "removed": [],
+    "failed": [],
+    "nextConnSeq": 17
+   },
+   "after": {
+    "format": "autoino-project",
+    "version": 2,
+    "savedAt": "2026-01-01T00:00:00.000Z",
+    "name": "제목 없는 프로젝트",
+    "boardId": "esp32-devkit-v1",
+    "boards": [
+     {
+      "instanceId": "board-1",
+      "boardId": "esp32-devkit-v1",
+      "label": "보드 1",
+      "x": 40,
+      "y": 40
+     }
+    ],
+    "modules": [
+     {
+      "instanceId": "potentiometer#1",
+      "moduleId": "potentiometer",
+      "label": "가변저항 10 kΩ 1",
+      "x": 488,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "mq2-gas#2",
+      "moduleId": "mq2-gas",
+      "label": "MQ-2 가스 센서 1",
+      "x": 672,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     },
+     {
+      "instanceId": "cd74hc4067#3",
+      "moduleId": "cd74hc4067",
+      "label": "아날로그 멀티플렉서 (16채널) 1",
+      "x": 688,
+      "y": 40,
+      "params": {},
+      "hostBoardId": "board-1"
+     }
+    ],
+    "connections": [
+     {
+      "id": "w3",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w4",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w5",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "VIN"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w6",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w7",
+      "from": {
+       "kind": "module",
+       "instanceId": "potentiometer#1",
+       "pinId": "wiper"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "c0"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w8",
+      "from": {
+       "kind": "module",
+       "instanceId": "mq2-gas#2",
+       "pinId": "ao"
+      },
+      "to": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "c1"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w9",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s1"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w10",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s2"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w11",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s3"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": false,
+      "via": "breadboard"
+     },
+     {
+      "id": "w12",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "sig"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO36"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w13",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "s0"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GPIO32"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w14",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "en"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w15",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "vcc"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "3V3"
+      },
+      "auto": true,
+      "via": "breadboard"
+     },
+     {
+      "id": "w16",
+      "from": {
+       "kind": "module",
+       "instanceId": "cd74hc4067#3",
+       "pinId": "gnd"
+      },
+      "to": {
+       "kind": "board",
+       "boardInstanceId": "board-1",
+       "pinId": "GND"
+      },
+      "auto": true,
+      "via": "breadboard"
+     }
+    ],
+    "links": [],
+    "breadboard": {
+     "x": 40,
+     "y": 340
+    },
+    "nextSeq": 4,
+    "nextConnSeq": 17,
+    "nextBoardSeq": 2,
+    "nextLinkSeq": 1,
+    "labelCounters": {
+     "potentiometer": 1,
+     "mq2-gas": 1,
+     "cd74hc4067": 1
+    }
+   },
+   "issues": [
+    {
+     "code": "supply-note",
+     "severity": "info",
+     "message": "MQ-2 가스 센서 1: VIN — USB 로 전원을 공급할 때 VIN 에는 USB 5 V 계열 전압이 나옵니다. 보드 회로에 따라 5 V 보다 조금 낮을 수 있습니다.",
+     "instanceId": "mq2-gas#2",
+     "connectionId": "w5"
+    }
+   ],
+   "resistors": [],
+   "pinTable": [
+    {
+     "instanceId": "potentiometer#1",
+     "moduleLabel": "가변저항 10 kΩ 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "3V3",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "potentiometer#1",
+     "moduleLabel": "가변저항 10 kΩ 1",
+     "pinName": "OUT",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "아날로그 멀티플렉서 (16채널) 1 C0 (SIG → GPIO36)"
+    },
+    {
+     "instanceId": "potentiometer#1",
+     "moduleLabel": "가변저항 10 kΩ 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "mq2-gas#2",
+     "moduleLabel": "MQ-2 가스 센서 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "VIN",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "mq2-gas#2",
+     "moduleLabel": "MQ-2 가스 센서 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "mq2-gas#2",
+     "moduleLabel": "MQ-2 가스 센서 1",
+     "pinName": "AO",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "아날로그 멀티플렉서 (16채널) 1 C1 (SIG → GPIO36)"
+    },
+    {
+     "instanceId": "mq2-gas#2",
+     "moduleLabel": "MQ-2 가스 센서 1",
+     "pinName": "DO",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "SIG",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO36",
+     "boardPinFeatures": "디지털, 아날로그, 인터럽트",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S0",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GPIO32",
+     "boardPinFeatures": "디지털, PWM, 인터럽트, 아날로그, 터치",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S1",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S2",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "S3",
+     "role": "신호",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "EN",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "VCC",
+     "role": "전원",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "3V3",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "GND",
+     "role": "GND",
+     "optional": false,
+     "boardName": "",
+     "boardPin": "GND",
+     "boardPinFeatures": "",
+     "note": ""
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C0",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C1",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "다른 부품에 연결"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C2",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C3",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C4",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C5",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C6",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C7",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C8",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C9",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C10",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C11",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C12",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C13",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C14",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    },
+    {
+     "instanceId": "cd74hc4067#3",
+     "moduleLabel": "아날로그 멀티플렉서 (16채널) 1",
+     "pinName": "C15",
+     "role": "수동",
+     "optional": true,
+     "boardName": "",
+     "boardPin": "",
+     "boardPinFeatures": "",
+     "note": "연결 불필요"
+    }
+   ],
+   "bom": [
+    {
+     "item": "ESP32 DevKit V1",
+     "spec": "ESP32-WROOM-32 (ESP32-D0WD, Xtensa LX6 듀얼코어)",
+     "quantity": 1,
+     "note": "메인 보드 (보드 1)"
+    },
+    {
+     "item": "가변저항 10 kΩ",
+     "spec": "10 kΩ Potentiometer",
+     "quantity": 1,
+     "note": "가변저항 10 kΩ 1"
+    },
+    {
+     "item": "MQ-2 가스 센서",
+     "spec": "MQ-2 Gas Sensor",
+     "quantity": 1,
+     "note": "MQ-2 가스 센서 1"
+    },
+    {
+     "item": "아날로그 멀티플렉서 (16채널)",
+     "spec": "CD74HC4067 16-Channel Analog Multiplexer",
+     "quantity": 1,
+     "note": "아날로그 멀티플렉서 (16채널) 1"
+    },
+    {
+     "item": "점퍼 와이어",
+     "spec": "",
+     "quantity": 14,
+     "note": "브레드보드 배선에 따라 달라질 수 있음"
+    }
+   ],
+   "power": {
+    "sources": [
+     {
+      "key": "board:board-1:3V3",
+      "kind": "board",
+      "label": "보드 3V3",
+      "voltage": 3.3,
+      "limitMa": null,
+      "loads": [
+       {
+        "key": "module:cd74hc4067#3:vcc",
+        "instanceId": "cd74hc4067#3",
+        "label": "아날로그 멀티플렉서 (16채널) 1",
+        "pinName": "VCC",
+        "typicalMa": 0.1,
+        "peakMa": 1,
+        "minVoltage": 2,
+        "maxVoltage": 6
+       },
+       {
+        "key": "module:potentiometer#1:vcc",
+        "instanceId": "potentiometer#1",
+        "label": "가변저항 10 kΩ 1",
+        "pinName": "VCC",
+        "typicalMa": 1,
+        "peakMa": 1,
+        "minVoltage": 1,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 1.1,
+      "peakMa": 2,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     },
+     {
+      "key": "board:board-1:VIN",
+      "kind": "board",
+      "label": "보드 VIN",
+      "voltage": 5,
+      "limitMa": 400,
+      "loads": [
+       {
+        "key": "module:mq2-gas#2:vcc",
+        "instanceId": "mq2-gas#2",
+        "label": "MQ-2 가스 센서 1",
+        "pinName": "VCC",
+        "typicalMa": 150,
+        "peakMa": 180,
+        "minVoltage": 4.5,
+        "maxVoltage": 5.5
+       }
+      ],
+      "typicalMa": 150,
+      "peakMa": 180,
+      "unknown": [],
+      "status": "ok",
+      "parallel": []
+     }
+    ],
+    "needs": []
    }
   }
  ]

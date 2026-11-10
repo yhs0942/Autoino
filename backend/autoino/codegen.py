@@ -20,7 +20,8 @@ from .engine.electrical import is_gpio, supply_pin_of
 from .engine.netlist import build_netlist
 from .engine.paths import route_to_board
 from .engine.resistor import compute_series_resistors, format_ohms
-from .engine.shares import compute_ladder_resistors, ladder_label, ladder_thresholds, share_board_pin, share_kind
+from .engine.mux import mux_channel_of
+from .engine.shares import compute_ladder_resistors, describe_role, ladder_label, ladder_thresholds, role_of_key, share_board_pin, share_kind
 from .engine.validate import count_issues, validate_circuit
 from .models import BoardLink, PlacedBoard, PlacedModule
 
@@ -252,26 +253,115 @@ def _sketch_for(c: Circuit, board: PlacedBoard, project_name: str, now: datetime
         kind = share_kind(c, on, rp.board if rp else None, rp.pin if rp else None)
         if not kind:
             continue
-        labels = ", ".join(c.placed_module(k.split(":")[1]).label for k in on)
+        def member_label(k: str) -> str:
+            item = c.placed_module(k.split(":")[1])
+            pin = c.module_def(item.module_id).pin(k.rsplit(":", 1)[1])
+            same = sum(1 for x in on if x.split(":")[1] == item.instance_id) > 1
+            return f"{item.label} {pin.name}" if same and pin else item.label
+
+        labels = ", ".join(member_label(k) for k in on)
         for k in on:
             shared[k] = {"kind": kind, "first": on[0], "members": on, "pin": target[1], "labels": labels}
 
     def share_note(item: PlacedModule, pin_id: str) -> dict | None:
         return shared.get(f"module:{item.instance_id}:{pin_id}")
 
+    def share_how(group: dict) -> str:
+        if group["kind"] == "output":
+            role = role_of_key(c, group["first"])
+            return "같이 켜지고 꺼집니다" if role == "output" else f"같은 신호({describe_role(role)})로 같이 움직입니다"
+        return {"input": "어느 쪽을 눌러도 같이 읽힙니다", "ladder": "저항 사다리 코드에서 함께 읽습니다"}[group["kind"]]
+
+    # 멀티플렉서 채널을 읽는 함수 (멀티플렉서마다 한 번 만든다)
+    mux_helpers: dict[str, tuple[str, int] | None] = {}
+
+    def mux_read(item: PlacedModule, pin_id: str) -> str | None:
+        """센서 핀이 아날로그 멀티플렉서 채널에 이어져 있으면 그 채널을 읽는 식 (예: readMux1(2))"""
+        found = mux_channel_of(c, f"module:{item.instance_id}:{pin_id}")
+        if not found:
+            return None
+        mux_id, channel = found
+        mux = c.placed_module(mux_id)
+        spec = c.module_def(mux.module_id).mux
+        if mux_id not in mux_helpers:
+            mux_helpers[mux_id] = None
+            sig = _module_pin(c, traced, mux, spec.common, board.instance_id)
+            rp = resolve_board_pin(c, board.instance_id, sig) if sig else None
+            if not (rp and rp.pin and "analog" in rp.pin.capabilities):
+                b.warnings.append(f"{mux.label}: SIG 가 이 보드의 아날로그 핀에 연결되지 않아 멀티플렉서로 읽는 코드를 생략했습니다.")
+                b.globals.append(f"// {mux.label}: SIG 가 아날로그 핀에 연결되지 않아 이 멀티플렉서의 센서 코드를 생략했습니다.")
+            else:
+                select: list[tuple[str, str]] = []
+                for sp in spec.select:
+                    bp = _module_pin(c, traced, mux, sp, board.instance_id)
+                    rsp = resolve_board_pin(c, board.instance_id, bp) if bp else None
+                    if not (rsp and rsp.pin and is_gpio(rsp.pin)):
+                        break  # GND 에 묶인 선택선부터는 늘 0
+                    select.append((sp, bp))
+                mname = _ident("mux", mux.label, used_names)
+                upper = mname.upper()
+                fn = f"read{mname[0].upper()}{mname[1:]}"
+                sig_name = const(f"{upper}_SIG", mux, spec.common, sig, " (아날로그 멀티플렉서 공통 신호)")
+                names = [const(f"{upper}_S{i}", mux, sp, bp, f" (채널 선택 비트 {i})") for i, (sp, bp) in enumerate(select)]
+                rest = spec.select[len(select):]
+                if rest:
+                    pin_rows.append(f" *   {mux.label} · {', '.join(x.upper() for x in rest)} → GND (쓰지 않는 선택선)")
+                lines = [f"// {mux.label}: 채널(0–{2 ** len(select) - 1})을 골라 SIG({sig}) 로 읽는다"]
+                if select:
+                    b.globals.append(f"const uint8_t {upper}_SELECT[{len(select)}] = {{{', '.join(names)}}};  // S0 부터. 나머지 선택선은 GND")
+                    b.setup.append(f"  for (uint8_t i = 0; i < {len(select)}; i++) pinMode({upper}_SELECT[i], OUTPUT);")
+                    body = f"  for (uint8_t i = 0; i < {len(select)}; i++) digitalWrite({upper}_SELECT[i], (channel >> i) & 1);\n"
+                else:
+                    body = "  (void)channel;  // 선택선이 모두 GND 라 채널 0 만 읽는다\n"
+                add_function(
+                    f"int {fn}(",
+                    "\n".join(lines)
+                    + f"\nint {fn}(uint8_t channel) {{\n"
+                    + body
+                    + "  delayMicroseconds(10);  // 채널을 바꾼 뒤 신호가 자리 잡을 시간\n"
+                    + f"  analogRead({sig_name});  // 첫 값은 버린다 (ADC 가 새 채널 전압으로 바뀌도록)\n"
+                    + f"  return analogRead({sig_name});\n"
+                    + "}\n",
+                )
+                mux_helpers[mux_id] = (fn, len(select))
+        helper = mux_helpers[mux_id]
+        if not helper:
+            return None
+        fn, bits = helper
+        pin = c.module_def(item.module_id).pin(pin_id)
+        if channel >= 2**bits:
+            b.warnings.append(f"{item.label}: {mux.label} C{channel} 을 고르려면 선택선이 더 필요합니다 (지금 {bits}개). [자동 핀 배정]으로 선택선을 이으세요.")
+            return None
+        pin_rows.append(f" *   {item.label} · {pin.name if pin else pin_id} → {mux.label} C{channel}")
+        return f"{fn}({channel})"
+
     for item in hosted:
         module = c.module_def(item.module_id)
-        signal = next((p.id for p in module.pins if p.role == "signal"), None)
-        group = share_note(item, signal) if signal else None
-        if group and group["first"] != f"module:{item.instance_id}:{signal}":
+        signals = [p.id for p in module.pins if p.role == "signal"]
+        signal = signals[0] if signals else None
+        spec0 = module.code
+        # 따라 움직이는 부품: 신호 핀이 하나뿐인 부품(LED·서보 등)은 그 핀, 스텝 드라이버는 STEP 핀이 공유되면
+        # 첫 부품의 코드가 함께 움직인다 (같은 핀에 Servo 객체를 둘 붙이거나 펄스를 두 번 내지 않도록)
+        lead = signal if len(signals) == 1 else (spec0.pins.get("step") if spec0 and spec0.template == "step-dir" and spec0.pins else None)
+        group = share_note(item, lead) if lead else None
+        if group and group["first"] != f"module:{item.instance_id}:{lead}":
             first = c.placed_module(group["first"].split(":")[1])
-            how = {"output": "같이 켜지고 꺼집니다", "input": "어느 쪽을 눌러도 같이 읽힙니다", "ladder": "저항 사다리 코드에서 함께 읽습니다"}[group["kind"]]
-            b.globals.append(f"// {item.label}: {first.label} 와(과) 같은 핀({group['pin']})을 함께 씁니다 (핀 공유) — {how}.")
+            b.globals.append(f"// {item.label}: {first.label} 와(과) 같은 핀({group['pin']})을 함께 씁니다 (핀 공유) — {share_how(group)}.")
             if group["kind"] != "ladder":  # 사다리는 첫 버튼 자리에서 저항값과 함께 적는다
-                pin_rows.append(f" *   {item.label} · {module.pin(signal).name} → {group['pin']} (핀 공유)")
+                pin_rows.append(f" *   {item.label} · {module.pin(lead).name} → {group['pin']} (핀 공유)")
             continue
-        if group:
-            b.globals.append(f"// 핀 공유: {group['labels']} 이(가) {group['pin']} 을(를) 함께 씁니다.")
+        noted = set()
+        for pid in signals:
+            g = share_note(item, pid)
+            if not g or g["pin"] in noted:
+                continue
+            noted.add(g["pin"])
+            if g["first"].split(":")[1] == item.instance_id:
+                b.globals.append(f"// 핀 공유: {g['labels']} 이(가) {g['pin']} 을(를) 함께 씁니다 — {share_how(g)}.")
+            else:
+                first = c.placed_module(g["first"].split(":")[1])
+                b.globals.append(f"// {item.label}: {module.pin(pid).name} 핀({g['pin']})을 {first.label} 와(과) 함께 씁니다 (핀 공유).")
+        group = share_note(item, signal) if signal else None
         if group and group["kind"] == "ladder":
             rungs = [r for r in ladder if r["boardInstanceId"] == board.instance_id and r["boardPinId"] == group["pin"]]
             names = [_ident("button", c.placed_module(r["instanceId"]).label, used_names) for r in rungs]
@@ -301,6 +391,12 @@ def _sketch_for(c: Circuit, board: PlacedBoard, project_name: str, now: datetime
             continue
         spec = module.code
         template = spec.template if spec else None
+        if template == "mux":
+            users = [k for k in (f"module:{p.instance_id}:{pp.id}" for p in c.placed for pp in c.module_def(p.module_id).pins) if (mux_channel_of(c, k) or ("", -1))[0] == item.instance_id]
+            b.globals.append(
+                f"// {item.label}: 아날로그 센서 {len(users)}개를 채널로 나눠 읽습니다 (아래 read 함수)." if users else f"// {item.label}: 아직 채널에 이어진 센서가 없습니다."
+            )
+            continue
         base = BASE_NAMES.get(item.module_id) or (spec.base if spec else None)
         if base is None:
             reason = "모터 드라이버 코드에서 제어합니다" if module.motor else "전원 부품이라 별도 코드가 필요 없습니다" if module.category == "power" else "신호 변환 부품이라 별도 코드가 필요 없습니다"
@@ -534,9 +630,28 @@ def _sketch_for(c: Circuit, board: PlacedBoard, project_name: str, now: datetime
             b.globals.append(f"bool forward_{name} = true;")
             b.setup.append(f"  pinMode({step}, OUTPUT);")
             b.setup.append(f"  pinMode({direction}, OUTPUT);")
+            # STEP 을 함께 쓰는 다른 드라이버의 DIR 이 따로 연결되어 있으면 같은 방향으로 맞춘다
+            mirror_dirs = []
+            step_group = share_note(item, spec.pins["step"])
+            dir_group = share_note(item, spec.pins["dir"])
+            for k in (step_group["members"] if step_group else []):
+                other = c.placed_module(k.split(":")[1])
+                if other.instance_id == item.instance_id:
+                    continue
+                odir = c.module_def(other.module_id).code.pins["dir"]
+                if dir_group and f"module:{other.instance_id}:{odir}" in dir_group["members"]:
+                    continue
+                bp = _module_pin(c, traced, other, odir, board.instance_id)
+                if not bp:
+                    b.warnings.append(f"{other.label}: DIR 이 연결되지 않아 방향이 정해지지 않습니다. {item.label} 의 DIR 과 함께 묶으세요.")
+                    continue
+                mirror_dirs.append(const(f"{upper}_DIR{len(mirror_dirs) + 2}", other, odir, bp, f" — {item.label} 와 같은 방향"))
+                b.setup.append(f"  pinMode({mirror_dirs[-1]}, OUTPUT);")
             b.loop.append(f"  // {item.label}: 200 스텝마다 방향 전환 (풀스텝이면 한 바퀴)")
             b.loop.append(f"  if (every(timer_{name}, 2)) {{")
             b.loop.append(f"    digitalWrite({direction}, forward_{name} ? HIGH : LOW);")
+            for d in mirror_dirs:
+                b.loop.append(f"    digitalWrite({d}, forward_{name} ? HIGH : LOW);")
             b.loop.append(f"    digitalWrite({step}, HIGH);")
             b.loop.append("    delayMicroseconds(5);")
             b.loop.append(f"    digitalWrite({step}, LOW);")
@@ -556,13 +671,15 @@ def _sketch_for(c: Circuit, board: PlacedBoard, project_name: str, now: datetime
             b.loop.append(f'    if (now != {name}Last) {{ {name}Last = now; Serial.print("{name}: "); Serial.println(now == HIGH ? "HIGH" : "LOW"); }}')
             b.loop.append("  }")
         elif template == "analog-read":
-            pins = role_pins("value")
-            if not pins:
-                continue
-            p = const(f"{upper}_PIN", item, spec.pins["value"], pins["value"])
+            read = mux_read(item, spec.pins["value"])
+            if read is None:
+                pins = role_pins("value")
+                if not pins:
+                    continue
+                read = f"analogRead({const(f'{upper}_PIN', item, spec.pins['value'], pins['value'])})"
             b.globals.append(f"unsigned long timer_{name} = 0;")
             b.loop.append(f"  // {item.label}: 0.5초마다 아날로그 값 출력")
-            b.loop.append(f'  if (every(timer_{name}, 500)) {{ Serial.print("{name}: "); Serial.println(analogRead({p})); }}')
+            b.loop.append(f'  if (every(timer_{name}, 500)) {{ Serial.print("{name}: "); Serial.println({read}); }}')
         elif template == "digital-write":
             pins = role_pins("value")
             if not pins:
@@ -576,18 +693,20 @@ def _sketch_for(c: Circuit, board: PlacedBoard, project_name: str, now: datetime
             b.loop.append(f"  // {item.label}: 1초마다 켜기·끄기")
             b.loop.append(f"  if (every(timer_{name}, 1000)) {{ {name}On = !{name}On; digitalWrite({p}, {name}On ? {on} : {off}); }}")
         elif template == "joystick":
-            pins = role_pins("x", "y", "button")
+            reads = {axis: mux_read(item, spec.pins[axis]) for axis in ("x", "y")}
+            pins = role_pins(*[axis for axis in ("x", "y") if reads[axis] is None], "button")
             if not pins:
                 continue
-            x = const(f"{upper}_X", item, spec.pins["x"], pins["x"])
-            y = const(f"{upper}_Y", item, spec.pins["y"], pins["y"])
+            for axis in ("x", "y"):
+                if reads[axis] is None:
+                    reads[axis] = f"analogRead({const(f'{upper}_{axis.upper()}', item, spec.pins[axis], pins[axis])})"
             sw = const(f"{upper}_SW", item, spec.pins["button"], pins["button"], " — 누르면 LOW")
             b.setup.append(f"  pinMode({sw}, INPUT_PULLUP);")
             b.globals.append(f"unsigned long timer_{name} = 0;")
             b.loop.append(f"  // {item.label}: 0.2초마다 축 값과 버튼 출력")
             b.loop.append(f"  if (every(timer_{name}, 200)) {{")
-            b.loop.append(f'    Serial.print("{name} x="); Serial.print(analogRead({x}));')
-            b.loop.append(f'    Serial.print(" y="); Serial.print(analogRead({y}));')
+            b.loop.append(f'    Serial.print("{name} x="); Serial.print({reads["x"]});')
+            b.loop.append(f'    Serial.print(" y="); Serial.print({reads["y"]});')
             b.loop.append(f'    Serial.print(" sw="); Serial.println(digitalRead({sw}) == LOW ? "down" : "up");')
             b.loop.append("  }")
         elif template == "encoder":

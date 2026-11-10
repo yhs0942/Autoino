@@ -29,7 +29,7 @@ import { analyzeLevels } from './levels'
 import { buildNetlist } from './netlist'
 import { analyzePower, BREADBOARD_CURRENT_LIMIT_MA, formatCurrent, loadOfPin, motorsOnChannel, netVoltage, USB_5V_BUDGET_MA, wirePeakMa } from './power'
 import { computeSeriesResistors, formatOhms } from './resistor'
-import { computeLadderResistors, ladderLabel, roleOfKey, shareKind, shareOf } from './shares'
+import { computeLadderResistors, describeRole, ladderLabel, roleOfKey, shareKind, shareOf } from './shares'
 import { isServoChannelLink } from './motorAttach'
 
 // 전기적 검증. 결과는 화면의 [검사] 탭과 상태 표시줄에 표시된다.
@@ -309,7 +309,7 @@ export function validateCircuit(circuit: Circuit): Issue[] {
         severity: 'info',
         message:
           kind === 'output'
-            ? `핀 공유: ${at} 을(를) ${labels} 이(가) 함께 씁니다. 같이 켜지고 꺼집니다.`
+            ? `핀 공유: ${at} 을(를) ${labels} 이(가) 함께 씁니다. ${roleOfKey(circuit, users[0].key) === 'output' ? '같이 켜지고 꺼집니다.' : `같은 신호(${describeRole(roleOfKey(circuit, users[0].key)!)})를 받아 같이 움직입니다.`}`
             : kind === 'input'
               ? `핀 공유: ${at} 을(를) ${labels} 이(가) 함께 씁니다. 어느 것을 눌러도 같은 신호가 되어 서로 구분할 수 없습니다.`
               : `핀 공유: ${at} 을(를) 버튼 ${users.length}개가 저항 사다리로 함께 씁니다 (${ladderLabel(circuit, rungs)}).`,

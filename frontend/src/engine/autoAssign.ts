@@ -19,12 +19,14 @@ import {
   groundPinsOf,
   hasRestriction,
   isGpio,
+  isGroundPin,
   isUsbSerialPin,
   linkError,
   sourceVoltage,
   supplyPinForPin,
   usesServo,
 } from './electrical'
+import { buildNetlist } from './netlist'
 import { BREADBOARD_CURRENT_LIMIT_MA, wirePeakMa } from './power'
 
 // 자동 핀 배정 엔진
@@ -403,6 +405,38 @@ export function autoAssign(circuit: Circuit, nextConnSeq: number, options: AutoA
     }
     usedGpio.set(usedKey(host.instanceId, best.bp.id), bus)
     connect(item.instanceId, pin.id, host.instanceId, best.bp.id)
+  }
+
+  // 공통 GND: 외부 전원 − 에 물린 부품의 신호가 보드에 이어져 있으면, 그 − 를 보드 GND 와도 잇는다
+  // (외부 전원을 잇기 전에 모터를 드라이버에 놓는 등 순서에 따라 전원 − 만 부품 GND 에 물린 채 남을 수 있다)
+  const net = buildNetlist({ ...circuit, connections: result })
+  const groundKey = (k: string) => {
+    const e = parseEndpointKey(k)
+    const def = e?.kind === 'board' ? boardDefOf(circuit, e.boardInstanceId) : undefined
+    return !!e && e.kind === 'board' && !!def && isGroundPin(def, e.pinId)
+  }
+  const signalOnBoard = (instanceId: string) =>
+    result.some((c) => {
+      const l = asModuleBoardLink(c)
+      return !!l && l.instanceId === instanceId && resolveModulePin(circuit.placed, moduleEndpoint(instanceId, l.modulePinId))?.pin.role === 'signal'
+    })
+  const done = new Set<string>()
+  for (const source of sourcesOf(circuit)) {
+    const g = groundOfSource(source)
+    if (!g || g.kind !== 'module') continue
+    const key = endpointKey(g)
+    const members = net.members.get(net.netOf(key)) ?? []
+    if (done.has(net.netOf(key)) || members.some(groundKey)) continue
+    const fed = members.some((k) => {
+      const e = parseEndpointKey(k)
+      return e?.kind === 'module' && e.instanceId !== source.item.instanceId && signalOnBoard(e.instanceId)
+    })
+    const host = hostBoardOf(circuit, source.item)
+    const board = host && boardDefOf(circuit, host.instanceId)
+    const ground = board && groundPinsOf(board)[0]
+    if (!fed || !host || !ground) continue
+    done.add(net.netOf(key))
+    connect(g.instanceId, g.pinId, host.instanceId, ground)
   }
 
   return { connections: result, nextConnSeq: seq, added, removed, failed }

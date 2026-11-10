@@ -47,7 +47,7 @@ from .power import (
     wire_peak_ma,
 )
 from .resistor import compute_series_resistors, format_ohms
-from .shares import compute_ladder_resistors, ladder_label, role_of_key, share_kind, share_of
+from .shares import compute_ladder_resistors, describe_role, ladder_label, role_of_key, share_kind, share_of
 
 
 def _is_servo_module(module) -> bool:
@@ -245,7 +245,9 @@ def validate_circuit(c: Circuit) -> list[dict]:
             shared_pins.add(f"{users[0]['boardInstanceId']}:{users[0]['pinId']}")
             rungs = [r for r in ladder if r["boardInstanceId"] == users[0]["boardInstanceId"] and r["boardPinId"] == users[0]["pinId"]]
             if kind == "output":
-                message, hint = f"핀 공유: {at} 을(를) {labels} 이(가) 함께 씁니다. 같이 켜지고 꺼집니다.", None
+                role = role_of_key(c, users[0]["key"])
+                how = "같이 켜지고 꺼집니다." if role == "output" else f"같은 신호({describe_role(role)})를 받아 같이 움직입니다."
+                message, hint = f"핀 공유: {at} 을(를) {labels} 이(가) 함께 씁니다. {how}", None
             elif kind == "input":
                 message = f"핀 공유: {at} 을(를) {labels} 이(가) 함께 씁니다. 어느 것을 눌러도 같은 신호가 되어 서로 구분할 수 없습니다."
                 hint = "Uno·Nano·Mega 의 아날로그 핀(A0 등)에 묶으면 저항 사다리로 어느 버튼인지 구분합니다."

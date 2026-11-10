@@ -330,6 +330,8 @@ export interface Module {
   internalConnections?: [string, string][]
   /** 신호를 그대로 전달하는 핀 쌍 (예: 레벨 시프터 HV1↔LV1, 분배기 IN→OUT). 핀 배정표·코드 생성이 이 경로를 따라간다. */
   passThrough?: [string, string][]
+  /** 아날로그 멀티플렉서: 선택선(select)으로 고른 채널(channels)이 공통 핀(common)에 이어진다 */
+  mux?: MuxSpec
   /** 모터 사양 (모터 부품) */
   motor?: MotorSpec
   /** 드라이버 사양 (모터 드라이버 부품) */
@@ -342,6 +344,16 @@ export interface Module {
 }
 
 export type SupplyKind = 'adapter' | 'battery' | 'usb'
+
+/** 아날로그 멀티플렉서 사양 (예: CD74HC4067) */
+export interface MuxSpec {
+  /** 보드 아날로그 핀에 잇는 공통 핀 */
+  common: string
+  /** 채널 선택선 (S0 이 최하위 비트). 쓰지 않는 선택선은 GND 에 묶는다 */
+  select: string[]
+  /** 채널 핀 (C0 부터) */
+  channels: string[]
+}
 
 /** 외부 전원 예시 (data/power-supplies.json) */
 export interface PowerSupply {

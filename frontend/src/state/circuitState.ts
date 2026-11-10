@@ -8,6 +8,7 @@ import { BB_COLUMNS, checkLeadMove, holeId, holeLabel, holeNode, nodeLabel, rout
 import { resolveBoardPin, type Circuit } from '../engine/circuit'
 import {
   asModuleBoardLink,
+  boardEndpoint,
   boardHasPin,
   describeEndpoint,
   endpointKey,
@@ -19,7 +20,8 @@ import {
   touchesBoard,
   touchesInstance,
 } from '../engine/connections'
-import { boardToBoardError, linkError } from '../engine/electrical'
+import { boardToBoardError, groundPinsOf, isGroundPin, linkError } from '../engine/electrical'
+import { muxChannelOf, muxChannelPin, muxUsers, selectBitsFor } from '../engine/mux'
 import { insertLevelShifters } from '../engine/levelShift'
 import { buildNetlist } from '../engine/netlist'
 import { motorPins, planMotorAttach, recommendDriver } from '../engine/motorAttach'
@@ -611,12 +613,46 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       return { ...state, layout: { ...state.layout, [action.id]: { x: Math.round(action.position.x), y: Math.round(action.position.y) } } }
     }
     case 'connect': {
+      const circuit = circuitOf(state)
       const keys = [endpointKey(action.from), endpointKey(action.to)]
-      const bothModules = action.from.kind === 'module' && action.to.kind === 'module' && action.from.instanceId !== action.to.instanceId
-      if (bothModules && keys.some((k) => roleOfKey(circuitOf(state), k)) ) return sharePins(state, action.to, action.from, action.via)
+      const ends = [action.from, action.to]
+      if (action.from.kind === 'module' && action.to.kind === 'module' && keys[0] !== keys[1]) {
+        // 센서 핀을 멀티플렉서 채널에 잇는다 (센서의 보드 연결은 대체되고, 선택선을 채널 수에 맞춘다)
+        const channelEnd = ends.findIndex((e) => muxChannelPin(circuit, e))
+        if (channelEnd >= 0 && !muxChannelPin(circuit, ends[1 - channelEnd])) {
+          const next = connect(state, ends[1 - channelEnd], ends[channelEnd], action.via)
+          return next.connections === state.connections ? next : { ...syncMux(next, muxChannelPin(circuit, ends[channelEnd])!.muxId, action.via ? 'breadboard' : 'direct'), statusMessage: next.statusMessage }
+        }
+        // 공유할 수 있는 부품 핀끼리(같은 부품의 다른 핀도): 핀 공유. 한쪽만 공유 핀이면(서보 신호 → 서보 드라이버 채널 등) 그냥 잇는다
+        if (keys.every((k) => roleOfKey(circuit, k))) return sharePins(state, action.to, action.from, action.via)
+      }
+      // 같은 종류 신호가 이미 쓰는 보드 핀에 놓으면 그 신호와 핀 공유로 묶는다
+      const board = ends.find((e) => e.kind === 'board')
+      const item = ends.find((e) => e.kind === 'module')
+      if (board?.kind === 'board' && item) {
+        const key = endpointKey(item)
+        const role = roleOfKey(circuit, key)
+        const mate =
+          role && role !== 'analog'
+            ? state.connections
+                .map(asModuleBoardLink)
+                .map((l) => (l && l.boardInstanceId === board.boardInstanceId && l.pinId === board.pinId ? endpointKey(moduleEndpoint(l.instanceId, l.modulePinId)) : null))
+                .find((k) => k && k !== key && roleOfKey(circuit, k) === role && !shareRefusal(circuit, [k, key]))
+            : null
+        if (mate) return sharePins(state, parseEndpointKey(mate)!, item, action.via)
+      }
       return connect(state, action.from, action.to, action.via)
     }
     case 'unsharePin': {
+      const onMux = muxChannelOf(circuitOf(state), action.key)
+      if (onMux) {
+        const e = parseEndpointKey(action.key)!
+        const connections = state.connections.filter((c) => !(touches(c, e) && [c.from, c.to].some((x) => muxChannelPin(circuitOf(state), x))))
+        const freed = { ...state, connections }
+        const result = autoAssign(circuitOf(freed), freed.nextConnSeq, { only: new Set([action.key]) })
+        const label = describeEndpoint(e, circuitOf(state))
+        return { ...syncMux({ ...freed, connections: result.connections, nextConnSeq: result.nextConnSeq }, onMux.muxId, 'direct'), statusMessage: `${label}을(를) 멀티플렉서에서 빼고 보드 핀에 다시 연결했습니다.` }
+      }
       const share = shareOf(circuitOf(state), action.key)
       if (!share) return state
       const target = shareBoardPin(circuitOf(state), share)
@@ -907,6 +943,7 @@ function sharePins(state: CircuitState, onto: Endpoint, from: Endpoint, via?: 'b
   const members = [...new Set([ka, ...groups.flatMap((g) => g.members), kb])]
   const refusal = shareRefusal(circuit, members)
   if (refusal) return { ...state, statusMessage: refusal }
+  if (roleOfKey(circuit, ka) === 'analog') return shareAnalog(state, [ka, kb], via)
   const linkOf = (key: string, connections: Connection[]) => {
     const e = parseEndpointKey(key)
     return e?.kind === 'module' ? connections.map(asModuleBoardLink).find((l) => l && l.instanceId === e.instanceId && l.modulePinId === e.pinId) ?? null : null
@@ -943,6 +980,73 @@ function sharePins(state: CircuitState, onto: Endpoint, from: Endpoint, via?: 'b
     selection: { kind: 'module', instanceId: (from as { instanceId: string }).instanceId },
     statusMessage: `핀 공유: ${labels} 이(가) ${target.pinId} 를 함께 씁니다.`,
   }
+}
+
+/**
+ * 아날로그 센서 핀들을 멀티플렉서 채널에 하나씩 잇는다. 두 핀 중 하나가 이미 멀티플렉서에 있으면 그 멀티플렉서의
+ * 빈 채널을 쓰고, 없으면 새 CD74HC4067 을 센서 옆에 놓는다. 선택선·SIG·전원은 채널 수에 맞춰 배정한다.
+ */
+function shareAnalog(state: CircuitState, keys: string[], via?: 'breadboard'): CircuitState {
+  const route: RouteMode = via ? 'breadboard' : 'direct'
+  const anchor = state.placed.find((p) => keys[0].startsWith(`module:${p.instanceId}:`))!
+  let s = state
+  let muxId = keys.map((k) => muxChannelOf(circuitOf(state), k)?.muxId).find(Boolean)
+  if (!muxId) {
+    s = reduce(s, { type: 'addModule', moduleId: 'cd74hc4067' })
+    const mux = s.placed.at(-1)!
+    const spot = clampToCanvas({ x: anchor.x + MODULE_SIZE.width + 40, y: anchor.y })
+    s = { ...s, placed: s.placed.map((p) => (p === mux ? { ...p, x: spot.x, y: spot.y, hostBoardId: anchor.hostBoardId } : p)) }
+    muxId = mux.instanceId
+  }
+  const mux = s.placed.find((p) => p.instanceId === muxId)!
+  const spec = getModule(mux.moduleId).mux!
+  for (const key of keys) {
+    const circuit = circuitOf(s)
+    if (muxChannelOf(circuit, key)?.muxId === muxId) continue
+    const used = new Set(muxUsers(circuit, muxId).map((u) => u.channel))
+    const free = spec.channels.findIndex((_, i) => !used.has(i))
+    if (free < 0) return { ...state, statusMessage: `${mux.label}의 채널 ${spec.channels.length}개가 모두 찼습니다. 멀티플렉서를 하나 더 놓고 센서 핀을 그 채널에 이으세요.` }
+    s = connect(s, parseEndpointKey(key)!, moduleEndpoint(muxId, spec.channels[free]), via)
+  }
+  s = syncMux(s, muxId, route)
+  const circuit = circuitOf(s)
+  const users = muxUsers(circuit, muxId)
+  const sig = s.connections.map(asModuleBoardLink).find((l) => l && l.instanceId === muxId && l.modulePinId === spec.common)?.pinId
+  const bits = selectBitsFor(Math.max(0, ...users.map((u) => u.channel)))
+  const list = users.map((u) => `${describeEndpoint(parseEndpointKey(u.key)!, circuit)} → C${u.channel}`).join(', ')
+  return {
+    ...s,
+    shares: s.shares.filter((g) => !g.members.some((k) => keys.includes(k))),
+    selection: { kind: 'module', instanceId: muxId },
+    statusMessage: `아날로그 센서는 한 핀에 바로 묶으면 전압이 부딪치므로 ${mux.label}로 이었습니다: ${list}. ${sig ?? '아날로그 핀'} 하나와 선택선 ${bits}개로 차례로 읽습니다.`,
+  }
+}
+
+/** 멀티플렉서 선택선을 쓰는 채널 수에 맞춘다: 필요한 선택선은 보드 핀에, 나머지는 GND 에. SIG·EN·전원도 배정한다 */
+function syncMux(state: CircuitState, muxId: string, route: RouteMode): CircuitState {
+  const item = state.placed.find((p) => p.instanceId === muxId)
+  const module = item && getModule(item.moduleId)
+  if (!item || !module?.mux) return state
+  const spec = module.mux
+  const circuit = circuitOf(state)
+  const users = muxUsers(circuit, muxId)
+  const bits = selectBitsFor(Math.max(0, ...users.map((u) => u.channel)))
+  const host = state.boards.find((b) => b.instanceId === item.hostBoardId) ?? state.boards[0]
+  const board = getBoard(host.boardId)
+  const ground = groundPinsOf(board)[0]
+  let connections = state.connections
+  let seq = state.nextConnSeq
+  spec.select.forEach((pinId, i) => {
+    const e = moduleEndpoint(muxId, pinId)
+    const wires = connections.filter((c) => touches(c, e))
+    const tiedLow = wires.some((c) => [c.from, c.to].some((x) => x.kind === 'board' && isGroundPin(board, x.pinId)))
+    if (i < bits && tiedLow) connections = connections.filter((c) => !wires.includes(c))
+    else if (i >= bits && !wires.length && ground)
+      connections = [...connections, { id: `w${seq++}`, from: e, to: boardEndpoint(host.instanceId, ground), auto: false, ...(route === 'breadboard' ? { via: 'breadboard' as const } : {}) }]
+  })
+  const scope = new Set(module.pins.filter((p) => !spec.channels.includes(p.id)).map((p) => endpointKey(moduleEndpoint(muxId, p.id))))
+  const result = autoAssign({ ...circuit, connections }, seq, { route, only: scope })
+  return { ...state, connections: result.connections, nextConnSeq: result.nextConnSeq }
 }
 
 /** 지워진 보드·부품의 실물 배치 위치를 지운다 */

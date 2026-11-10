@@ -7,6 +7,7 @@ from .electrical import CAPABILITY_LABELS, ROLE_LABELS
 from .netlist import build_netlist
 from .paths import route_to_board
 from .resistor import compute_series_resistors, format_ohms
+from .mux import mux_channel_of
 from .shares import compute_ladder_resistors, share_board_pin, share_of
 
 
@@ -40,7 +41,13 @@ def build_pin_table(c: Circuit) -> list[dict]:
             if not connected and optional:
                 notes.append("연결 불필요 (내부 연결)" if is_internal_pin(module, pin.id) else "연결 불필요")
             elif connected and not route:
-                notes.append("다른 부품에 연결")
+                ch = mux_channel_of(c, f"module:{item.instance_id}:{pin.id}")
+                mux = c.placed_module(ch[0]) if ch else None
+                if mux:
+                    sig = route_to_board(c, mux.instance_id, c.module_def(mux.module_id).mux.common, traced)
+                    notes.append(f"{mux.label} C{ch[1]} (SIG → {sig.pin_id if sig else '미연결'})")
+                else:
+                    notes.append("다른 부품에 연결")
             rows.append(
                 {
                     "instanceId": item.instance_id,

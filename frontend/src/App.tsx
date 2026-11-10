@@ -4,6 +4,8 @@ import { useBackend } from './api/useBackend'
 import { CodeDialog } from './components/BackendDialogs/CodeDialog'
 import { ServerProjectsDialog } from './components/BackendDialogs/ServerProjectsDialog'
 import { SimulationDialog } from './components/BackendDialogs/SimulationDialog'
+import { SimBar } from './components/Simulation/SimBar'
+import { useSimulation } from './components/Simulation/simStore'
 import { CircuitCanvas } from './components/CircuitCanvas/CircuitCanvas'
 import { ConnectionPanel } from './components/ConnectionPanel/ConnectionPanel'
 import { Modal } from './components/common/Modal'
@@ -19,6 +21,7 @@ import { parseProjectFile, ProjectFileError, toProjectFile, type ProjectFile } f
 import { routeBreadboard } from './engine/breadboard'
 import { renderBreadboardSvg } from './engine/breadboardSvg'
 import type { Circuit } from './engine/circuit'
+import { parseEndpointKey } from './engine/connections'
 import { analyzePower, findMergeableSupplies, type PowerNeed, type SupplyExample } from './engine/power'
 import { renderSchematicSvg } from './engine/schematicSvg'
 import { computeSeriesResistors } from './engine/resistor'
@@ -94,6 +97,10 @@ function App() {
   const pinRows = useMemo(() => buildPinTable(circuit), [circuit])
   const routing = useMemo(() => routeBreadboard(circuit), [circuit])
   const power = useMemo(() => analyzePower(circuit), [circuit])
+  /** 시뮬레이션: 생성 코드의 동작을 배선도 위에서 돌린다 (배선 편집은 잠근다) */
+  const [simOn, setSimOn] = useState(false)
+  const sim = useSimulation(simOn && view === 'wiring', circuit, issues, power)
+  const boardLabels = useMemo(() => Object.fromEntries(boards.map((b) => [b.instanceId, b.label])), [boards])
   const merges = useMemo(
     () => findMergeableSupplies(circuit).map((m) => ({ voltage: m.voltage, items: m.items.map((i) => ({ instanceId: i.instanceId, label: i.label })) })),
     [circuit],
@@ -178,6 +185,8 @@ function App() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (dialog.kind !== 'none' || isTypingTarget(e.target)) return
+      // 시뮬레이션 중에는 배선을 바꾸지 않는다
+      if (simOn && e.key !== 'Escape') return
       const mod = e.ctrlKey || e.metaKey
       if (mod && (e.key === 'z' || e.key === 'Z')) {
         e.preventDefault()
@@ -203,7 +212,7 @@ function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [dialog, state.selection, removeModule, removeConnection, select])
+  }, [dialog, simOn, state.selection, removeModule, removeConnection, select])
 
   const { selection } = state
   const selectedLabel =
@@ -286,8 +295,18 @@ function App() {
           <button type="button" className="button" onClick={() => openBackendDialog('code')} data-testid="open-code">
             코드
           </button>
-          <button type="button" className="button" onClick={() => openBackendDialog('simulate')} data-testid="open-simulate">
-            시뮬레이션
+          <button
+            type="button"
+            className={`button${simOn ? ' button--primary' : ''}`}
+            aria-pressed={simOn}
+            onClick={() => {
+              if (!simOn && view === 'layout') changeView('wiring')
+              setSimOn(!simOn)
+            }}
+            title="생성 코드의 동작을 작업 화면에서 돌려 부품이 실제로 움직이는지 확인합니다"
+            data-testid="open-simulate"
+          >
+            {simOn ? '시뮬레이션 종료' : '시뮬레이션'}
           </button>
           <button type="button" className="button" onClick={() => setDialog({ kind: 'export' })}>
             내보내기
@@ -337,6 +356,7 @@ function App() {
             onRedo={() => dispatch({ type: 'redo' })}
             onReset={requestReset}
           />
+          {sim && <SimBar store={sim} boardLabels={boardLabels} onStop={() => setSimOn(false)} onOpenAnalysis={() => openBackendDialog('simulate')} />}
           {view === 'layout' ? (
             <LayoutView
               doc={state}
@@ -375,6 +395,7 @@ function App() {
             onShowPower={() => setTab('power')}
             onConnectToHole={(endpoint, hole) => dispatch({ type: 'connectToHole', endpoint, hole, route })}
             onDeleteWire={removeConnection}
+            sim={sim}
           />
           )}
         </div>
@@ -408,6 +429,11 @@ function App() {
           onResetModuleWiring={(instanceId) => dispatch({ type: 'resetModuleWiring', instanceId })}
           onAutoAssignModule={(instanceId) => dispatch({ type: 'autoAssignModule', instanceId, route })}
           onUnshare={(key) => dispatch({ type: 'unsharePin', key })}
+          onSharePins={(fromKey, toKey) => {
+            const from = parseEndpointKey(fromKey)
+            const to = parseEndpointKey(toKey)
+            if (from && to) dispatch({ type: 'connect', from, to, ...(route === 'breadboard' ? { via: 'breadboard' as const } : {}) })
+          }}
         />
       </main>
 

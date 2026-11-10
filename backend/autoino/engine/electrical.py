@@ -152,7 +152,8 @@ def link_error(board: Board, module: Module, pin: ModulePin, board_pin: BoardPin
         return None
     if pin.role == "signal":
         if is_ground_pin(board, pid):
-            return "신호 핀을 GND 에 직접 연결했습니다."
+            # 멀티플렉서의 쓰지 않는 선택선은 GND 에 묶는다
+            return None if module.mux and pin.id in module.mux.select else "신호 핀을 GND 에 직접 연결했습니다."
         if not is_gpio(board_pin):
             if module.series_resistor and module.series_resistor.pin_id == pin.id and is_supply:
                 return None

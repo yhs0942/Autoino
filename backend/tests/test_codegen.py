@@ -195,3 +195,61 @@ def test_esp32_uses_hardware_serial_and_explicit_spi_pins(engine_cases):
     assert "Serial2.begin(9600, SERIAL_8N1, BT1_RX, BT1_TX);" in s.code
     assert "SPI.begin(RFID1_SCK, RFID1_MISO, RFID1_MOSI, RFID1_SS);" in s.code
     assert "SoftwareSerial" not in s.code
+
+
+# ---------- 핀 공유 확장 · 아날로그 멀티플렉서 ----------
+
+
+def _code(engine_cases, name: str) -> str:
+    c = circuit_of(case_by(engine_cases, name))
+    return generate_sketches(c, name, NOW)[0].code
+
+
+def test_shared_servo_signal_is_driven_once(engine_cases):
+    code = _code(engine_cases, "share-servos")
+    # 한 핀에 Servo 객체 두 개를 붙이면 펄스가 겹치므로 첫 서보만 제어하고 두 번째는 설명만 남긴다
+    assert code.count(".attach(") == 1
+    assert "SG90 서보 모터 2: SG90 서보 모터 1 와(과) 같은 핀(D9)을 함께 씁니다" in code
+    assert "같은 신호(서보 신호)로 같이 움직입니다" in code
+
+
+def test_shared_trig_keeps_each_echo(engine_cases):
+    code = _code(engine_cases, "share-trig")
+    trig = set(re.findall(r"const uint8_t SONAR\d_TRIG = (\w+);", code))
+    assert len(trig) == 1  # TRIG 는 한 핀
+    assert len(re.findall(r"const uint8_t SONAR\d_ECHO = (\w+);", code)) == 3
+    assert code.count("readDistanceCm(SONAR") == 3  # 센서마다 거리 측정
+
+
+def test_l298n_channels_share_pins_inside_one_module(engine_cases):
+    code = _code(engine_cases, "share-l298n-inside")
+    en = dict(re.findall(r"const uint8_t (MOTOR\d(?:A|B)_EN) = (\w+);", code))
+    assert len(en) == 2 and len(set(en.values())) == 1
+    assert "L298N 모터 드라이버 1 ENA, L298N 모터 드라이버 1 ENB" in code
+
+
+def test_shared_step_mirrors_second_driver(engine_cases):
+    code = _code(engine_cases, "share-steppers")
+    assert len(re.findall(r"if \(every\(timer_stepper\w*, 2\)\)", code)) == 1  # 펄스를 두 번 내지 않는다
+    assert "같은 신호(스텝 펄스(STEP))로 같이 움직입니다" in code
+
+
+def test_mux_sensors_read_through_one_analog_pin(engine_cases):
+    code = _code(engine_cases, "mux-analog")
+    assert "int readMux1(uint8_t channel)" in code
+    assert "const uint8_t MUX1_SIG = A0;" in code
+    assert re.search(r"const uint8_t MUX1_SELECT\[3\] = \{MUX1_S0, MUX1_S1, MUX1_S2\};", code)
+    for ch in range(3):
+        assert f"readMux1({ch})" in code
+    # 조이스틱 X·Y 도 멀티플렉서로 읽고, 버튼은 디지털 핀 그대로
+    assert "readMux1(3)" in code and "readMux1(4)" in code
+    assert "digitalRead(STICK1_SW)" in code
+    assert "analogRead(POT" not in code
+    assert "C0" in code and "SIG" in code
+
+
+def test_mux_on_esp32_uses_gpio_numbers(engine_cases):
+    code = _code(engine_cases, "mux-esp32")
+    assert "const uint8_t MUX1_SIG = 36;" in code
+    assert "MUX1_SELECT[1]" in code
+    assert "readMux1(1)" in code

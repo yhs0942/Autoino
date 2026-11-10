@@ -1,0 +1,412 @@
+/* ---------- 시뮬레이션 막대 · 시리얼 모니터 ---------- */
+.sim-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 12px;
+  background: color-mix(in srgb, #16a34a 8%, var(--surface));
+  border-bottom: 1px solid var(--border);
+}
+
+.sim-bar__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.sim-bar__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sim-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.sim-dot.is-running {
+  background: #16a34a;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #16a34a 30%, transparent);
+  animation: sim-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes sim-pulse {
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+.sim-bar__time {
+  font-family: var(--font-mono);
+  min-width: 56px;
+}
+
+.sim-bar__summary {
+  color: var(--ok-text);
+}
+
+.sim-bar__summary.is-bad {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.sim-bar__spacer {
+  flex: 1;
+}
+
+.sim-bar__speed,
+.sim-bar__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sim-bar__note {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.sim-monitor {
+  height: 120px;
+  overflow-y: auto;
+  padding: 6px 8px;
+  background: #0b1220;
+  color: #d1fae5;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.sim-monitor__t {
+  display: inline-block;
+  min-width: 52px;
+  color: #64748b;
+}
+
+.sim-monitor__board {
+  margin-right: 6px;
+  color: #93c5fd;
+}
+
+/* ---------- 카드 안 시뮬레이션 ---------- */
+.placed-module.is-sim .placed-module__pins,
+.placed-module.is-sim .placed-module__sub {
+  visibility: hidden;
+}
+
+.placed-module.is-sim .card-badges {
+  display: none;
+}
+
+.placed-module.is-sim {
+  cursor: default;
+}
+
+.sim-card {
+  position: absolute;
+  inset: 44px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 4px;
+  background: var(--surface);
+  border-radius: 6px;
+  cursor: default;
+  overflow: hidden;
+}
+
+.sim-card__status {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--ok-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sim-card.is-bad .sim-card__status {
+  color: var(--danger);
+}
+
+.sim-card.has-warn .sim-card__status {
+  color: var(--warning-text);
+}
+
+.placed-module.is-sim:has(.sim-card.is-bad) {
+  border-color: var(--danger);
+  border-style: dashed;
+}
+
+.sim-card__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+}
+
+.sim-card.is-bad .sim-card__body {
+  opacity: 0.55;
+}
+
+.sim-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sim-row--wrap {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.sim-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+}
+
+.sim-svg {
+  flex: none;
+}
+
+.sim-glow {
+  filter: drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 2px var(--glow));
+}
+
+.sim-big {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.sim-led {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 0.5rem;
+  color: var(--text-muted);
+}
+
+.sim-led::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--led) 25%, #334155);
+}
+
+.sim-led.is-on::before {
+  background: var(--led);
+  box-shadow: 0 0 6px var(--led);
+}
+
+.sim-chip {
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 0.58rem;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+}
+
+.sim-chip.is-on {
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 700;
+}
+
+.sim-slider {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.56rem;
+  color: var(--text-muted);
+}
+
+.sim-slider input {
+  width: 100%;
+  height: 12px;
+  margin: 0;
+}
+
+.sim-raw {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 30px;
+  text-align: right;
+}
+
+.sim-hold,
+.sim-btn,
+.sim-toggle {
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  font: inherit;
+  font-size: 0.66rem;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.sim-hold.is-active {
+  background: #f97316;
+  border-color: #ea580c;
+  color: #fff;
+  transform: translateY(1px);
+}
+
+.sim-btn--wide {
+  flex: none;
+}
+
+.sim-toggle.is-dark {
+  background: #111827;
+  color: #f8fafc;
+}
+
+.sim-lcd,
+.sim-oled,
+.sim-seg {
+  width: 100%;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+.sim-lcd {
+  padding: 2px 4px;
+  background: #1e3a5f;
+  color: #93c5fd;
+  font-size: 0.6rem;
+  line-height: 1.25;
+  white-space: pre;
+  overflow: hidden;
+}
+
+.sim-lcd.is-lit {
+  background: #2563eb;
+  color: #e0f2fe;
+}
+
+.sim-oled {
+  height: 36px;
+  padding: 1px 4px;
+  background: #000;
+  color: #e0f2fe;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sim-seg {
+  padding: 1px 6px;
+  background: #111;
+  color: #ef4444;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-align: right;
+  text-shadow: 0 0 6px #ef4444;
+}
+
+.sim-pixels span {
+  flex: 1;
+  max-width: 14px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.sim-meter {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.sim-meter span {
+  display: block;
+  height: 100%;
+  background: #16a34a;
+}
+
+.sim-pad {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: #1f2937;
+  touch-action: none;
+  cursor: grab;
+}
+
+.sim-pad span {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: #94a3b8;
+  box-shadow: inset 0 -2px 0 #475569;
+}
+
+.sim-text {
+  width: 100%;
+  font: inherit;
+  font-size: 0.62rem;
+  padding: 1px 4px;
+}
+
+.sim-mux {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+}
+
+.sim-mux .is-active {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.sim-flash {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.sim-board-leds {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  padding: 2px 6px;
+  background: rgb(15 23 42 / 0.75);
+  border-radius: 4px;
+}
+
+.sim-board-leds .sim-led {
+  color: #cbd5e1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sim-dot.is-running {
+    animation: none;
+  }
+}

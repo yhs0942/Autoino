@@ -149,7 +149,8 @@ export function linkError(
       if (!isGroundPin(board, id)) return 'GND 핀은 보드의 GND 에 연결해야 합니다.'
       return null
     case 'signal': {
-      if (isGroundPin(board, id)) return '신호 핀을 GND 에 직접 연결했습니다.'
+      // 멀티플렉서의 쓰지 않는 선택선은 GND 에 묶는다
+      if (isGroundPin(board, id)) return module.mux?.select.includes(pin.id) ? null : '신호 핀을 GND 에 직접 연결했습니다.'
       if (!isGpio(boardPin)) {
         // 직렬 저항이 붙는 핀(LED 애노드)은 5V/3.3V 에 연결해 상시 점등할 수 있다(검증에서 안내).
         if (module.seriesResistor?.pinId === pin.id && isSupply) return null

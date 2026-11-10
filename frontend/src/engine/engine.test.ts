@@ -51,14 +51,15 @@ describe('자동 핀 배정', () => {
   it('수동 연결을 유지하고, 충돌하는 연결만 재배치한다', () => {
     let s = run([
       add('led-5mm'),
-      add('led-5mm'),
+      add('push-button'),
       { type: 'connect', from: mod('led-5mm#1', 'anode'), to: pin('D6') },
-      { type: 'connect', from: mod('led-5mm#2', 'anode'), to: pin('D6') },
+      // 종류가 다른 신호(버튼)는 같은 핀에 놓아도 핀 공유로 묶이지 않고 충돌이 된다
+      { type: 'connect', from: mod('push-button#2', 'pin2a'), to: pin('D6') },
     ])
     expect(issuesOf(s).some((i) => i.severity === 'error' && i.message.includes('핀 충돌'))).toBe(true)
     s = circuitReducer(s, { type: 'autoAssign' })
     expect(assigned(s, 'led-5mm#1', 'anode')).toBe('D6')
-    const moved = assigned(s, 'led-5mm#2', 'anode')
+    const moved = assigned(s, 'push-button#2', 'pin2a')
     expect(moved).not.toBe('D6')
     expect(moved).toBeTruthy()
     expect(issuesOf(s).filter((i) => i.severity === 'error')).toEqual([])

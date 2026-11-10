@@ -50,13 +50,14 @@ const SCENARIOS: Scenario[] = [
     name: 'uno-manual-errors',
     manualOnly: true,
     setup: [
-      add('i2c-lcd-1602'), add('hc-sr04'), add('led-5mm'), add('led-5mm'),
+      add('i2c-lcd-1602'), add('hc-sr04'), add('led-5mm'), add('push-button'),
       connect(mod('i2c-lcd-1602#1', 'sda'), bp('D7')),
       connect(mod('i2c-lcd-1602#1', 'vcc'), bp('GND')),
       connect(mod('hc-sr04#2', 'gnd'), bp('5V')),
       connect(mod('hc-sr04#2', 'trig'), bp('5V')),
       connect(mod('led-5mm#3', 'anode'), bp('D0')),
-      connect(mod('led-5mm#4', 'anode'), bp('D0')),
+      // 종류가 다른 신호(버튼)를 LED 가 쓰는 핀에 놓으면 핀 공유가 아니라 충돌이다
+      connect(mod('push-button#4', 'pin2a'), bp('D0')),
     ],
   },
   { name: 'esp32-all', start: esp, setup: ALL },
@@ -234,6 +235,64 @@ const SCENARIOS: Scenario[] = [
     ],
   },
 ]
+
+// 핀 공유 확장: 출력 신호끼리, 한 부품 안의 핀, 보드 핀에 놓아 묶기
+SCENARIOS.push(
+  {
+    name: 'share-servos',
+    setup: [add('sg90'), add('sg90'), add('led-5mm'), connect(mod('sg90#1', 'signal'), bp('D9')), connect(mod('sg90#2', 'signal'), mod('sg90#1', 'signal'))],
+  },
+  {
+    // L298N 의 두 채널을 한 핀씩으로 묶어 두 모터를 같이 돌린다 (ENB→ENA, IN3→IN1, IN4→IN2)
+    name: 'share-l298n-inside',
+    setup: [
+      add('external-power'), add('l298n'), add('dc-gear-tt'), add('dc-gear-tt'), ...supply('external-power#1', '7.4', '5000'),
+      { type: 'attachMotor', motorId: 'dc-gear-tt#3', driverId: 'l298n#2', route: 'direct' },
+      { type: 'attachMotor', motorId: 'dc-gear-tt#4', driverId: 'l298n#2', route: 'direct' },
+      connect(mod('l298n#2', 'enb'), mod('l298n#2', 'ena')),
+      connect(mod('l298n#2', 'in3'), mod('l298n#2', 'in1')),
+      connect(mod('l298n#2', 'in4'), mod('l298n#2', 'in2')),
+    ],
+  },
+  {
+    // 초음파 센서 두 개가 TRIG 를 함께 쓰고, 세 번째는 같은 핀에 놓아 묶는다
+    name: 'share-trig',
+    setup: [
+      add('hc-sr04'), add('hc-sr04'), add('hc-sr04'),
+      connect(mod('hc-sr04#1', 'trig'), bp('D7')),
+      connect(mod('hc-sr04#2', 'trig'), mod('hc-sr04#1', 'trig')),
+      connect(mod('hc-sr04#3', 'trig'), bp('D7')),
+    ],
+  },
+  {
+    // 스테퍼 드라이버 두 개가 STEP·DIR 를 함께 쓴다 (듀얼 Y 축처럼 같이 움직임)
+    name: 'share-steppers',
+    setup: [
+      add('external-power'), add('a4988'), add('a4988'), add('stepper-nema17'), add('stepper-nema17'), ...supply('external-power#1', '12', '5000'),
+      { type: 'attachMotor', motorId: 'stepper-nema17#4', driverId: 'a4988#2', route: 'direct' },
+      { type: 'attachMotor', motorId: 'stepper-nema17#5', driverId: 'a4988#3', route: 'direct' },
+      connect(mod('a4988#3', 'step'), mod('a4988#2', 'step')),
+      connect(mod('a4988#3', 'dir'), mod('a4988#2', 'dir')),
+    ],
+  },
+  {
+    // 아날로그 센서 다섯 개(조이스틱 X·Y 포함)를 멀티플렉서 하나로 읽는다
+    name: 'mux-analog',
+    setup: [
+      add('potentiometer'), add('ldr-module'), add('soil-moisture'), add('joystick-ky023'), { type: 'autoAssign' },
+      connect(mod('ldr-module#2', 'ao'), mod('potentiometer#1', 'wiper')),
+      connect(mod('soil-moisture#3', 'ao'), mod('ldr-module#2', 'ao')),
+      connect(mod('joystick-ky023#4', 'vrx'), mod('potentiometer#1', 'wiper')),
+      connect(mod('joystick-ky023#4', 'vry'), mod('joystick-ky023#4', 'vrx')),
+    ],
+  },
+  {
+    name: 'mux-esp32',
+    start: esp,
+    route: 'breadboard',
+    setup: [add('potentiometer'), add('mq2-gas'), { type: 'autoAssign', route: 'breadboard' }, { type: 'connect', from: mod('mq2-gas#2', 'ao'), to: mod('potentiometer#1', 'wiper'), via: 'breadboard' }],
+  },
+)
 
 function stripIds<T extends { id: string }>(issues: T[]): Omit<T, 'id'>[] {
   return issues.map(({ id: _id, ...rest }) => rest)

@@ -369,3 +369,23 @@
 .share-row p {
   margin: 0;
 }
+
+/* 핀 공유: 함께 쓸 핀 고르기 */
+.share-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 6px 0;
+  font-size: 0.76rem;
+}
+
+.share-pick select {
+  font: inherit;
+  padding: 3px 4px;
+}
+
+.mux-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.78rem;
+}

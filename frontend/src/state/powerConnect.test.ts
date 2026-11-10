@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { analyzePower, findMergeableSupplies } from '../engine/power'
+import { validateCircuit } from '../engine/validate'
 import type { Endpoint } from '../types'
 import { circuitOf, circuitReducer, createInitialState, type CircuitAction, type CircuitState } from './circuitState'
 
@@ -100,5 +101,18 @@ describe('같은 전압 전원 합치기', () => {
     const merged = circuitReducer(changed, { type: 'mergeSupplies', keepId: keep.instanceId, otherIds: [other.instanceId] })
     expect(merged.placed).toHaveLength(changed.placed.length)
     expect(merged.statusMessage).toContain('전압')
+  })
+})
+
+describe('공통 GND', () => {
+  it('외부 전원을 잇기 전에 모터를 드라이버에 놓아도, 자동 배정하면 전원 − 가 보드 GND 와 이어진다', () => {
+    const s = run([
+      add('external-power'), add('l298n'), add('dc-gear-tt'),
+      { type: 'attachMotor', motorId: 'dc-gear-tt#3', driverId: 'l298n#2', route: 'direct' },
+      { type: 'autoAssign' },
+    ])
+    const errors = validateCircuit(circuitOf(s)).filter((i) => i.severity === 'error')
+    expect(errors.map((i) => i.code)).not.toContain('module-ground-not-common')
+    expect(wired(s, mod('external-power#1', 'minus'), { kind: 'board', boardInstanceId: 'board-1', pinId: 'GND' })).toBe(true)
   })
 })

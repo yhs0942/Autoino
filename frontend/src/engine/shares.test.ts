@@ -94,8 +94,9 @@ describe('핀 공유 그룹 만들기', () => {
     expect(s.statusMessage).toContain('함께 쓸 수 없습니다')
   })
 
-  it('그룹 없이 한 핀에 신호 두 개를 꽂으면 여전히 핀 충돌이고, 묶는 방법을 알려 준다', () => {
-    const s = run([add('led-5mm'), add('led-5mm'), link(mod('led-5mm#1', 'anode'), bp('D5')), link(mod('led-5mm#2', 'anode'), bp('D5'))])
+  it('그룹 없이 한 핀에 신호 두 개가 있으면(예: 그룹이 없는 예전 파일) 핀 충돌이고, 묶는 방법을 알려 준다', () => {
+    const s0 = run([add('led-5mm'), add('led-5mm'), link(mod('led-5mm#1', 'anode'), bp('D5'))])
+    const s = { ...s0, connections: [...s0.connections, { id: 'w99', from: mod('led-5mm#2', 'anode'), to: bp('D5'), auto: false }] }
     const conflict = issues(s).find((i) => i.code === 'pin-conflict')!
     expect(conflict.severity).toBe('error')
     expect(conflict.hint).toContain('끌어')

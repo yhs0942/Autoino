@@ -753,6 +753,282 @@
     ]
   },
   {
+    "id": "cd74hc4067",
+    "name": "아날로그 멀티플렉서 (16채널)",
+    "nameEn": "CD74HC4067 16-Channel Analog Multiplexer",
+    "category": "interface",
+    "icon": "icons/analog-mux.svg",
+    "sizeMm": {
+      "width": 41,
+      "height": 18
+    },
+    "description": "아날로그 센서 여러 개를 아날로그 핀 하나로 읽게 해 주는 CD74HC4067 모듈입니다. S0–S3 으로 고른 채널(C0–C15) 하나만 SIG 에 이어집니다.",
+    "pins": [
+      {
+        "id": "sig",
+        "name": "SIG",
+        "role": "signal",
+        "description": "공통 신호. 고른 채널이 이 핀에 이어집니다. 보드의 아날로그 핀에 연결합니다.",
+        "requires": [
+          "analog"
+        ],
+        "direction": "in"
+      },
+      {
+        "id": "s0",
+        "name": "S0",
+        "role": "signal",
+        "description": "채널 선택 비트 0 (최하위). 쓰지 않으면 GND 에 연결합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "s1",
+        "name": "S1",
+        "role": "signal",
+        "description": "채널 선택 비트 1. 쓰지 않으면 GND 에 연결합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "s2",
+        "name": "S2",
+        "role": "signal",
+        "description": "채널 선택 비트 2. 쓰지 않으면 GND 에 연결합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "s3",
+        "name": "S3",
+        "role": "signal",
+        "description": "채널 선택 비트 3. 쓰지 않으면 GND 에 연결합니다.",
+        "requires": [
+          "digital"
+        ],
+        "direction": "out"
+      },
+      {
+        "id": "en",
+        "name": "EN",
+        "role": "ground",
+        "description": "켜기(LOW 에서 동작). GND 에 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "vcc",
+        "name": "VCC",
+        "role": "power",
+        "description": "전원 2–6 V. 보드 로직 전압에 연결합니다 (센서 전원과 같은 전압).",
+        "requires": [],
+        "supplyVoltage": 5,
+        "minVoltage": 2,
+        "maxVoltage": 6,
+        "typicalMa": 0.1,
+        "peakMa": 1,
+        "logicSupply": true
+      },
+      {
+        "id": "gnd",
+        "name": "GND",
+        "role": "ground",
+        "description": "접지",
+        "requires": []
+      },
+      {
+        "id": "c0",
+        "name": "C0",
+        "role": "passive",
+        "description": "0번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c1",
+        "name": "C1",
+        "role": "passive",
+        "description": "1번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c2",
+        "name": "C2",
+        "role": "passive",
+        "description": "2번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c3",
+        "name": "C3",
+        "role": "passive",
+        "description": "3번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c4",
+        "name": "C4",
+        "role": "passive",
+        "description": "4번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c5",
+        "name": "C5",
+        "role": "passive",
+        "description": "5번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c6",
+        "name": "C6",
+        "role": "passive",
+        "description": "6번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c7",
+        "name": "C7",
+        "role": "passive",
+        "description": "7번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c8",
+        "name": "C8",
+        "role": "passive",
+        "description": "8번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c9",
+        "name": "C9",
+        "role": "passive",
+        "description": "9번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c10",
+        "name": "C10",
+        "role": "passive",
+        "description": "10번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c11",
+        "name": "C11",
+        "role": "passive",
+        "description": "11번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c12",
+        "name": "C12",
+        "role": "passive",
+        "description": "12번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c13",
+        "name": "C13",
+        "role": "passive",
+        "description": "13번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c14",
+        "name": "C14",
+        "role": "passive",
+        "description": "14번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      },
+      {
+        "id": "c15",
+        "name": "C15",
+        "role": "passive",
+        "description": "15번 채널. 아날로그 센서 출력을 연결합니다.",
+        "requires": []
+      }
+    ],
+    "mux": {
+      "common": "sig",
+      "select": [
+        "s0",
+        "s1",
+        "s2",
+        "s3"
+      ],
+      "channels": [
+        "c0",
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9",
+        "c10",
+        "c11",
+        "c12",
+        "c13",
+        "c14",
+        "c15"
+      ]
+    },
+    "electrical": [
+      {
+        "label": "전원 전압",
+        "value": "2–6 V",
+        "confidence": "official",
+        "note": "CD74HC4067 데이터시트 권장 동작 범위"
+      },
+      {
+        "label": "켜짐 저항",
+        "value": "약 70 Ω (VCC 4.5 V)",
+        "confidence": "official",
+        "note": "전압이 낮을수록 커집니다. 센서 출력 임피던스에 비해 작아 읽기에 영향이 거의 없습니다."
+      },
+      {
+        "label": "채널 전환",
+        "value": "선택선을 바꾼 뒤 수 µs 기다렸다가 읽기",
+        "confidence": "typical",
+        "note": "ADC 샘플 커패시터가 새 채널 전압으로 바뀌도록 첫 값은 버리고 다시 읽는 것이 좋습니다."
+      },
+      {
+        "label": "신호 범위",
+        "value": "0 V – VCC",
+        "confidence": "official",
+        "note": "VCC 보다 높은 센서 전압은 넣지 마세요."
+      }
+    ],
+    "tags": [
+      "mux",
+      "multiplexer",
+      "멀티플렉서",
+      "analog",
+      "아날로그",
+      "cd74hc4067",
+      "74hc4067",
+      "4067",
+      "채널",
+      "핀 공유"
+    ],
+    "notes": [
+      "아날로그 센서 핀을 다른 아날로그 센서 핀에 끌어 놓으면 이 모듈이 자동으로 들어가고 센서마다 채널이 정해집니다.",
+      "채널 2개면 S0 하나, 4개면 S0·S1, 8개면 S0–S2, 16개면 S0–S3 이 필요합니다. 쓰지 않는 선택선은 GND 에 묶습니다.",
+      "EN 은 GND 에 연결해야 동작합니다."
+    ],
+    "code": {
+      "template": "mux"
+    }
+  },
+  {
     "id": "external-power",
     "name": "외부 전원",
     "nameEn": "External DC Power Supply",

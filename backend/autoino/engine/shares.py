@@ -1,7 +1,9 @@
 """핀 공유 그룹 (frontend/src/engine/shares.ts 와 같은 규칙)
 
-사람이 부품 핀을 다른 부품 핀에 끌어 이으면, 두 핀이 같은 보드 핀을 함께 쓰는 그룹이 된다.
+사람이 부품 핀을 다른 부품 핀(같은 부품의 다른 핀도 됨)에 끌어 이으면, 두 핀이 같은 보드 핀을 함께 쓰는 그룹이 된다.
 - 출력끼리(LED·부저·릴레이 입력): 같이 켜지고 꺼진다
+- 같은 종류의 출력 신호끼리(서보 신호, TRIG, STEP·DIR, 모터 드라이버 EN·IN 등): 같은 신호를 받는다
+- 아날로그 센서끼리는 한 핀에 바로 묶지 않고 아날로그 멀티플렉서 채널로 잇는다 (그룹으로 저장하지 않음)
 - 버튼끼리, 디지털 핀: 어느 버튼을 눌러도 LOW 가 된다 (서로 구분할 수 없다)
 - 버튼끼리, AVR(Uno·Nano·Mega)의 아날로그 핀, 4개까지: 저항 사다리 (INPUT_PULLUP + analogRead)
 """
@@ -19,14 +21,78 @@ LADDER_PULLUP_MAX = 50000
 
 
 def share_role(module: Module, pin: ModulePin) -> str | None:
-    if pin.role != "signal":
+    if pin.role != "signal" or module.mux:
         return None
-    template = module.code.template if module.code else None
+    spec = module.code
+    template = spec.template if spec else None
     if pin.direction == "out" and ((module.series_resistor and module.series_resistor.pin_id == pin.id) or template == "digital-write"):
         return "output"
     if pin.direction == "in" and pin.pull == "up" and not template and not any(p.role == "power" for p in module.pins):
         return "button"
+    if pin.direction == "in" and "analog" in pin.requires:
+        return "analog"
+    if pin.direction != "out":
+        return None
+
+    def is_(role: str) -> bool:
+        return bool(spec and spec.pins and spec.pins.get(role) == pin.id)
+
+    if template in ("servo", "servo-continuous", "esc") and is_("signal"):
+        return f"signal:{template}"
+    if template == "neopixel" and is_("data"):
+        return "signal:neopixel"
+    if template == "tm1637" and is_("clk"):
+        return "signal:tm1637-clk"
+    if template == "step-dir" and is_("step"):
+        return "signal:step"
+    if template == "step-dir" and is_("dir"):
+        return "signal:dir"
+    if template == "rc522" and is_("rst"):
+        return "signal:rc522-rst"
+    if template == "serial-module" and is_("tx"):
+        return "signal:uart-tx"
+    if pin.id == "trig":
+        return "signal:trig"
+    if template == "h-bridge":
+        if spec.standby_pin == pin.id:
+            return "signal:hbridge-stby"
+        for ch in module.driver.channels if module.driver else []:
+            if pin.id not in ch.inputs:
+                continue
+            if spec.scheme != "en-in1-in2":
+                return "signal:hbridge-pwm"
+            return "signal:hbridge-en" if ch.inputs.index(pin.id) == 0 else "signal:hbridge-in"
+    if template == "stepper-coils" and module.driver and module.driver.channels and pin.id in module.driver.channels[0].inputs:
+        return f"signal:coil-{module.driver.channels[0].inputs.index(pin.id) + 1}"
     return None
+
+
+ROLE_LABELS = {
+    "output": "출력(LED·부저·릴레이)",
+    "button": "버튼",
+    "analog": "아날로그 센서 출력",
+    "signal:servo": "서보 신호",
+    "signal:servo-continuous": "연속 회전 서보 신호",
+    "signal:esc": "ESC 스로틀 신호",
+    "signal:neopixel": "NeoPixel 데이터(DIN)",
+    "signal:tm1637-clk": "TM1637 CLK",
+    "signal:step": "스텝 펄스(STEP)",
+    "signal:dir": "방향(DIR)",
+    "signal:rc522-rst": "RC522 RST",
+    "signal:uart-tx": "보드 송신(모듈 RXD)",
+    "signal:trig": "초음파 TRIG",
+    "signal:hbridge-stby": "드라이버 대기(STBY)",
+    "signal:hbridge-pwm": "모터 입력(PWM)",
+    "signal:hbridge-en": "모터 속도(EN·PWM)",
+    "signal:hbridge-in": "모터 방향(IN)",
+}
+
+
+def describe_role(role: str) -> str:
+    """공유 종류의 이름 (예: 서보 신호)"""
+    if role.startswith("signal:coil-"):
+        return f"스테퍼 코일 입력 {role.rsplit('-', 1)[1]}"
+    return ROLE_LABELS.get(role, role)
 
 
 def role_of_key(c: Circuit, key: str) -> str | None:
@@ -45,10 +111,10 @@ def share_kind(c: Circuit, members: list[str], board: Board | None = None, pin: 
     if len(members) < 2:
         return None
     roles = [role_of_key(c, k) for k in members]
-    if all(r == "output" for r in roles):
-        return "output"
     if all(r == "button" for r in roles):
         return "ladder" if board is not None and supports_ladder(board, pin) and len(members) <= len(LADDER_OHMS) else "input"
+    if roles[0] and roles[0] != "analog" and (roles[0] == "output" or roles[0].startswith("signal:")) and all(r == roles[0] for r in roles):
+        return "output"
     return None
 
 
@@ -61,7 +127,7 @@ def share_token(c: Circuit, key: str) -> str | None:
     if not share:
         return None
     roles = [role_of_key(c, k) for k in share.members]
-    return f"share:{share.id}" if all(r is not None and r == roles[0] for r in roles) else None
+    return f"share:{share.id}" if roles[0] != "analog" and all(r is not None and r == roles[0] for r in roles) else None
 
 
 def _link_of(c: Circuit, key: str, connections=None):

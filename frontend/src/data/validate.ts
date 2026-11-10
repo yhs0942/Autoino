@@ -246,6 +246,13 @@ export function validateModules(data: unknown): Module[] {
         arr(co.accepts, `${p}.driver.channels[${i}].accepts`).forEach((k, j) => oneOf(k, MOTOR_KINDS, `${p}.driver.channels[${i}].accepts[${j}]`))
       })
     }
+    if (o.mux !== undefined) {
+      const mx = obj(o.mux, `${p}.mux`)
+      modPin(mx.common, `${p}.mux.common`)
+      for (const key of ['select', 'channels'])
+        arr(mx[key], `${p}.mux.${key}`).forEach((id, i) => modPin(id, `${p}.mux.${key}[${i}]`))
+      if (2 ** arr(mx.select, `${p}.mux.select`).length < arr(mx.channels, `${p}.mux.channels`).length) fail(`${p}.mux`, '선택선이 채널 수에 비해 모자랍니다')
+    }
     if (o.regulator !== undefined) {
       const re = obj(o.regulator, `${p}.regulator`)
       modPin(re.inputPin, `${p}.regulator.inputPin`)

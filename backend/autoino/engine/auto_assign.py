@@ -24,12 +24,14 @@ from .electrical import (
     ground_pins_of,
     has_restriction,
     is_gpio,
+    is_ground_pin,
     is_usb_serial_pin,
     link_error,
     source_voltage,
     supply_pin_for_pin,
     uses_servo,
 )
+from .netlist import build_netlist
 from .power import BREADBOARD_CURRENT_LIMIT_MA, wire_peak_ma
 
 SHARED_BUS = ["i2c-sda", "i2c-scl", "spi-mosi", "spi-miso", "spi-sck"]
@@ -350,5 +352,48 @@ def auto_assign(c: Circuit, next_conn_seq: int, route: str = "direct", only: set
         best = candidates[0][2]
         used[f"{host.instance_id}:{best.id}"] = bus
         connect(item.instance_id, pin.id, host.instance_id, best.id)
+
+    # 공통 GND: 외부 전원 − 에 물린 부품의 신호가 보드에 이어져 있으면, 그 − 를 보드 GND 와도 잇는다
+    net = build_netlist(Circuit(c.boards, c.placed, result, c.links, c.catalog, c.shares))
+
+    def ground_key(k: str) -> bool:
+        e = parse_endpoint_key(k)
+        if not isinstance(e, BoardEndpoint):
+            return False
+        bdef = c.board_def(e.board_instance_id)
+        return bdef is not None and is_ground_pin(bdef, e.pin_id)
+
+    def signal_on_board(instance_id: str) -> bool:
+        for conn in result:
+            link = as_module_board_link(conn)
+            if link and link.instance_id == instance_id:
+                r = resolve_module_pin(c, module_ep(instance_id, link.module_pin_id))
+                if r and r.pin.role == "signal":
+                    return True
+        return False
+
+    done: set[str] = set()
+    for source in _sources_of(c):
+        g = _ground_of_source(source)
+        if not isinstance(g, ModuleEndpoint):
+            continue
+        key = endpoint_key(g)
+        root = net.net_of(key)
+        members = net.members.get(root, [])
+        if root in done or any(ground_key(k) for k in members):
+            continue
+        fed = False
+        for k in members:
+            e = parse_endpoint_key(k)
+            if isinstance(e, ModuleEndpoint) and e.instance_id != source.item.instance_id and signal_on_board(e.instance_id):
+                fed = True
+                break
+        host = host_board_of(c, source.item)
+        board = c.board_def(host.instance_id) if host else None
+        grounds = ground_pins_of(board) if board else []
+        if not fed or not host or not grounds:
+            continue
+        done.add(root)
+        connect(g.instance_id, g.pin_id, host.instance_id, grounds[0])
 
     return AutoAssignResult(result, seq, added, removed, failed)
