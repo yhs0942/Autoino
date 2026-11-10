@@ -1,5 +1,6 @@
-import { useRef, useState, type KeyboardEvent } from 'react'
+import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react'
 import type { CodeStatus } from '../../engine/sim/codeRuntime'
+import { pastedSketches } from '../../engine/setupText'
 import { downloadText } from '../../utils/download'
 
 // 보드마다 아두이노 코드를 넣고 실행하는 편집기 (시뮬레이션 막대 안)
@@ -19,7 +20,8 @@ interface CodePanelProps {
   onRun: (drafts: Record<string, string>) => void
   /** 백엔드가 만든 예시 코드 (없으면 null) */
   onLoadExample: (boardId: string) => Promise<string | null>
-  onOpenPrompt: () => void
+  /** 회로 설정 글 (AI 에 붙여 넣을 것) */
+  onOpenSetupText: () => void
 }
 
 const STATE_LABEL: Record<CodeStatus['state'], string> = {
@@ -30,7 +32,7 @@ const STATE_LABEL: Record<CodeStatus['state'], string> = {
   stopped: '끝남',
 }
 
-export function CodePanel({ boards, sketches, status, onRun, onLoadExample, onOpenPrompt }: CodePanelProps) {
+export function CodePanel({ boards, sketches, status, onRun, onLoadExample, onOpenSetupText }: CodePanelProps) {
   const [picked, setActive] = useState(boards[0]?.instanceId ?? '')
   const active = boards.some((b) => b.instanceId === picked) ? picked : (boards[0]?.instanceId ?? '')
   const [drafts, setDrafts] = useState<Record<string, string>>(sketches)
@@ -86,6 +88,18 @@ export function CodePanel({ boards, sketches, status, onRun, onLoadExample, onOp
       requestAnimationFrame(() => el.setSelectionRange(s + 2, s + 2))
     }
   }
+  // AI 답변을 통째로 붙여 넣으면 설명은 빼고 코드 블록만 (보드마다 블록이 있으면 나눠서)
+  const onPaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
+    const found = pastedSketches(e.clipboardData.getData('text/plain'), boards, active)
+    if (!found) return
+    e.preventDefault()
+    const { selectionStart: s, selectionEnd: t } = e.currentTarget
+    const next = { ...drafts }
+    for (const f of found) next[f.board] = f.board === active ? `${code.slice(0, s)}${f.code}${code.slice(t)}` : f.code
+    setDrafts(next)
+    const others = found.filter((f) => f.board !== active).map((f) => boards.find((b) => b.instanceId === f.board)?.label)
+    setNote(`붙여 넣은 글에서 코드 블록만 골라 넣었습니다${others.length ? ` (${others.join(', ')} 코드는 그 보드 탭에)` : ''}. [▶ 고친 코드로 실행] 을 누르세요.`)
+  }
   const loadExample = async () => {
     setLoading(true)
     setNote('')
@@ -130,8 +144,8 @@ export function CodePanel({ boards, sketches, status, onRun, onLoadExample, onOp
         <button type="button" className="button button--small" onClick={() => void loadExample()} disabled={loading} data-testid="code-example">
           {loading ? '불러오는 중…' : '예시 코드 불러오기'}
         </button>
-        <button type="button" className="button button--small" onClick={onOpenPrompt} data-testid="code-ai">
-          AI 로 코드 만들기
+        <button type="button" className="button button--small" onClick={onOpenSetupText} title="회로 설정을 글로 정리해 ChatGPT 같은 AI 에 붙여 넣을 수 있게 합니다" data-testid="code-setup-text">
+          AI용 설정 복사
         </button>
         <button type="button" className="button button--small" onClick={() => fileRef.current?.click()}>
           .ino 열기
@@ -165,9 +179,10 @@ export function CodePanel({ boards, sketches, status, onRun, onLoadExample, onOp
           value={code}
           spellCheck={false}
           wrap="off"
-          placeholder={'void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(500);\n  digitalWrite(13, LOW);\n  delay(500);\n}\n\n여기에 아두이노 코드를 붙여 넣거나 [예시 코드 불러오기] · [AI 로 코드 만들기] 를 누르세요.'}
+          placeholder={'void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(500);\n  digitalWrite(13, LOW);\n  delay(500);\n}\n\n여기에 아두이노 코드를 붙여 넣으세요 (AI 답변을 통째로 붙여 넣어도 코드만 골라 넣습니다). [AI용 설정 복사] 로 회로 설정을 AI 에 알려 줄 수 있습니다.'}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={onKey}
+          onPaste={onPaste}
           onScroll={(e) => {
             if (gutter.current) gutter.current.scrollTop = e.currentTarget.scrollTop
           }}
@@ -177,7 +192,7 @@ export function CodePanel({ boards, sketches, status, onRun, onLoadExample, onOp
       </div>
       {(note || dirty || st) && (
         <div className="code-messages" data-testid="code-messages">
-          {note && <div className="code-msg is-warn">{note}</div>}
+          {note && <div className="code-msg is-warn" data-testid="code-note">{note}</div>}
           {dirty && <div className="code-msg is-info">코드를 고쳤습니다. [▶ 고친 코드로 실행] 을 누르면 처음부터 다시 실행합니다.</div>}
           {st?.errors.map((e, i) => (
             <button key={`e${i}`} type="button" className="code-msg is-error" onClick={() => jump(e.line)} data-testid="code-error">

@@ -1,0 +1,64 @@
+.setup-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setup-text p {
+  margin: 0;
+}
+
+.setup-text__options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.setup-text__field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.setup-text__field select {
+  font: inherit;
+  font-weight: 400;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.setup-text__check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.setup-text__count {
+  margin-left: auto;
+}
+
+.setup-text__body {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-alt, #f1f5f9);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.setup-text__fail {
+  color: var(--danger);
+}

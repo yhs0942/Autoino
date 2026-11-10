@@ -102,11 +102,15 @@
 - `shared/fixtures/sketches.json`(백엔드가 만든 예시 스케치)을 모두 실행해 오류가 없고, 예시 동작 시뮬레이션과 부품 모습이 같은지
   `engine/sim/sketches.test.ts` 가 검사한다. 코드 생성을 바꾸면 `UPDATE_FIXTURES=1 python -m pytest tests/test_sketch_fixtures.py` 로 다시 만든다.
 
-## AI 프롬프트
+## AI용 회로 설정 글
 
-- `engine/aiPrompt.ts` 의 `buildAiPrompt` 가 만들 동작, 보드 사양, 부품마다 핀과 코드 번호(D7 → 7, ESP32 GPIO21 → 21)·직렬 저항·핀 공유,
-  부품별 코드 요령(버튼 INPUT_PULLUP, 28BYJ-48 의 IN1·IN3·IN2·IN4 순서, ESC 시동 등), 외부 전원, 보드 간 통신, 시뮬레이터 조건을 적는다.
-- `extractSketches` 는 AI 답변에서 코드 블록만 꺼내 보드 이름 주석(`// 보드 2`)이나 블록 위 제목으로 보드를 정한다.
+- `engine/setupText.ts` 의 `buildSetupText` 가 회로 설정만 글로 정리한다: 보드 사양, 부품마다 핀 → 연결된 곳과 코드에서 쓰는 핀 번호
+  (D7 → 7, ESP32 GPIO21 → 21)·직렬 저항·저항 사다리·핀 공유, 부품의 성질(I²C 주소, LOW 에서 켜지는 릴레이, 연속 회전 서보,
+  스테퍼 한 바퀴 스텝 수, 모터가 물린 드라이버 채널, 멀티플렉서 채널), 외부 전원이 전원을 주는 곳, 보드 간 통신.
+  사용자가 자기 요청 문장과 함께 AI 에 붙여 넣는 용도라 요청·지시·코드 요령은 넣지 않는다.
+  `simulator: true` 면 시뮬레이터에서 쓸 수 있는 라이브러리, 부품별 라이브러리, 지원하지 않는 기능을 덧붙인다.
+- 코드 편집기에 붙여 넣은 글에 ``` 코드 블록이 있으면 `pastedSketches` 가 설명은 빼고 코드만 꺼낸다. 블록이 하나면 지금 탭에,
+  여러 개면 `extractSketches` 가 보드 이름 주석(`// 보드 2`)이나 블록 위 제목으로 보드를 정한다.
 
 ## 외부 전원
 

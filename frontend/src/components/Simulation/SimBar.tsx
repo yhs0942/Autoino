@@ -15,7 +15,9 @@ interface SimBarProps {
   sketches: Record<string, string>
   onRunCode: (drafts: Record<string, string>) => void
   onLoadExample: (boardId: string) => Promise<string | null>
-  onOpenPrompt: () => void
+  onOpenSetupText: () => void
+  /** 바뀔 때마다 코드 편집기를 연다 */
+  editorRequest?: number
 }
 
 const LF = String.fromCharCode(10)
@@ -49,10 +51,15 @@ function useBuzzerSound(store: SimStore, enabled: boolean) {
 }
 
 /** 시뮬레이션 조작 막대, 코드 편집기, 시리얼 모니터 */
-export function SimBar({ store, boardLabels, onStop, onOpenAnalysis, mode, onModeChange, boards, sketches, onRunCode, onLoadExample, onOpenPrompt }: SimBarProps) {
+export function SimBar({ store, boardLabels, onStop, onOpenAnalysis, mode, onModeChange, boards, sketches, onRunCode, onLoadExample, onOpenSetupText, editorRequest = 0 }: SimBarProps) {
   const snapshot = useSyncExternalStore(store.subscribe, store.getSnapshot)
   const [monitor, setMonitor] = useState(true)
   const [editor, setEditor] = useState(true)
+  const [editorAsked, setEditorAsked] = useState(editorRequest)
+  if (editorAsked !== editorRequest) {
+    setEditorAsked(editorRequest)
+    setEditor(true)
+  }
   const [sound, setSound] = useState(false)
   const [sendText, setSendText] = useState('')
   const [sendBoard, setSendBoard] = useState(boards[0]?.instanceId ?? '')
@@ -131,7 +138,7 @@ export function SimBar({ store, boardLabels, onStop, onOpenAnalysis, mode, onMod
         </button>
       </div>
       <div className="sim-bar__body">
-        {codeMode && editor && <CodePanel boards={boards} sketches={sketches} status={snapshot.code} onRun={onRunCode} onLoadExample={onLoadExample} onOpenPrompt={onOpenPrompt} />}
+        {codeMode && editor && <CodePanel boards={boards} sketches={sketches} status={snapshot.code} onRun={onRunCode} onLoadExample={onLoadExample} onOpenSetupText={onOpenSetupText} />}
         {monitor && (
           <div className="sim-monitor-wrap">
             <div className="sim-monitor" ref={logRef} data-testid="sim-monitor" aria-live="off">

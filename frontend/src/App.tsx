@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import './App.css'
 import { api } from './api/client'
 import { useBackend } from './api/useBackend'
-import { AiPromptDialog } from './components/AiPrompt/AiPromptDialog'
+import { SetupTextDialog } from './components/SetupText/SetupTextDialog'
 import { CodeDialog } from './components/BackendDialogs/CodeDialog'
 import { ServerProjectsDialog } from './components/BackendDialogs/ServerProjectsDialog'
 import { SimulationDialog } from './components/BackendDialogs/SimulationDialog'
@@ -45,7 +45,7 @@ type Dialog =
   | { kind: 'server'; project: ProjectFile }
   | { kind: 'code'; project: ProjectFile }
   | { kind: 'simulate'; project: ProjectFile }
-  | { kind: 'ai'; board?: string }
+  | { kind: 'setup-text'; board?: string }
   | { kind: 'error'; title: string; message: string }
 
 function isTypingTarget(target: EventTarget | null): boolean {
@@ -104,6 +104,7 @@ function App() {
   const [simOn, setSimOn] = useState(false)
   /** 예시 동작 또는 보드마다 넣은 코드 실행 */
   const [simMode, setSimMode] = useState<SimMode>('demo')
+  const [editorRequest, setEditorRequest] = useState(0)
   const sketches = state.sketches
   const sim = useSimulation(simOn && view === 'wiring', circuit, issues, power, simMode, sketches)
   const codeBoards = useMemo(() => boards.map((b) => ({ instanceId: b.instanceId, label: b.label, boardName: getBoard(b.boardId).name })), [boards])
@@ -153,7 +154,17 @@ function App() {
     return r.sketches.find((x) => x.boardInstanceId === boardId)?.code ?? null
   }
 
-  const openAi = () => setDialog({ kind: 'ai', board: state.boards.length > 1 ? activeBoard.instanceId : undefined })
+  const openSetupText = () => setDialog({ kind: 'setup-text', board: state.boards.length > 1 ? activeBoard.instanceId : undefined })
+
+  /** 시뮬레이션의 코드 편집기를 연다 (AI 가 만든 코드를 붙여 넣는 곳) */
+  const openCodeEditor = () => {
+    setSimMode('code')
+    if (view === 'layout') changeView('wiring')
+    setSimOn(true)
+    setEditorRequest((n) => n + 1)
+    setDialog({ kind: 'none' })
+    dispatch({ type: 'setStatus', message: '코드 편집기에 AI 가 만든 코드를 붙여 넣고 [▶ 실행] 을 누르세요. 답변을 통째로 붙여 넣어도 코드만 골라 넣습니다.' })
+  }
 
   const changeWireStyle = (style: WireStyle) => {
     setWireStyle(style)
@@ -336,11 +347,11 @@ function App() {
           <button
             type="button"
             className="button"
-            onClick={openAi}
-            title="지금 배선을 설명하는 프롬프트를 만들어 ChatGPT·Gemini 같은 생성형 AI 로 코드를 만들고, 받은 코드를 시뮬레이션합니다"
-            data-testid="open-ai"
+            onClick={openSetupText}
+            title="지금 회로 설정(보드·부품·핀 연결·전원)을 글로 정리합니다. 복사해서 ChatGPT·Gemini 같은 생성형 AI 에 보내는 글에 붙여 넣으세요"
+            data-testid="open-setup-text"
           >
-            AI 코드
+            AI용 설정
           </button>
           <button
             type="button"
@@ -420,7 +431,8 @@ function App() {
               sketches={sketches}
               onRunCode={runDrafts}
               onLoadExample={loadExample}
-              onOpenPrompt={openAi}
+              onOpenSetupText={openSetupText}
+              editorRequest={editorRequest}
             />
           )}
           {view === 'layout' ? (
@@ -682,7 +694,7 @@ function App() {
         />
       )}
 
-      {dialog.kind === 'ai' && <AiPromptDialog circuit={circuit} initialBoard={dialog.board} onApply={runSketches} onClose={closeDialog} />}
+      {dialog.kind === 'setup-text' && <SetupTextDialog circuit={circuit} initialBoard={dialog.board} onOpenEditor={openCodeEditor} onClose={closeDialog} />}
       {dialog.kind === 'simulate' && <SimulationDialog status={backend} project={dialog.project} onRecheck={recheckBackend} onClose={closeDialog} />}
 
       {dialog.kind === 'open-confirm' && (
