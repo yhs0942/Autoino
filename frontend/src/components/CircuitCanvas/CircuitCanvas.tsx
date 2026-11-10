@@ -31,6 +31,8 @@ import { BREADBOARD_SIZE, CANVAS_SIZE, MODULE_SIZE } from '../../utils/placement
 import { MODULE_DRAG_TYPE } from '../ModuleLibrary/ModuleLibrary'
 import { BoardGraphic } from './BoardGraphic'
 import { SimBoardLeds, SimCard } from '../Simulation/SimCard'
+import { usePanZoom } from '../common/usePanZoom'
+import { ZoomControls } from '../common/ZoomControls'
 import type { SimStore } from '../Simulation/simStore'
 import { WireLayer, type Grip } from './WireLayer'
 import { wirePath, type Anchor, type WireStyle } from './wireGeometry'
@@ -196,6 +198,8 @@ export function CircuitCanvas({
   sim = null,
 }: CircuitCanvasProps) {
   const surfaceRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const view = usePanZoom(scrollRef)
   const moveRef = useRef<MoveState | null>(null)
   const [anchors, setAnchors] = useState<Record<string, Anchor>>({})
   const [wireDrag, setWireDrag] = useState<WireDrag | null>(null)
@@ -220,10 +224,12 @@ export function CircuitCanvas({
   const isWiring = wireDrag !== null
   const isGripping = gripDrag !== null
 
-  /** 화면 좌표를 캔버스 좌표로 변환한다 (스크롤 반영). */
+  /** 화면 좌표를 캔버스 좌표로 변환한다 (스크롤·확대 배율 반영). */
   const toCanvasPoint = (clientX: number, clientY: number): Point => {
-    const rect = surfaceRef.current!.getBoundingClientRect()
-    return { x: clientX - rect.left, y: clientY - rect.top }
+    const surface = surfaceRef.current!
+    const rect = surface.getBoundingClientRect()
+    const scale = rect.width / surface.offsetWidth || 1
+    return { x: (clientX - rect.left) / scale, y: (clientY - rect.top) / scale }
   }
 
   // 렌더링 후 핀 위치를 측정해 전선 끝점으로 사용한다. 값이 같으면 상태를 바꾸지 않아 반복 렌더링이 없다.
@@ -231,25 +237,29 @@ export function CircuitCanvas({
     const surface = surfaceRef.current
     if (!surface) return
     const origin = surface.getBoundingClientRect()
+    // 확대·축소 중이면 화면 크기를 캔버스 크기로 되돌려 잰다
+    const scale = origin.width / surface.offsetWidth || 1
+    const sx = (v: number) => Math.round((v - origin.left) / scale)
+    const sy = (v: number) => Math.round((v - origin.top) / scale)
     const next: Record<string, Anchor> = {}
     surface.querySelectorAll<HTMLElement>('[data-endpoint]').forEach((el) => {
       const r = el.getBoundingClientRect()
       const anchor: Anchor = {
-        x: Math.round(r.left - origin.left + r.width / 2),
-        y: Math.round(r.top - origin.top + r.height / 2),
+        x: sx(r.left + r.width / 2),
+        y: sy(r.top + r.height / 2),
         dir: Number(el.dataset.dir ?? 1),
       }
       // 부품 카드의 핀 칩: 전선이 칩 가장자리에서 시작해 반대쪽 끝을 향한 카드 가장자리로 나가게 한다
       const card = el.closest<HTMLElement>('.placed-module')
       if (card) {
         const c = card.getBoundingClientRect()
-        anchor.half = Math.round(r.height / 2)
+        anchor.half = Math.round(r.height / 2 / scale)
         anchor.card = {
           id: card.dataset.instanceId ?? '',
-          left: Math.round(c.left - origin.left),
-          top: Math.round(c.top - origin.top),
-          right: Math.round(c.right - origin.left),
-          bottom: Math.round(c.bottom - origin.top),
+          left: sx(c.left),
+          top: sy(c.top),
+          right: sx(c.right),
+          bottom: sy(c.bottom),
         }
       }
       next[el.dataset.endpoint!] = anchor
@@ -554,18 +564,23 @@ export function CircuitCanvas({
 
   return (
     <section className="circuit-canvas" aria-label="회로 설계 작업 공간">
-      <div className="circuit-canvas__scroll">
+      <ZoomControls view={view} />
+      <div ref={scrollRef} className={`circuit-canvas__scroll is-pannable${view.panning ? ' is-panning' : ''}`} data-testid="canvas-scroll">
+        <div className="zoom-box" style={{ width: CANVAS_SIZE.width * view.zoom, height: CANVAS_SIZE.height * view.zoom }}>
         <div
           ref={surfaceRef}
           className={`circuit-canvas__surface${wireDrag || gripDrag?.grip.kind === 'pin' ? ' is-wiring' : ''}${gripDrag ? ' is-gripping' : ''}`}
-          style={{ width: CANVAS_SIZE.width, height: CANVAS_SIZE.height }}
+          style={{ width: CANVAS_SIZE.width, height: CANVAS_SIZE.height, ...(view.zoom !== 1 ? { transform: `scale(${view.zoom})`, transformOrigin: '0 0' } : {}) }}
           data-testid="canvas-surface"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          onPointerDown={() => {
-            setPopover(null)
-            onSelect({ kind: 'none' })
-          }}
+          // 바탕을 끌면 화면 이동, 끌지 않고 떼면 선택 해제
+          onPointerDown={(e) =>
+            view.startPan(e, () => {
+              setPopover(null)
+              onSelect({ kind: 'none' })
+            })
+          }
         >
           <WireLayer
             width={CANVAS_SIZE.width}
@@ -897,6 +912,7 @@ export function CircuitCanvas({
               <span>왼쪽 라이브러리에서 부품을 끌어다 놓거나 [추가] 버튼을 누르세요.</span>
             </div>
           )}
+        </div>
         </div>
       </div>
       {placed.length > 0 && (

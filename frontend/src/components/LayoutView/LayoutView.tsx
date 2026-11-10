@@ -6,6 +6,8 @@ import type { Board, Point, Selection } from '../../types'
 import { assetUrl } from '../../utils/assetUrl'
 import { BREADBOARD_SIZE, CANVAS_SIZE } from '../../utils/placement'
 import { LAYOUT_SCALE, layoutItems, type LayoutItem } from './layoutItems'
+import { usePanZoom } from '../common/usePanZoom'
+import { ZoomControls } from '../common/ZoomControls'
 import './LayoutView.css'
 
 // 실물 배치 모드: 전선과 설명 없이 보드·부품을 실제 상대 크기로 보여 주고, 끌어서 자리를 잡는다.
@@ -52,13 +54,17 @@ function BoardShape({ board, width, height }: { board: Board | undefined; width:
 
 export function LayoutView({ doc, selection, onSelect, onMove, onCheckpoint }: LayoutViewProps) {
   const surfaceRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const view = usePanZoom(scrollRef)
   const dragRef = useRef<{ id: string; dx: number; dy: number; sx: number; sy: number; recorded: boolean } | null>(null)
   const items = layoutItems(doc)
   const breadboardBody = useMemo(() => renderBreadboardBody(EMPTY_ROUTING), [])
 
   const point = (e: ReactPointerEvent) => {
-    const r = surfaceRef.current!.getBoundingClientRect()
-    return { x: e.clientX - r.left, y: e.clientY - r.top }
+    const surface = surfaceRef.current!
+    const r = surface.getBoundingClientRect()
+    const scale = r.width / surface.offsetWidth || 1
+    return { x: (e.clientX - r.left) / scale, y: (e.clientY - r.top) / scale }
   }
   const selected = (item: LayoutItem) =>
     (selection.kind === 'module' && selection.instanceId === item.id) ||
@@ -97,13 +103,21 @@ export function LayoutView({ doc, selection, onSelect, onMove, onCheckpoint }: L
   const ordered = [...items].sort((a, b) => b.width * b.height - a.width * a.height)
   return (
     <section className="layout-view" aria-label="실물 배치 작업 공간">
-      <div className="layout-view__scroll">
+      <ZoomControls view={view} />
+      <div ref={scrollRef} className={`layout-view__scroll is-pannable${view.panning ? ' is-panning' : ''}`}>
+        <div className="zoom-box" style={{ width: CANVAS_SIZE.width * view.zoom, height: CANVAS_SIZE.height * view.zoom }}>
         <div
           ref={surfaceRef}
           className="layout-view__surface"
-          style={{ width: CANVAS_SIZE.width, height: CANVAS_SIZE.height, backgroundSize: `${10 * LAYOUT_SCALE}px ${10 * LAYOUT_SCALE}px` }}
+          style={{
+            width: CANVAS_SIZE.width,
+            height: CANVAS_SIZE.height,
+            backgroundSize: `${10 * LAYOUT_SCALE}px ${10 * LAYOUT_SCALE}px`,
+            ...(view.zoom !== 1 ? { transform: `scale(${view.zoom})`, transformOrigin: '0 0' } : {}),
+          }}
           data-testid="layout-surface"
-          onPointerDown={() => onSelect({ kind: 'none' })}
+          // 바탕을 끌면 화면 이동, 끌지 않고 떼면 선택 해제
+          onPointerDown={(e) => view.startPan(e, () => onSelect({ kind: 'none' }))}
         >
           {ordered.map((item) => (
             <div
@@ -138,6 +152,7 @@ export function LayoutView({ doc, selection, onSelect, onMove, onCheckpoint }: L
             <span style={{ width: 10 * LAYOUT_SCALE }} />
             10 mm
           </div>
+        </div>
         </div>
       </div>
       <p className="circuit-canvas__hint">

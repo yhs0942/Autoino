@@ -1,0 +1,59 @@
+.zoom-controls {
+  position: absolute;
+  top: 10px;
+  right: 22px;
+  z-index: 20;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.12);
+  overflow: hidden;
+}
+
+.zoom-controls button {
+  min-width: 30px;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.zoom-controls button + button {
+  border-left: 1px solid var(--border);
+}
+
+.zoom-controls button:hover:not(:disabled) {
+  background: var(--surface-alt, #f1f5f9);
+}
+
+.zoom-controls button:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.zoom-controls__value {
+  min-width: 52px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 바탕을 끌어 화면을 옮기는 작업 공간 */
+.is-pannable {
+  cursor: grab;
+}
+
+.is-panning,
+.is-panning * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* 배율만큼의 크기를 차지하는 상자 (안의 캔버스는 transform 으로 키우거나 줄인다) */
+.zoom-box {
+  position: relative;
+  overflow: clip;
+}
