@@ -27,6 +27,8 @@ export interface ProjectData {
   shares?: PinShare[]
   /** 실물 배치 모드의 위치 (보드·부품 인스턴스 ID 또는 'breadboard' → 좌표) */
   layout?: Record<string, Point>
+  /** 보드 인스턴스 ID → 사용자가 넣은 스케치 (코드 시뮬레이션) */
+  sketches?: Record<string, string>
   nextSeq: number
   nextConnSeq: number
   nextBoardSeq: number
@@ -58,6 +60,7 @@ export function toProjectFile(data: ProjectData, now = new Date()): ProjectFile 
     ...(data.breadboardHoles && Object.keys(data.breadboardHoles).length ? { breadboardHoles: data.breadboardHoles } : {}),
     ...(data.shares?.length ? { shares: data.shares } : {}),
     ...(data.layout && Object.keys(data.layout).length ? { layout: data.layout } : {}),
+    ...(data.sketches && Object.keys(data.sketches).length ? { sketches: data.sketches } : {}),
     nextSeq: data.nextSeq,
     nextConnSeq: data.nextConnSeq,
     nextBoardSeq: data.nextBoardSeq,
@@ -231,6 +234,9 @@ export function parseProjectFile(input: unknown): ProjectData {
   if (isObj(raw.layout))
     for (const [id, pos] of Object.entries(raw.layout))
       if ((boardIds.has(id) || instanceIds.has(id) || id === 'breadboard') && isObj(pos) && isNum(pos.x) && isNum(pos.y)) layout[id] = { x: pos.x, y: pos.y }
+  // 보드별 스케치: 있는 보드만, 글자만
+  const sketches: Record<string, string> = {}
+  if (isObj(raw.sketches)) for (const [id, code] of Object.entries(raw.sketches)) if (boardIds.has(id) && isStr(code) && code.trim()) sketches[id] = code
 
   // 브레드보드 구멍: 있는 끝점과 올바른 구멍 ID 만 남긴다
   const breadboardHoles: Record<string, string> = {}
@@ -251,6 +257,7 @@ export function parseProjectFile(input: unknown): ProjectData {
     ...(Object.keys(breadboardHoles).length ? { breadboardHoles } : {}),
     ...(shares.length ? { shares } : {}),
     ...(Object.keys(layout).length ? { layout } : {}),
+    ...(Object.keys(sketches).length ? { sketches } : {}),
     nextSeq: counter(raw.nextSeq, maxSeq + 1),
     nextConnSeq: counter(raw.nextConnSeq, maxConn + 1),
     nextBoardSeq: counter(raw.nextBoardSeq, maxBoard + 1),

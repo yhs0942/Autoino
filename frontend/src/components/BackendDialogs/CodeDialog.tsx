@@ -13,12 +13,14 @@ interface CodeDialogProps {
   errorCount: number
   onRecheck: () => void
   onClose: () => void
+  /** 이 코드를 넣고 '내 코드 실행' 시뮬레이션 */
+  onSimulate?: (sketches: Sketch[]) => void
 }
 
 type Load = { state: 'loading' } | { state: 'done'; sketches: Sketch[] } | { state: 'error'; message: string }
 
 /** 보드별 Arduino 스케치 (백엔드 /api/codegen) */
-export function CodeDialog({ status, project, errorCount, onRecheck, onClose }: CodeDialogProps) {
+export function CodeDialog({ status, project, errorCount, onRecheck, onClose, onSimulate }: CodeDialogProps) {
   const [load, setLoad] = useState<Load>({ state: 'loading' })
   const [active, setActive] = useState(0)
   const [copied, setCopied] = useState(false)
@@ -86,6 +88,11 @@ export function CodeDialog({ status, project, errorCount, onRecheck, onClose }: 
               <strong>{sketch.filename}</strong> · {sketch.boardName} ({sketch.core} 코어)
             </span>
             <span className="code-toolbar__buttons">
+              {onSimulate && load.state === 'done' && (
+                <button type="button" className="button button--small" onClick={() => onSimulate(load.sketches)} title="이 코드를 보드에 넣고 시뮬레이션에서 실제로 실행합니다 (편집기에서 고칠 수 있습니다)" data-testid="code-simulate">
+                  이 코드로 시뮬레이션
+                </button>
+              )}
               <button type="button" className="button button--small" onClick={() => void copy(sketch.code)}>
                 {copied ? '복사됨' : '복사'}
               </button>

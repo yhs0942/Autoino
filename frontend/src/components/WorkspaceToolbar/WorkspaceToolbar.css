@@ -107,3 +107,15 @@
   padding: 4px 6px;
   font-size: 0.95rem;
 }
+
+.workspace-toolbar__assign {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.workspace-toolbar__assign select {
+  font-size: 0.78rem;
+}

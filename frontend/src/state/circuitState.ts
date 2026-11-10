@@ -77,6 +77,11 @@ export interface CircuitDocument {
 }
 
 export interface CircuitState extends CircuitDocument {
+  /**
+   * 보드 인스턴스 ID → 사용자가 넣은 스케치 (코드 시뮬레이션).
+   * 프로젝트 파일에는 저장하지만 실행 취소 기록에는 넣지 않는다 (배선을 되돌려도 코드는 그대로).
+   */
+  sketches: Record<string, string>
   selection: Selection
   /** 하단 상태 표시줄 메시지 */
   statusMessage: string
@@ -109,7 +114,8 @@ export type CircuitAction =
   | { type: 'setConnectionRoute'; connectionId: string; via: RouteMode }
   | { type: 'removeConnection'; connectionId: string }
   | { type: 'clearConnections' }
-  | { type: 'autoAssign'; route?: RouteMode }
+  /** board 를 주면 아직 어느 보드에도 연결되지 않은 부품을 그 보드에 배정한다 */
+  | { type: 'autoAssign'; route?: RouteMode; board?: string }
   /** 전원 예시를 외부 전원 부품으로 놓고 지정한 전원 핀에 연결한다 */
   | { type: 'applySupply'; supplyId: string; pins: string[]; route: RouteMode }
   | { type: 'moveBreadboard'; position: Point }
@@ -137,6 +143,8 @@ export type CircuitAction =
   | { type: 'insertLevelShifters' }
   | { type: 'arrangeModules' }
   | { type: 'setProjectName'; name: string }
+  /** 보드 코드 바꾸기 (빈 글자면 지운다) */
+  | { type: 'setSketch'; boardInstanceId: string; code: string }
   | { type: 'loadProject'; data: ProjectData; message?: string }
   | { type: 'reset' }
   | { type: 'setStatus'; message: string }
@@ -147,7 +155,7 @@ export type CircuitAction =
 
 /** 기록하지 않는 동작 */
 const NOT_RECORDED = new Set<CircuitAction['type']>([
-  'select', 'setStatus', 'moveModule', 'moveBoard', 'moveBreadboard', 'moveLayout', 'setProjectName', 'loadProject', 'checkpoint', 'undo', 'redo',
+  'select', 'setStatus', 'moveModule', 'moveBoard', 'moveBreadboard', 'moveLayout', 'setProjectName', 'setSketch', 'loadProject', 'checkpoint', 'undo', 'redo',
 ])
 
 export function createBoardInstance(boardId: string = DEFAULT_BOARD_ID, seq = 1, position: Point = BOARD_POSITION): PlacedBoard {
@@ -166,6 +174,7 @@ export function createInitialState(board: string | PlacedBoard = DEFAULT_BOARD_I
     breadboardHoles: {},
     shares: [],
     layout: {},
+    sketches: {},
     selection: { kind: 'none' },
     nextSeq: 1,
     nextConnSeq: 1,
@@ -187,8 +196,9 @@ function sameDocument(a: CircuitDocument, b: CircuitDocument): boolean {
   return (Object.keys(documentOf(a)) as (keyof CircuitDocument)[]).every((k) => a[k] === b[k])
 }
 
-export function toProjectData(state: CircuitDocument): ProjectData {
+export function toProjectData(state: CircuitDocument & { sketches?: Record<string, string> }): ProjectData {
   const d = documentOf(state)
+  const sketches = state.sketches && Object.keys(state.sketches).length ? { sketches: state.sketches } : {}
   return {
     name: d.projectName,
     boards: d.boards,
@@ -199,6 +209,7 @@ export function toProjectData(state: CircuitDocument): ProjectData {
     ...(Object.keys(d.breadboardHoles).length ? { breadboardHoles: d.breadboardHoles } : {}),
     ...(d.shares.length ? { shares: d.shares } : {}),
     ...(Object.keys(d.layout).length ? { layout: d.layout } : {}),
+    ...sketches,
     nextSeq: d.nextSeq,
     nextConnSeq: d.nextConnSeq,
     nextBoardSeq: d.nextBoardSeq,
@@ -511,6 +522,7 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       const removedLinks = new Set(state.links.filter((l) => !links.includes(l)).map((l) => l.id))
       const connections = state.connections.filter((c) => !touchesBoard(c, target.instanceId) && !(c.linkId && removedLinks.has(c.linkId)))
       const placed = state.placed.map((p) => (p.hostBoardId === target.instanceId ? { ...p, hostBoardId: boards[0].instanceId } : p))
+      const sketches = Object.fromEntries(Object.entries(state.sketches).filter(([id]) => id !== target.instanceId))
       return keepSelection(
         {
           ...state,
@@ -518,6 +530,7 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
           links,
           connections,
           placed,
+          sketches,
           statusMessage: `${target.label}를 삭제했습니다. 연결 ${state.connections.length - connections.length}개도 함께 제거했습니다.`,
         },
         state.selection,
@@ -792,8 +805,28 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       )
     case 'autoAssign': {
       if (state.placed.length === 0) return { ...state, statusMessage: '배치된 부품이 없습니다.' }
-      const result = autoAssign(circuitOf(state), state.nextConnSeq, { route: action.route })
-      return keepSelection({ ...state, connections: result.connections, nextConnSeq: result.nextConnSeq, statusMessage: statusOfAssign(result) }, state.selection)
+      const target = action.board ? state.boards.find((b) => b.instanceId === action.board) : undefined
+      let placed = state.placed
+      let moved = 0
+      let kept = 0
+      if (target) {
+        // 이미 다른 보드에 전선이 있는 부품은 그대로 둔다 (먼저 그 전선을 지우면 옮길 수 있다)
+        placed = state.placed.map((p) => {
+          if (p.hostBoardId === target.instanceId) return p
+          const wired = state.connections.some((c) => touchesInstance(c, p.instanceId) && (c.from.kind === 'board' || c.to.kind === 'board'))
+          if (wired) {
+            kept++
+            return p
+          }
+          moved++
+          return { ...p, hostBoardId: target.instanceId }
+        })
+      }
+      const result = autoAssign({ ...circuitOf(state), placed }, state.nextConnSeq, { route: action.route })
+      const prefix = target ? `${target.label}에 배정 — ` : ''
+      const suffix = target && kept ? ` · 다른 보드에 이미 연결된 부품 ${kept}개는 그대로 두었습니다 (옮기려면 그 부품의 [배선 지우기] 후 다시 배정)` : ''
+      void moved
+      return keepSelection({ ...state, placed, connections: result.connections, nextConnSeq: result.nextConnSeq, statusMessage: `${prefix}${statusOfAssign(result)}${suffix}` }, state.selection)
     }
     case 'applySupply': {
       const supply = findSupply(action.supplyId)
@@ -895,6 +928,13 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       return { ...state, placed: arrangeModules(circuitOf(state)), statusMessage: '부품을 연결된 핀 순서대로 정렬했습니다.' }
     case 'setProjectName':
       return { ...state, projectName: action.name }
+    case 'setSketch': {
+      if (!state.boards.some((b) => b.instanceId === action.boardInstanceId)) return state
+      const sketches = { ...state.sketches }
+      if (action.code.trim()) sketches[action.boardInstanceId] = action.code
+      else delete sketches[action.boardInstanceId]
+      return { ...state, sketches }
+    }
     case 'loadProject':
       return {
         ...createInitialState(action.data.boards[0]),
@@ -912,6 +952,7 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
         breadboardHoles: action.data.breadboardHoles ?? {},
         shares: action.data.shares ?? [],
         layout: action.data.layout ?? {},
+        sketches: action.data.sketches ?? {},
         statusMessage: action.message ?? `프로젝트 "${action.data.name}"을(를) 불러왔습니다.`,
       }
     case 'reset':

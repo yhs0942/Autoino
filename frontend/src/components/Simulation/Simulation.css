@@ -410,3 +410,226 @@
     animation: none;
   }
 }
+
+/* ---------- 내 코드 실행: 편집기 · 시리얼 입력 ---------- */
+.sim-bar__body {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.sim-bar.is-code .sim-bar__body {
+  min-height: 0;
+}
+
+.sim-monitor-wrap {
+  display: flex;
+  flex: 1 1 320px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sim-bar.is-code .sim-monitor {
+  height: 100%;
+  min-height: 150px;
+  max-height: 300px;
+}
+
+.sim-monitor .is-sent {
+  color: #fcd34d;
+}
+
+.sim-monitor__send {
+  display: flex;
+  gap: 4px;
+}
+
+.sim-monitor__send input {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.sim-monitor__send select {
+  font-size: 0.72rem;
+}
+
+.code-panel {
+  display: flex;
+  flex: 2 1 520px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.code-panel__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.code-state {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: var(--surface-alt, #e2e8f0);
+}
+
+.code-state.is-running {
+  background: color-mix(in srgb, #16a34a 18%, transparent);
+  color: var(--ok-text);
+}
+
+.code-state.is-compile-error,
+.code-state.is-error {
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  color: var(--danger);
+}
+
+.code-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.code-dot.is-running {
+  background: #16a34a;
+}
+
+.code-dot.is-compile-error,
+.code-dot.is-error {
+  background: var(--danger);
+}
+
+.code-editor {
+  display: flex;
+  height: 260px;
+  resize: vertical;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #0f172a;
+}
+
+.code-editor__gutter {
+  flex: none;
+  overflow: hidden;
+  padding: 6px 6px 6px 4px;
+  min-width: 36px;
+  text-align: right;
+  color: #64748b;
+  background: #0b1220;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  user-select: none;
+}
+
+.code-editor__gutter .is-error {
+  color: #fff;
+  background: #dc2626;
+  border-radius: 3px;
+}
+
+.code-editor__gutter .is-warn {
+  color: #111;
+  background: #fbbf24;
+  border-radius: 3px;
+}
+
+.code-editor__text {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 0;
+  outline: none;
+  resize: none;
+  color: #e2e8f0;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  tab-size: 2;
+  white-space: pre;
+}
+
+.code-editor__text::placeholder {
+  color: #475569;
+}
+
+.code-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.code-msg {
+  padding: 2px 8px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 3px;
+  text-align: left;
+  font: inherit;
+  font-size: 0.74rem;
+  background: transparent;
+  cursor: default;
+}
+
+button.code-msg {
+  cursor: pointer;
+}
+
+.code-msg strong {
+  margin-right: 6px;
+}
+
+.code-msg.is-error {
+  border-left-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
+
+.code-msg.is-warn {
+  border-left-color: #f59e0b;
+  background: color-mix(in srgb, #f59e0b 12%, transparent);
+}
+
+.code-msg.is-info {
+  border-left-color: #3b82f6;
+  background: color-mix(in srgb, #3b82f6 8%, transparent);
+}
+
+/* OLED 화면 (코드가 그린 픽셀과 글자) */
+.sim-oled-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #000;
+  border-radius: 3px;
+}
+
+/* 7세그먼트 4자리 */
+.sim-seg-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #111;
+  border-radius: 3px;
+}
+
+@media (max-width: 900px) {
+  .sim-bar__body {
+    flex-direction: column;
+  }
+}

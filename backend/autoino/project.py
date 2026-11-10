@@ -244,6 +244,13 @@ def parse_project(data: Any, catalog: Catalog | None = None) -> ProjectData:
             if (key in board_ids or key in instance_ids or key == "breadboard") and _is_obj(pos) and _is_num(pos.get("x")) and _is_num(pos.get("y")):
                 layout[key] = {"x": pos["x"], "y": pos["y"]}
 
+    # 보드별 스케치 (사용자가 시뮬레이션에 넣은 코드): 있는 보드만, 글자만
+    sketches: dict[str, str] = {}
+    if _is_obj(raw.get("sketches")):
+        for key, code in raw["sketches"].items():
+            if key in board_ids and _is_str(code) and code.strip():
+                sketches[key] = code
+
     name = raw.get("name")
     breadboard = raw.get("breadboard")
     position = {"breadboard": {"x": breadboard["x"], "y": breadboard["y"]}} if _is_obj(breadboard) and _is_num(breadboard.get("x")) and _is_num(breadboard.get("y")) else {}
@@ -258,6 +265,7 @@ def parse_project(data: Any, catalog: Catalog | None = None) -> ProjectData:
             **({"breadboardHoles": holes} if holes else {}),
             **({"shares": shares} if shares else {}),
             **({"layout": layout} if layout else {}),
+            **({"sketches": sketches} if sketches else {}),
             "nextSeq": counter(raw.get("nextSeq"), max_seq + 1),
             "nextConnSeq": counter(raw.get("nextConnSeq"), max_conn + 1),
             "nextBoardSeq": counter(raw.get("nextBoardSeq"), max_board + 1),
@@ -278,6 +286,8 @@ def to_project_file(project: ProjectData, now: datetime | None = None) -> dict:
         breadboard["shares"] = d["shares"]
     if d.get("layout"):
         breadboard["layout"] = d["layout"]
+    if d.get("sketches"):
+        breadboard["sketches"] = d["sketches"]
     return {
         "format": PROJECT_FORMAT,
         "version": PROJECT_VERSION,

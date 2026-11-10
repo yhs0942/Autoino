@@ -23,6 +23,11 @@ interface WorkspaceToolbarProps {
   onBoardChange: (boardId: string) => void
   onAddBoard: () => void
   onAutoAssign: () => void
+  /** 보드가 여러 개일 때 자동 핀 배정 대상으로 고를 수 있는 보드 */
+  assignBoards: { instanceId: string; label: string }[]
+  /** '' 이면 부품마다 정한 제어 보드 */
+  assignBoard: string
+  onAssignBoardChange: (boardInstanceId: string) => void
   onInsertLevelShifters: () => void
   onArrange: () => void
   onClearConnections: () => void
@@ -84,9 +89,23 @@ export function WorkspaceToolbar(props: WorkspaceToolbarProps) {
           onClick={props.onAutoAssign}
           disabled={placedCount === 0}
           title="연결되지 않은 핀을 자동으로 배정하고, 오류·충돌이 있는 연결을 재배치합니다"
+          data-testid="auto-assign"
         >
           자동 핀 배정
         </button>
+        {props.assignBoards.length > 0 && (
+          <label className="workspace-toolbar__assign" title="자동 핀 배정으로 연결할 보드. 보드를 고르면 아직 어느 보드에도 연결되지 않은 부품을 그 보드에 연결합니다 (보드 직결 · 브레드보드 경유 모두)">
+            <span>배정할 보드</span>
+            <select value={props.assignBoard} onChange={(e) => props.onAssignBoardChange(e.target.value)} data-testid="assign-board">
+              <option value="">부품마다 정한 보드</option>
+              {props.assignBoards.map((b) => (
+                <option key={b.instanceId} value={b.instanceId}>
+                  {b.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <button
           type="button"
           className="button"

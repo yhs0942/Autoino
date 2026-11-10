@@ -1,16 +1,23 @@
 import { useEffect, useMemo } from 'react'
 import type { Circuit } from '../../engine/circuit'
 import type { PowerReport } from '../../engine/power'
+import { CodeRuntime, type CodeStatus } from '../../engine/sim/codeRuntime'
 import { SimRuntime, type SerialLine, type SimInput, type SimView } from '../../engine/sim/runtime'
 import type { Issue } from '../../engine/validate'
 
 // 시뮬레이션 상태 저장소. 화면 전체를 다시 그리지 않도록, 부품 카드·시리얼 모니터가 각자 구독해 필요한 부분만 바꾼다.
+
+/** 예시 동작(생성 코드와 같은 동작) 또는 내 코드(보드마다 넣은 스케치를 실제로 실행) */
+export type SimMode = 'demo' | 'code'
 
 export interface SimSnapshot {
   view: SimView
   serial: SerialLine[]
   running: boolean
   speed: number
+  mode: SimMode
+  /** 내 코드 모드: 보드마다 컴파일·실행 상태 */
+  code: CodeStatus[] | null
 }
 
 export interface SimStore {
@@ -23,29 +30,41 @@ export interface SimStore {
   rotate: (instanceId: string, dir: 1 | -1) => void
   tapCard: (instanceId: string) => void
   sendBluetooth: (instanceId: string, text: string) => void
+  /** 시리얼 모니터에서 보드로 보내기 (내 코드 모드) */
+  sendSerial: (boardId: string, text: string) => void
   setRunning: (running: boolean) => void
   setSpeed: (speed: number) => void
   restart: () => void
 }
 
-export function createSimStore(circuit: Circuit, issues: Issue[], power: PowerReport): SimStore {
-  let runtime = new SimRuntime(circuit, { issues, power })
+export function createSimStore(circuit: Circuit, issues: Issue[], power: PowerReport, mode: SimMode = 'demo', sketches: Record<string, string> = {}): SimStore {
+  let saved: Map<string, number[]> | undefined
+  const make = (): SimRuntime => (mode === 'code' ? new CodeRuntime(circuit, { issues, power }, sketches, saved) : new SimRuntime(circuit, { issues, power }))
+  let runtime = make()
   let running = true
   let speed = 1
-  let serialLength = -1
+  let serialVersion = -1
   let serial: SerialLine[] = []
+  let code: CodeStatus[] | null = null
+  let codeAt = -1e9
   const listeners = new Set<() => void>()
-  const make = (): SimSnapshot => {
-    // 시리얼 줄이 늘었을 때만 새 배열을 만든다 (모니터가 매 프레임 다시 그려지지 않게)
-    if (runtime.serial.length !== serialLength || runtime.serial.at(-1) !== serial.at(-1)) {
+  const snap = (): SimSnapshot => {
+    // 시리얼 줄이 바뀌었을 때만 새 배열을 만든다 (모니터가 매 프레임 다시 그려지지 않게)
+    if (runtime.serialVersion !== serialVersion) {
       serial = [...runtime.serial]
-      serialLength = runtime.serial.length
+      serialVersion = runtime.serialVersion
     }
-    return { view: runtime.view(), serial, running, speed }
+    // 코드 상태(오류·안내)는 0.25초마다 다시 계산한다
+    if (runtime instanceof CodeRuntime && (code === null || runtime.t - codeAt >= 250 || runtime.t < codeAt)) {
+      const next = runtime.codeStatus()
+      if (JSON.stringify(next) !== JSON.stringify(code)) code = next
+      codeAt = runtime.t
+    }
+    return { view: runtime.view(), serial, running, speed, mode, code }
   }
-  let snapshot = make()
+  let snapshot = snap()
   const emit = () => {
-    snapshot = make()
+    snapshot = snap()
     listeners.forEach((l) => l())
   }
   return {
@@ -76,6 +95,10 @@ export function createSimStore(circuit: Circuit, issues: Issue[], power: PowerRe
       runtime.sendBluetooth(id, text)
       emit()
     },
+    sendSerial: (boardId, text) => {
+      if (runtime instanceof CodeRuntime) runtime.sendSerial(boardId, text)
+      emit()
+    },
     setRunning: (value) => {
       running = value
       emit()
@@ -85,16 +108,19 @@ export function createSimStore(circuit: Circuit, issues: Issue[], power: PowerRe
       emit()
     },
     restart: () => {
-      runtime = new SimRuntime(circuit, { issues, power })
-      serialLength = -1
+      // EEPROM 은 실제 보드처럼 다시 시작해도 남는다
+      if (runtime instanceof CodeRuntime) saved = runtime.savedStorage()
+      runtime = make()
+      serialVersion = -1
+      code = null
       emit()
     },
   }
 }
 
 /** 시뮬레이션이 켜져 있는 동안 저장소를 만들고 화면 프레임마다 시간을 흘린다 */
-export function useSimulation(active: boolean, circuit: Circuit, issues: Issue[], power: PowerReport): SimStore | null {
-  const store = useMemo(() => (active ? createSimStore(circuit, issues, power) : null), [active, circuit, issues, power])
+export function useSimulation(active: boolean, circuit: Circuit, issues: Issue[], power: PowerReport, mode: SimMode = 'demo', sketches: Record<string, string> = {}): SimStore | null {
+  const store = useMemo(() => (active ? createSimStore(circuit, issues, power, mode, sketches) : null), [active, circuit, issues, power, mode, sketches])
   useEffect(() => {
     if (!store) return
     let raf = 0

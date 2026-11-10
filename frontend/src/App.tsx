@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import './App.css'
+import { api } from './api/client'
 import { useBackend } from './api/useBackend'
+import { AiPromptDialog } from './components/AiPrompt/AiPromptDialog'
 import { CodeDialog } from './components/BackendDialogs/CodeDialog'
 import { ServerProjectsDialog } from './components/BackendDialogs/ServerProjectsDialog'
 import { SimulationDialog } from './components/BackendDialogs/SimulationDialog'
 import { SimBar } from './components/Simulation/SimBar'
-import { useSimulation } from './components/Simulation/simStore'
+import { useSimulation, type SimMode } from './components/Simulation/simStore'
 import { CircuitCanvas } from './components/CircuitCanvas/CircuitCanvas'
 import { ConnectionPanel } from './components/ConnectionPanel/ConnectionPanel'
 import { Modal } from './components/common/Modal'
@@ -43,6 +45,7 @@ type Dialog =
   | { kind: 'server'; project: ProjectFile }
   | { kind: 'code'; project: ProjectFile }
   | { kind: 'simulate'; project: ProjectFile }
+  | { kind: 'ai'; board?: string }
   | { kind: 'error'; title: string; message: string }
 
 function isTypingTarget(target: EventTarget | null): boolean {
@@ -99,7 +102,14 @@ function App() {
   const power = useMemo(() => analyzePower(circuit), [circuit])
   /** 시뮬레이션: 생성 코드의 동작을 배선도 위에서 돌린다 (배선 편집은 잠근다) */
   const [simOn, setSimOn] = useState(false)
-  const sim = useSimulation(simOn && view === 'wiring', circuit, issues, power)
+  /** 예시 동작 또는 보드마다 넣은 코드 실행 */
+  const [simMode, setSimMode] = useState<SimMode>('demo')
+  const sketches = state.sketches
+  const sim = useSimulation(simOn && view === 'wiring', circuit, issues, power, simMode, sketches)
+  const codeBoards = useMemo(() => boards.map((b) => ({ instanceId: b.instanceId, label: b.label, boardName: getBoard(b.boardId).name })), [boards])
+  /** 자동 핀 배정 대상 보드 ('' 이면 부품마다 정한 제어 보드) */
+  const [assignBoard, setAssignBoard] = useState('')
+  const assignTarget = boards.some((b) => b.instanceId === assignBoard) ? assignBoard : ''
   const boardLabels = useMemo(() => Object.fromEntries(boards.map((b) => [b.instanceId, b.label])), [boards])
   const merges = useMemo(
     () => findMergeableSupplies(circuit).map((m) => ({ voltage: m.voltage, items: m.items.map((i) => ({ instanceId: i.instanceId, label: i.label })) })),
@@ -113,9 +123,37 @@ function App() {
       name: projectName, boards, placed, connections, links, breadboard: breadboardPosition,
       ...(Object.keys(breadboardHoles).length ? { breadboardHoles } : {}),
       ...(shares.length ? { shares } : {}),
+      ...(Object.keys(state.layout).length ? { layout: state.layout } : {}),
+      ...(Object.keys(sketches).length ? { sketches } : {}),
       nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters,
     })
-  }, [projectName, boards, placed, connections, links, breadboardPosition, breadboardHoles, shares, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters])
+  }, [projectName, boards, placed, connections, links, breadboardPosition, breadboardHoles, shares, state.layout, sketches, nextSeq, nextConnSeq, nextBoardSeq, nextLinkSeq, labelCounters])
+
+  /** 보드마다 코드를 넣고 '내 코드 실행' 으로 시뮬레이션을 시작한다 */
+  const runSketches = (list: { board: string; code: string }[]) => {
+    for (const { board: b, code } of list) dispatch({ type: 'setSketch', boardInstanceId: b, code })
+    setSimMode('code')
+    if (view === 'layout') changeView('wiring')
+    setSimOn(true)
+    setDialog({ kind: 'none' })
+    dispatch({ type: 'setStatus', message: `코드 ${list.length}개를 넣고 시뮬레이션을 시작했습니다.` })
+  }
+
+  /** 편집기에서 고친 코드로 다시 실행 (바뀐 것이 없으면 처음부터) */
+  const runDrafts = (drafts: Record<string, string>) => {
+    const changed = boards.filter((b) => (drafts[b.instanceId] ?? '') !== (sketches[b.instanceId] ?? ''))
+    for (const b of changed) dispatch({ type: 'setSketch', boardInstanceId: b.instanceId, code: drafts[b.instanceId] ?? '' })
+    if (!changed.length) sim?.restart()
+  }
+
+  /** 백엔드가 만든 예시 코드 */
+  const loadExample = async (boardId: string): Promise<string | null> => {
+    if (backend.state !== 'online') return null
+    const r = await api.codegen(toProjectFile(toProjectData(state)))
+    return r.sketches.find((x) => x.boardInstanceId === boardId)?.code ?? null
+  }
+
+  const openAi = () => setDialog({ kind: 'ai', board: state.boards.length > 1 ? activeBoard.instanceId : undefined })
 
   const changeWireStyle = (style: WireStyle) => {
     setWireStyle(style)
@@ -297,10 +335,21 @@ function App() {
           </button>
           <button
             type="button"
+            className="button"
+            onClick={openAi}
+            title="지금 배선을 설명하는 프롬프트를 만들어 ChatGPT·Gemini 같은 생성형 AI 로 코드를 만들고, 받은 코드를 시뮬레이션합니다"
+            data-testid="open-ai"
+          >
+            AI 코드
+          </button>
+          <button
+            type="button"
             className={`button${simOn ? ' button--primary' : ''}`}
             aria-pressed={simOn}
             onClick={() => {
               if (!simOn && view === 'layout') changeView('wiring')
+              // 넣어 둔 코드가 있으면 그 코드를 실행한다
+              if (!simOn) setSimMode(Object.keys(sketches).length ? 'code' : 'demo')
               setSimOn(!simOn)
             }}
             title="생성 코드의 동작을 작업 화면에서 돌려 부품이 실제로 움직이는지 확인합니다"
@@ -345,7 +394,10 @@ function App() {
             onViewChange={changeView}
             onBoardChange={(boardId) => dispatch({ type: 'setBoard', boardInstanceId: activeBoard.instanceId, boardId })}
             onAddBoard={() => dispatch({ type: 'addBoard', boardId: activeBoard.boardId })}
-            onAutoAssign={() => dispatch({ type: 'autoAssign', route })}
+            onAutoAssign={() => dispatch({ type: 'autoAssign', route, ...(assignTarget ? { board: assignTarget } : {}) })}
+            assignBoards={state.boards.length > 1 ? state.boards.map((b) => ({ instanceId: b.instanceId, label: `${b.label} · ${getBoard(b.boardId).name}` })) : []}
+            assignBoard={assignTarget}
+            onAssignBoardChange={setAssignBoard}
             onInsertLevelShifters={() => dispatch({ type: 'insertLevelShifters' })}
             onArrange={() => dispatch({ type: 'arrangeModules' })}
             onClearConnections={() => dispatch({ type: 'clearConnections' })}
@@ -356,7 +408,21 @@ function App() {
             onRedo={() => dispatch({ type: 'redo' })}
             onReset={requestReset}
           />
-          {sim && <SimBar store={sim} boardLabels={boardLabels} onStop={() => setSimOn(false)} onOpenAnalysis={() => openBackendDialog('simulate')} />}
+          {sim && (
+            <SimBar
+              store={sim}
+              boardLabels={boardLabels}
+              onStop={() => setSimOn(false)}
+              onOpenAnalysis={() => openBackendDialog('simulate')}
+              mode={simMode}
+              onModeChange={setSimMode}
+              boards={codeBoards}
+              sketches={sketches}
+              onRunCode={runDrafts}
+              onLoadExample={loadExample}
+              onOpenPrompt={openAi}
+            />
+          )}
           {view === 'layout' ? (
             <LayoutView
               doc={state}
@@ -606,9 +672,17 @@ function App() {
       )}
 
       {dialog.kind === 'code' && (
-        <CodeDialog status={backend} project={dialog.project} errorCount={counts.error} onRecheck={recheckBackend} onClose={closeDialog} />
+        <CodeDialog
+          status={backend}
+          project={dialog.project}
+          errorCount={counts.error}
+          onRecheck={recheckBackend}
+          onClose={closeDialog}
+          onSimulate={(list) => runSketches(list.map((x) => ({ board: x.boardInstanceId, code: x.code })))}
+        />
       )}
 
+      {dialog.kind === 'ai' && <AiPromptDialog circuit={circuit} initialBoard={dialog.board} onApply={runSketches} onClose={closeDialog} />}
       {dialog.kind === 'simulate' && <SimulationDialog status={backend} project={dialog.project} onRecheck={recheckBackend} onClose={closeDialog} />}
 
       {dialog.kind === 'open-confirm' && (

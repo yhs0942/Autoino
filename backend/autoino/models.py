@@ -387,6 +387,8 @@ class ProjectData(Lenient):
     shares: list[PinShare] | None = None
     #: 실물 배치 모드의 위치 (보드·부품 인스턴스 ID 또는 'breadboard' → 좌표)
     layout: dict[str, Position] | None = None
+    #: 보드 인스턴스 ID → 사용자가 넣은 스케치 (코드 시뮬레이션)
+    sketches: dict[str, str] | None = None
     next_seq: int
     next_conn_seq: int
     next_board_seq: int

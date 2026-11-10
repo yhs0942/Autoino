@@ -56,8 +56,8 @@ export type ModuleView = ViewBase &
     | { kind: 'driver'; channels: { label: string; speed: number }[]; leds?: boolean[]; powerLed: boolean }
     | { kind: 'esc'; throttle: number; armed: boolean }
     | { kind: 'lcd'; lines: string[]; backlight: boolean }
-    | { kind: 'oled'; lines: string[] }
-    | { kind: 'seg'; text: string }
+    | { kind: 'oled'; lines: string[]; frame?: OledFrame }
+    | { kind: 'seg'; text: string; segments?: number[]; brightness?: number }
     | { kind: 'pixels'; colors: string[] }
     | { kind: 'sonar'; cm: number; ping: boolean }
     | { kind: 'gauge'; control: 'value' | 'light' | 'moisture' | 'gas'; fraction: number; raw: number; max: number; led: boolean; heating?: boolean }
@@ -73,6 +73,17 @@ export type ModuleView = ViewBase &
     | { kind: 'mux'; channels: { channel: number; label: string; raw: number }[]; active: number }
     | { kind: 'pass'; text: string; active: boolean[] }
   )
+
+/** OLED 화면 (코드 시뮬레이션) */
+export interface OledFrame {
+  width: number
+  height: number
+  pixels: Uint8Array
+  texts: { x: number; y: number; size: number; text: string; color: number; bg: number | null }[]
+  inverted: boolean
+  /** display() 횟수 */
+  n: number
+}
 
 export interface SerialLine {
   t: number
@@ -144,28 +155,32 @@ const servoUs = (angle: number) => Math.round(SERVO_MIN_US + ((SERVO_MAX_US - SE
 export class SimRuntime {
   t = 0
   serial: SerialLine[] = []
-  private readonly inputs = new Map<string, SimInput>()
-  private readonly tasks: Task[] = []
-  private readonly health = new Map<string, Health>()
-  private readonly traced: Netlist
-  private readonly netlist: Netlist
-  private readonly last = new Map<string, unknown>()
-  private readonly encoder = new Map<string, number>()
-  private readonly pending = new Map<string, string[]>()
-  private readonly btTx = new Map<string, string>()
-  private readonly btRx = new Map<string, string>()
-  private readonly rfid = new Map<string, { uid: string; t: number }>()
-  private readonly motionUntil = new Map<string, number>()
-  private lastSerial = new Map<string, number>()
+  protected readonly inputs = new Map<string, SimInput>()
+  protected readonly tasks: Task[] = []
+  protected readonly health = new Map<string, Health>()
+  protected readonly traced: Netlist
+  protected readonly netlist: Netlist
+  protected readonly last = new Map<string, unknown>()
+  protected readonly encoder = new Map<string, number>()
+  protected readonly pending = new Map<string, string[]>()
+  protected readonly btTx = new Map<string, string>()
+  protected readonly btRx = new Map<string, string>()
+  protected readonly rfid = new Map<string, { uid: string; t: number }>()
+  protected readonly motionUntil = new Map<string, number>()
+  protected lastSerial = new Map<string, number>()
 
   readonly circuit: Circuit
 
-  constructor(circuit: Circuit, ctx: { issues: Issue[]; power: PowerReport }) {
+  /** 시리얼 출력이 바뀔 때마다 늘어난다 (모니터 갱신용) */
+  serialVersion = 0
+
+  constructor(circuit: Circuit, ctx: { issues: Issue[]; power: PowerReport; demo?: boolean }) {
     this.circuit = circuit
     this.netlist = buildNetlist(circuit)
     this.traced = buildNetlist(circuit, { passThrough: true })
     for (const item of circuit.placed) this.inputs.set(item.instanceId, { ...(BEHAVIOR[item.moduleId]?.defaults ?? {}) })
     this.computeHealth(ctx.issues, ctx.power)
+    if (ctx.demo === false) return
     this.buildTasks()
     for (const b of circuit.boards) this.print(b.instanceId, `Autoino: autoino_${b.instanceId.replace(/-/g, '_')}.ino start`)
   }
@@ -218,24 +233,25 @@ export class SimRuntime {
     this.t = to
   }
 
-  private print(board: string, text: string, t = this.t) {
+  protected print(board: string, text: string, t = this.t) {
+    this.serialVersion++
     this.serial.push({ t, board, text })
     if (this.serial.length > 300) this.serial.splice(0, this.serial.length - 300)
     this.lastSerial.set(board, t)
   }
 
-  private queue(task: Task, text: string) {
+  protected queue(task: Task, text: string) {
     this.pending.set(task.item.instanceId, [...(this.pending.get(task.item.instanceId) ?? []), text])
   }
 
-  private changed(key: string, value: unknown): boolean {
+  protected changed(key: string, value: unknown): boolean {
     if (this.last.get(key) === value) return false
     this.last.set(key, value)
     return true
   }
 
   /** 생성 코드의 every() 주기마다 하는 일 (값 읽기·출력) */
-  private poll(task: Task, t: number) {
+  protected poll(task: Task, t: number) {
     const id = task.item.instanceId
     const ok = this.healthOf(id).ok
     const input = this.input(id)
@@ -289,7 +305,7 @@ export class SimRuntime {
 
   // ---------------------------------------------------------------- 배선 · 전원
 
-  private computeHealth(issues: Issue[], power: PowerReport) {
+  protected computeHealth(issues: Issue[], power: PowerReport) {
     const { circuit } = this
     for (const item of circuit.placed) {
       const module = getModule(item.moduleId)
@@ -312,13 +328,13 @@ export class SimRuntime {
     }
   }
 
-  private healthOf(instanceId: string): Health {
+  protected healthOf(instanceId: string): Health {
     return this.health.get(instanceId) ?? { ok: false, reason: '알 수 없는 부품' }
   }
 
   // ---------------------------------------------------------------- 코드 (작업 목록)
 
-  private codeBoardOf(item: PlacedModule, module: Module): string | null {
+  protected codeBoardOf(item: PlacedModule, module: Module): string | null {
     let pin = PRIMARY_PIN[item.moduleId] ?? (module.code?.pins ? Object.values(module.code.pins)[0] : undefined)
     if (!pin && module.driver) pin = activeChannels(this.circuit.connections, item.instanceId, module)[0]?.inputs[0]
     const route = pin ? routeToBoard(this.circuit, item.instanceId, pin, this.traced) : null
@@ -326,14 +342,14 @@ export class SimRuntime {
   }
 
   /** 핀이 이 보드의 GPIO 에 이어져 있으면 그 보드 핀 */
-  private gpioOf(item: PlacedModule, pinId: string, board: string): string | null {
+  protected gpioOf(item: PlacedModule, pinId: string, board: string): string | null {
     const route = routeToBoard(this.circuit, item.instanceId, pinId, this.traced)
     if (!route || route.boardInstanceId !== board) return null
     const r = resolveBoardPin(this.circuit, board, route.pinId)
     return r?.pin && isGpio(r.pin) ? route.pinId : null
   }
 
-  private buildTasks() {
+  protected buildTasks() {
     const { circuit } = this
     const ladder = computeLadderResistors(circuit)
     for (const board of circuit.boards) {
@@ -419,7 +435,7 @@ export class SimRuntime {
   }
 
   /** 멀티플렉서의 그 채널을 이 보드에서 읽을 수 있는지 (SIG 가 아날로그 핀, 필요한 선택선이 GPIO) */
-  private muxReadable(muxId: string, channel: number, board: string): boolean {
+  protected muxReadable(muxId: string, channel: number, board: string): boolean {
     const mux = this.circuit.placed.find((p) => p.instanceId === muxId)
     const spec = mux && getModule(mux.moduleId).mux
     if (!mux || !spec || !this.healthOf(muxId).ok) return false
@@ -432,7 +448,7 @@ export class SimRuntime {
   }
 
   /** 서보 드라이버 채널에 물린 서보 (채널 → 서보) */
-  private servosOn(driver: PlacedModule): Map<number, PlacedModule> {
+  protected servosOn(driver: PlacedModule): Map<number, PlacedModule> {
     const out = new Map<number, PlacedModule>()
     const channels = getModule(driver.moduleId).driver?.channels ?? []
     for (const c of this.circuit.connections)
@@ -451,7 +467,7 @@ export class SimRuntime {
   // ---------------------------------------------------------------- 신호 계산
 
   /** 서보 템플릿의 각도 (생성 코드: 20 ms 마다 2°, 0°–180° 왕복). 연속 회전은 2초마다 120 → 90 → 60 → 90 */
-  private servoAngle(template: string, t: number): number {
+  protected servoAngle(template: string, t: number): number {
     if (template === 'servo-continuous') {
       const state = Math.floor(t / 2000) % 4
       return state === 1 ? 120 : state === 3 ? 60 : 90
@@ -460,7 +476,7 @@ export class SimRuntime {
   }
 
   /** 지금 시각의 보드 핀 신호 */
-  private outputs(t: number): Map<string, PinOut> {
+  protected outputs(t: number): Map<string, PinOut> {
     const pins = new Map<string, PinOut>()
     const set = (task: Task, role: string, out: PinOut) => {
       const pin = task.pins[role]
@@ -525,7 +541,7 @@ export class SimRuntime {
   }
 
   /** 부품 핀에 들어오는 보드 신호 (배선·레벨 시프터를 따라감). 보드 전원 핀이면 늘 HIGH */
-  private signalAt(pins: Map<string, PinOut>, item: PlacedModule, pinId: string): PinOut | null {
+  protected signalAt(pins: Map<string, PinOut>, item: PlacedModule, pinId: string): PinOut | null {
     const route = routeToBoard(this.circuit, item.instanceId, pinId, this.traced)
     if (!route) return null
     const board = boardDefOf(this.circuit, route.boardInstanceId)
@@ -533,12 +549,12 @@ export class SimRuntime {
     return pins.get(`${route.boardInstanceId}:${route.pinId}`) ?? LOW
   }
 
-  private adcMax(task: Task): number {
+  protected adcMax(task: Task): number {
     return boardDefOf(this.circuit, task.board)?.core === 'arduino-esp32' ? 4095 : 1023
   }
 
   /** 센서 출력값 (0–1) */
-  private fraction(item: PlacedModule, role: string): number {
+  protected fraction(item: PlacedModule, role: string): number {
     const input = this.input(item.instanceId)
     const id = item.moduleId
     if (id === 'joystick-ky023') return ((role === 'y' ? (input.y ?? 0) : (input.x ?? 0)) + 1) / 2
@@ -548,7 +564,7 @@ export class SimRuntime {
     return input.value ?? 0.5
   }
 
-  private analogRead(task: Task, role: string): number {
+  protected analogRead(task: Task, role: string): number {
     const max = this.adcMax(task)
     if (!this.healthOf(task.item.instanceId).ok) return 0
     const ch = task.mux?.[role]
@@ -556,14 +572,14 @@ export class SimRuntime {
     return Math.round(this.fraction(task.item, role) * max)
   }
 
-  private digitalOut(item: PlacedModule, t: number): boolean {
+  protected digitalOut(item: PlacedModule, t: number): boolean {
     const input = this.input(item.instanceId)
     if (item.moduleId === 'pir-hc-sr501') return !!input.motion || (this.motionUntil.get(item.instanceId) ?? -1) > t
     if (item.moduleId === 'line-tracker') return !!input.onLine
     return false
   }
 
-  private sonarCm(instanceId: string): number {
+  protected sonarCm(instanceId: string): number {
     const cm = this.input(instanceId).distance ?? 30
     return this.healthOf(instanceId).ok && cm >= 2 && cm <= 400 ? cm : -1
   }
@@ -583,7 +599,7 @@ export class SimRuntime {
     return { t, modules, boards, pins }
   }
 
-  private viewOf(item: PlacedModule, pins: Map<string, PinOut>, t: number): ModuleView {
+  protected viewOf(item: PlacedModule, pins: Map<string, PinOut>, t: number): ModuleView {
     const module = getModule(item.moduleId)
     const health = this.healthOf(item.instanceId)
     const { ok, reason, warn } = health
@@ -783,18 +799,18 @@ export class SimRuntime {
   }
 
   /** 핀 공유로 다른 부품 코드를 따라가는 부품인지 */
-  private mirrored(item: PlacedModule): boolean {
+  protected mirrored(item: PlacedModule): boolean {
     return getModule(item.moduleId)
       .pins.filter((p) => p.role === 'signal')
       .some((p) => !!shareOf(this.circuit, endpointKey(moduleEndpoint(item.instanceId, p.id))))
   }
 
-  private tasksDriving(item: PlacedModule, pinId: string, pins: Map<string, PinOut>): boolean {
+  protected tasksDriving(item: PlacedModule, pinId: string, pins: Map<string, PinOut>): boolean {
     const route = routeToBoard(this.circuit, item.instanceId, pinId, this.traced)
     return !!route && pins.has(`${route.boardInstanceId}:${route.pinId}`)
   }
 
-  private inputVoltage(item: PlacedModule, pins: Map<string, PinOut>): number | null {
+  protected inputVoltage(item: PlacedModule, pins: Map<string, PinOut>): number | null {
     const v = netVoltage(this.circuit, this.netlist, endpointKey(moduleEndpoint(item.instanceId, 'in')))
     if (v !== null) return v
     const s = this.signalAt(pins, item, 'in')
@@ -804,7 +820,7 @@ export class SimRuntime {
   }
 
   /** 서보가 서보 드라이버 채널에 물려 있으면 그 채널의 펄스 */
-  private servoFromDriver(servo: PlacedModule, t: number): PinOut | null {
+  protected servoFromDriver(servo: PlacedModule, t: number): PinOut | null {
     for (const task of this.tasks) {
       if (task.template !== 'pca9685') continue
       for (const [, s] of task.extra.servos as Map<number, PlacedModule>) {
@@ -817,7 +833,7 @@ export class SimRuntime {
   }
 
   /** 드라이버 채널 출력 (−1 역방향 … 1 정방향). 입력 핀 신호로 진리표를 따른다 */
-  private channelSpeed(driver: PlacedModule, module: Module, ch: NonNullable<Module['driver']>['channels'][number], pins: Map<string, PinOut>): number {
+  protected channelSpeed(driver: PlacedModule, module: Module, ch: NonNullable<Module['driver']>['channels'][number], pins: Map<string, PinOut>): number {
     const sig = (pinId: string) => this.signalAt(pins, driver, pinId)
     const spec = module.code
     if (spec?.template === 'h-bridge') {
@@ -838,7 +854,7 @@ export class SimRuntime {
     return 0
   }
 
-  private motorView(item: PlacedModule, module: Module, pins: Map<string, PinOut>, base: Health): ModuleView {
+  protected motorView(item: PlacedModule, module: Module, pins: Map<string, PinOut>, base: Health): ModuleView {
     const behavior = BEHAVIOR[item.moduleId]
     const style = behavior?.style ?? 'wheel'
     const link = motorDriverOf(this.circuit, item)
@@ -861,7 +877,7 @@ export class SimRuntime {
     return { ...base, kind: 'motor', speed, rpm, style, status }
   }
 
-  private stepperView(item: PlacedModule, pins: Map<string, PinOut>, base: Health): ModuleView {
+  protected stepperView(item: PlacedModule, pins: Map<string, PinOut>, base: Health): ModuleView {
     const behavior = BEHAVIOR[item.moduleId]!
     const link = motorDriverOf(this.circuit, item)
     const idle = (reason?: string): ModuleView => ({ ...base, ok: !reason && base.ok, reason: reason ?? base.reason, kind: 'stepper', angle: 0, rpm: 0, forward: true, status: '멈춤' })
@@ -901,12 +917,12 @@ const POLL: Record<string, number> = {
 }
 
 /** 오류지만 실물은 일단 돌아가는 것 (과전압·과전류): 시뮬레이션에서는 움직이며 경고한다 */
-const RUNS_ANYWAY = new Set(['motor-overvoltage', 'driver-overcurrent', 'driver-peak'])
+export const RUNS_ANYWAY = new Set(['motor-overvoltage', 'driver-overcurrent', 'driver-peak'])
 
 /** 경고 중 카드에 보여 줄 것 */
 const WARN_CODES = new Set(['board-power-warning', 'undervoltage-supply', 'usb-budget', 'pin-shared-current', 'motor-undervoltage', 'driver-undervoltage'])
 
-function ohms(text: string): number {
+export function ohms(text: string): number {
   const m = text.match(/^(\d+)([kKmM]?)(\d*)$/)
   if (!m) return 1
   const mult = m[2] === '' ? 1 : m[2].toLowerCase() === 'k' ? 1e3 : 1e6
@@ -914,7 +930,7 @@ function ohms(text: string): number {
 }
 
 /** MPU-6050 가속도 원시값 (±2 g, 16384 LSB/g) */
-function imuRaw(input: SimInput): [number, number, number] {
+export function imuRaw(input: SimInput): [number, number, number] {
   const x = ((input.tiltX ?? 0) * Math.PI) / 180
   const y = ((input.tiltY ?? 0) * Math.PI) / 180
   return [Math.round(16384 * Math.sin(y)), Math.round(16384 * Math.sin(x)), Math.round(16384 * Math.cos(x) * Math.cos(y))]

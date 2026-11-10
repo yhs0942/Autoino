@@ -1,6 +1,6 @@
-import { useState, useSyncExternalStore, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { memo, useMemo, useState, useSyncExternalStore, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { BEHAVIOR } from '../../engine/sim/behavior'
-import type { ModuleView } from '../../engine/sim/runtime'
+import type { ModuleView, OledFrame } from '../../engine/sim/runtime'
 import type { SimStore } from './simStore'
 
 // 시뮬레이션 중 부품 카드 안에 그리는 동작 모습과 입력 조작
@@ -218,6 +218,7 @@ function Visual({ view, store, id, t }: { view: ModuleView; store: SimStore; id:
         </div>
       )
     case 'oled':
+      if (view.frame) return <OledScreen frame={view.frame} />
       return (
         <div className="sim-oled">
           {view.lines.map((l, i) => (
@@ -226,6 +227,7 @@ function Visual({ view, store, id, t }: { view: ModuleView; store: SimStore; id:
         </div>
       )
     case 'seg':
+      if (view.segments) return <SegDisplay segments={view.segments} brightness={view.brightness ?? 7} />
       return <div className="sim-seg">{view.text.padStart(4, ' ').replace(/ /g, ' ')}</div>
     case 'pixels':
       return (
@@ -351,6 +353,80 @@ function Visual({ view, store, id, t }: { view: ModuleView; store: SimStore; id:
         </div>
       )
   }
+}
+
+/** OLED: 코드가 그린 픽셀(가로로 이어진 칸을 한 사각형으로)과 글자 */
+const OledScreen = memo(
+  function OledScreen({ frame }: { frame: OledFrame }) {
+    const rects = useMemo(() => {
+      const out: { x: number; y: number; w: number }[] = []
+      const { width, height, pixels } = frame
+      for (let y = 0; y < height; y++) {
+        let x = 0
+        while (x < width) {
+          if (!pixels[y * width + x]) {
+            x++
+            continue
+          }
+          const start = x
+          while (x < width && pixels[y * width + x]) x++
+          out.push({ x: start, y, w: x - start })
+        }
+      }
+      return out
+    }, [frame])
+    const fg = frame.inverted ? '#000' : '#e0f2fe'
+    const bg = frame.inverted ? '#e0f2fe' : '#000'
+    return (
+      <svg className="sim-oled-svg" viewBox={`0 0 ${frame.width} ${frame.height}`} role="img" aria-label={frame.texts.map((t) => t.text).join(' ')} data-testid="sim-oled">
+        <rect width={frame.width} height={frame.height} fill={bg} />
+        {rects.map((r, i) => (
+          <rect key={i} x={r.x} y={r.y} width={r.w} height={1} fill={fg} />
+        ))}
+        {frame.texts.map((t, i) => (
+          <text
+            key={`t${i}`}
+            x={t.x}
+            y={t.y + 7 * t.size}
+            fontSize={8 * t.size}
+            fontFamily="ui-monospace, Consolas, monospace"
+            textLength={Math.max(1, t.text.length) * 6 * t.size - t.size}
+            lengthAdjust="spacingAndGlyphs"
+            fill={t.color === 0 ? bg : fg}
+          >
+            {t.text}
+          </text>
+        ))}
+      </svg>
+    )
+  },
+  (a, b) => a.frame.n === b.frame.n && a.frame.inverted === b.frame.inverted,
+)
+
+/** TM1637 4자리: 세그먼트(a–g)와 가운데 콜론(2번째 자리의 DP 비트) */
+function SegDisplay({ segments, brightness }: { segments: number[]; brightness: number }) {
+  const on = '#ef4444'
+  const off = '#2a1515'
+  const opacity = 0.45 + (0.55 * brightness) / 7
+  const seg = (mask: number, bit: number, d: string) => <path key={bit} d={d} fill={mask & (1 << bit) ? on : off} opacity={mask & (1 << bit) ? opacity : 1} />
+  return (
+    <svg className="sim-seg-svg" viewBox="0 0 106 34" role="img" aria-label="7세그먼트" data-testid="sim-seg">
+      {segments.slice(0, 4).map((m, i) => (
+        <g key={i} transform={`translate(${6 + i * 23 + (i >= 2 ? 6 : 0)} 3)`}>
+          {seg(m, 0, 'M3 0h10l-2 3h-6z')}
+          {seg(m, 1, 'M14 1l2 2v10l-2 1-1-2v-9z')}
+          {seg(m, 2, 'M14 15l2 1v10l-2 2-1-3v-9z')}
+          {seg(m, 3, 'M3 28h10l2-2-2-1h-10l-2 1z')}
+          {seg(m, 4, 'M1 15l1-1 1 2v9l-1 3-2-2v-10z')}
+          {seg(m, 5, 'M1 1l1-1 1 3v9l-1 2-2-1v-10z')}
+          {seg(m, 6, 'M3 13h10l1.5 1.5-1.5 1.5h-10l-1.5-1.5z')}
+        </g>
+      ))}
+      {[10, 22].map((y) => (
+        <circle key={y} cx={55} cy={y} r={1.6} fill={(segments[1] ?? 0) & 0x80 ? on : off} />
+      ))}
+    </svg>
+  )
 }
 
 /** 조이스틱: 패드를 끌면 움직이고 놓으면 가운데로 돌아온다 */

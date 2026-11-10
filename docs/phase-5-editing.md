@@ -82,6 +82,32 @@
 - 버튼·조이스틱·엔코더·가변저항·조도·토양·가스·초음파 거리·온습도·PIR·라인·IMU 기울기·RFID 카드·블루투스 메시지는 카드에서 조작한다.
   보드에는 전원(ON)·L(D13, ESP32 는 GPIO2)·TX LED 가 보인다. 시뮬레이션 중에는 배선을 고칠 수 없다.
 
+## 내 코드 실행 (코드 시뮬레이션)
+
+- `engine/arduino/` 는 브라우저에서 도는 Arduino C++ 인터프리터다. 전처리(`#include`·`#define`·함수형 매크로·`#if defined`) →
+  구문 분석(전역·함수·구조체·열거형·참조·포인터·배열·`String`·모든 제어문·연산자) → 클로저로 컴파일한다.
+  기다리는 코드(`delay`, 반복문, 그런 함수를 부르는 함수)만 제너레이터로 만들어, 가상 시간으로 실행하다가 프레임마다 양보한다.
+  AVR 은 `int` 16비트·`double` 32비트(넘침·부호 규칙 그대로), ESP32 는 32/64비트. `sprintf` 의 `%f` 는 AVR 에서 `?` 다.
+- 라이브러리: Servo·ESP32Servo, Wire(주변장치 모드 포함), SPI(AVR 레지스터 SPCR·SPDR 과 `ISR(SPI_STC_vect)` 포함),
+  LiquidCrystal_I2C, Adafruit_SSD1306(+GFX 도형·글자), Adafruit_NeoPixel(색 순서 반영), TM1637Display, DHT, NewPing, MFRC522,
+  SoftwareSerial, Stepper, AccelStepper, Adafruit_PWMServoDriver, Adafruit_MPU6050, MPU6050(I2Cdev), EEPROM, FastLED(기본).
+  Wi-Fi·내장 블루투스·사용자 class·템플릿·람다·new 는 지원하지 않는다고 알린다.
+- `engine/sim/hardware.ts` 는 보드마다 `Host`(핀 상태, UART, I²C, SPI, 장치)를 만든다. 보드 핀을 읽으면 그 핀의 넷에 물린 신호원
+  (버튼이 이은 GND·전원, 센서 출력, 엔코더 위상, 초음파 에코 구간, 다른 보드 출력, 내부 풀업)을 전압·내부 저항으로 합쳐 판단한다.
+  아무것도 없으면 떠 있는 값이다. UART 는 USB 모니터·HC-05·다른 보드로 보율을 따져 전달하고, I²C 는 넷으로 같은 버스의 장치
+  (MPU-6050·PCA9685 레지스터, LCD·OLED, 주변장치 보드)를 찾는다.
+- `engine/sim/codeRuntime.ts` 는 이 핀 상태로 부품 모습을 만든다. LED 는 애노드·캐소드 양쪽과 PWM, 서보는 펄스 폭(움직이는 속도 포함),
+  ESC 는 최소 스로틀 시동, 28BYJ-48 은 켜진 코일 방향을 회전자가 따라가는 방식(코일 순서가 틀리면 떨림, 너무 빠르면 탈조),
+  STEP/DIR 은 펄스 수로 돈다.
+- `shared/fixtures/sketches.json`(백엔드가 만든 예시 스케치)을 모두 실행해 오류가 없고, 예시 동작 시뮬레이션과 부품 모습이 같은지
+  `engine/sim/sketches.test.ts` 가 검사한다. 코드 생성을 바꾸면 `UPDATE_FIXTURES=1 python -m pytest tests/test_sketch_fixtures.py` 로 다시 만든다.
+
+## AI 프롬프트
+
+- `engine/aiPrompt.ts` 의 `buildAiPrompt` 가 만들 동작, 보드 사양, 부품마다 핀과 코드 번호(D7 → 7, ESP32 GPIO21 → 21)·직렬 저항·핀 공유,
+  부품별 코드 요령(버튼 INPUT_PULLUP, 28BYJ-48 의 IN1·IN3·IN2·IN4 순서, ESC 시동 등), 외부 전원, 보드 간 통신, 시뮬레이터 조건을 적는다.
+- `extractSketches` 는 AI 답변에서 코드 블록만 꺼내 보드 이름 주석(`// 보드 2`)이나 블록 위 제목으로 보드를 정한다.
+
 ## 외부 전원
 
 - 외부 전원이 필요한 부품 카드에 **⚡ 전원 필요** 표시. 눌러서 그 자리에서 예시를 골라 연결한다. 부품 속성에도 같은 단추가 있다.
@@ -110,5 +136,6 @@
 | `breadboardHoles` | 끝점 키 → 구멍 ID |
 | `shares` | `{ id, members[] }` 목록 |
 | `layout` | 인스턴스 ID 또는 `breadboard` → `{ x, y }` |
+| `sketches` | 보드 인스턴스 ID → 사용자가 넣은 스케치 (실행 취소 기록에는 넣지 않는다) |
 
 서버 저장(`projects/`)과 자동 배정 API 도 이 필드를 보존한다.

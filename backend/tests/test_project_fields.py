@@ -10,6 +10,7 @@ from autoino.service import run_auto_assign
 from autoino.storage import ProjectStore
 
 FIXTURES = Path(__file__).resolve().parents[2] / "shared" / "fixtures" / "engine-cases.json"
+BLINK = "void setup() {}\nvoid loop() {}\n"
 
 
 def _case(name: str) -> dict:
@@ -21,6 +22,7 @@ def _with_extras() -> dict:
     raw = dict(_case("share-leds")["after"])
     raw["breadboardHoles"] = {"module:led-5mm#1:anode": "12c", "board:board-1:D5": "top+4", "module:ghost#9:x": "5a", "module:led-5mm#2:anode": "99z"}
     raw["layout"] = {"led-5mm#1": {"x": 120, "y": 80}, "board-1": {"x": 10, "y": 20}, "breadboard": {"x": 5, "y": 600}, "ghost#2": {"x": 1, "y": 1}, "led-5mm#2": {"x": "a"}}
+    raw["sketches"] = {"board-1": BLINK, "board-9": "void setup() {}", "board-2": 5}
     return raw
 
 
@@ -29,11 +31,12 @@ def test_parse_keeps_valid_entries_and_drops_bad_ones() -> None:
     assert data["breadboardHoles"] == {"module:led-5mm#1:anode": "12c", "board:board-1:D5": "top+4"}
     assert data["layout"] == {"led-5mm#1": {"x": 120, "y": 80}, "board-1": {"x": 10, "y": 20}, "breadboard": {"x": 5, "y": 600}}
     assert data["shares"] == _case("share-leds")["after"]["shares"]
+    assert data["sketches"] == {"board-1": BLINK}
 
 
 def test_empty_fields_are_not_written() -> None:
     data = to_project_file(parse_project(_case("uno-all")["after"]))
-    for key in ("breadboardHoles", "shares", "layout"):
+    for key in ("breadboardHoles", "shares", "layout", "sketches"):
         assert key not in data
 
 
