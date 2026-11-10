@@ -785,6 +785,102 @@
     ],
     "parameters": [
       {
+        "id": "supply",
+        "label": "전원 종류",
+        "defaultValue": "custom",
+        "note": "고르면 출력 전압·최대 전류가 그 제품의 대표값으로 맞춰집니다. 전압·전류를 따로 바꾸면 직접 설정으로 바뀝니다.",
+        "options": [
+          {
+            "value": "custom",
+            "label": "직접 설정"
+          },
+          {
+            "value": "usb-charger-5v2a",
+            "label": "USB 충전기 5 V 2 A"
+          },
+          {
+            "value": "powerbank-5v2a",
+            "label": "보조배터리 5 V 2.4 A"
+          },
+          {
+            "value": "adapter-5v3a",
+            "label": "DC 어댑터 5 V 3 A"
+          },
+          {
+            "value": "smps-5v10a",
+            "label": "SMPS 5 V 10 A"
+          },
+          {
+            "value": "aa4-nimh",
+            "label": "AA 니켈수소 4개 (4.8 V)"
+          },
+          {
+            "value": "aa4-alkaline",
+            "label": "AA 알칼라인 4개 (6 V)"
+          },
+          {
+            "value": "adapter-6v3a",
+            "label": "DC 어댑터 6 V 3 A"
+          },
+          {
+            "value": "liion-2s",
+            "label": "18650 리튬이온 2개 (7.4 V)"
+          },
+          {
+            "value": "lipo-2s",
+            "label": "리튬폴리머 2S 7.4 V 2200 mAh"
+          },
+          {
+            "value": "adapter-7v5-2a",
+            "label": "DC 어댑터 7.5 V 2 A"
+          },
+          {
+            "value": "battery-9v",
+            "label": "9 V 건전지 (6F22)"
+          },
+          {
+            "value": "aa6-alkaline",
+            "label": "AA 알칼라인 6개 (9 V)"
+          },
+          {
+            "value": "adapter-9v2a",
+            "label": "DC 어댑터 9 V 2 A"
+          },
+          {
+            "value": "liion-3s",
+            "label": "18650 리튬이온 3개 (11.1 V)"
+          },
+          {
+            "value": "lipo-3s",
+            "label": "리튬폴리머 3S 11.1 V 2200 mAh"
+          },
+          {
+            "value": "adapter-12v2a",
+            "label": "DC 어댑터 12 V 2 A"
+          },
+          {
+            "value": "adapter-12v5a",
+            "label": "DC 어댑터 12 V 5 A"
+          },
+          {
+            "value": "smps-12v10a",
+            "label": "SMPS 12 V 10 A"
+          },
+          {
+            "value": "sla-12v7ah",
+            "label": "납축전지 12 V 7 Ah"
+          },
+          {
+            "value": "lipo-4s",
+            "label": "리튬폴리머 4S 14.8 V 2200 mAh"
+          },
+          {
+            "value": "smps-24v5a",
+            "label": "SMPS 24 V 5 A"
+          }
+        ]
+      },
+      {
         "id": "voltage",
         "label": "출력 전압",
         "defaultValue": "12",

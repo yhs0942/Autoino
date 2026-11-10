@@ -52,3 +52,20 @@ def test_auto_assign_keeps_project_extras() -> None:
     assert project["shares"] == _case("share-leds")["after"]["shares"]
     assert project["layout"]["led-5mm#1"] == {"x": 120, "y": 80}
     assert project["breadboardHoles"]["board:board-1:D5"] == "top+4"
+
+
+def test_external_power_keeps_supply_kind() -> None:
+    """외부 전원의 [전원 종류](전원 예시 ID)가 저장·열기를 거쳐도 남고, 모르는 값은 직접 설정이 된다"""
+    raw = json.loads(json.dumps(_case("pca9685-servos")["after"]))
+    supply = next(m for m in raw["modules"] if m["moduleId"] == "external-power")
+    assert supply["params"]["supply"] == "smps-5v10a"
+    data = to_project_file(parse_project(raw))
+    assert next(m for m in data["modules"] if m["moduleId"] == "external-power")["params"]["supply"] == "smps-5v10a"
+
+    supply["params"]["supply"] = "없는-전원"
+    data = to_project_file(parse_project(raw))
+    assert next(m for m in data["modules"] if m["moduleId"] == "external-power")["params"]["supply"] == "custom"
+
+    del supply["params"]["supply"]  # 예전 파일
+    data = to_project_file(parse_project(raw))
+    assert next(m for m in data["modules"] if m["moduleId"] == "external-power")["params"]["supply"] == "custom"

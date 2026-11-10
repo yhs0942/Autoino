@@ -14,6 +14,7 @@ import type { Board, Connection, ElectricalSpec, Endpoint, PlacedBoard, PlacedMo
 import { assetUrl } from '../../utils/assetUrl'
 import { PinTable } from '../PinTable/PinTable'
 import { NeedQuick, PowerPanel } from '../PowerPanel/PowerPanel'
+import { placedSupplies, SUPPLY_PARAM } from '../../engine/supplyInfo'
 import { capacityLabel, MOTOR_KIND_LABELS, motorDriverOf, planMotorAttach, recommendDriver } from '../../engine/motorAttach'
 import { shareBoardPin, shareRole } from '../../engine/shares'
 import { IssueList, ValidationPanel } from '../ValidationPanel/ValidationPanel'
@@ -941,7 +942,17 @@ export function PropertyPanel(props: PropertyPanelProps) {
         {tab === 'pins' && (
           <PinTable rows={pinRows} boardName={circuit.boards.length > 1 ? `보드 ${circuit.boards.length}개` : board.name} multiBoard={circuit.boards.length > 1} onSelect={onSelect} />
         )}
-        {tab === 'power' && <PowerPanel report={props.power} onApply={props.onApplySupply} merges={props.merges} onMerge={props.onMerge} />}
+        {tab === 'power' && (
+          <PowerPanel
+            report={props.power}
+            onApply={props.onApplySupply}
+            merges={props.merges}
+            onMerge={props.onMerge}
+            supplies={placedSupplies(circuit, props.power)}
+            onSetSupply={(instanceId, supplyId) => props.onSetParam(instanceId, SUPPLY_PARAM, supplyId)}
+            onLocate={(instanceId) => onSelect({ kind: 'module', instanceId })}
+          />
+        )}
         {tab === 'properties' && (
           <>
             {selection.kind === 'breadboard' && <BreadboardProperties circuit={circuit} routing={props.routing} onExport={props.onExportBreadboard} onReset={props.onResetBreadboard} />}

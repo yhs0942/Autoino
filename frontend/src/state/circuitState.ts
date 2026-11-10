@@ -26,6 +26,7 @@ import { motorPins, planMotorAttach, recommendDriver } from '../engine/motorAtta
 import { analyzePower, formatCurrent, primaryGrounds, supplyScope } from '../engine/power'
 import type { ProjectData } from '../engine/project'
 import { roleOfKey, shareBoardPin, shareOf, shareRefusal } from '../engine/shares'
+import { hasSupplyKind, paramsForSupply, SUPPLY_PARAM, syncSupplyKind } from '../engine/supplyInfo'
 import type { Connection, Endpoint, PinShare, PlacedBoard, PlacedModule, Point, RouteMode, Selection } from '../types'
 import {
   BOARD_POSITION,
@@ -342,10 +343,13 @@ function leadAt(state: CircuitState, key: string): string | null {
 }
 
 /** 외부 전원 부품(itemId)의 전압·전류를 정하고 지정한 전원 핀(pins)과 GND 에 잇는다 */
-function connectSupply(state: CircuitState, itemId: string, pins: string[], route: RouteMode, voltage: number, currentMa: number, message: string): CircuitState {
+function connectSupply(state: CircuitState, itemId: string, pins: string[], route: RouteMode, voltage: number, currentMa: number, message: string, supplyId?: string): CircuitState {
   const item = state.placed.find((p) => p.instanceId === itemId)!
-  const param = (id: string, wanted: number) => getModule(item.moduleId).parameters!.find((p) => p.id === id)!.options.find((o) => o.number === wanted)?.value
-  const params = { ...item.params, voltage: param('voltage', voltage) ?? item.params.voltage, current: param('current', currentMa) ?? item.params.current }
+  const module = getModule(item.moduleId)
+  const param = (id: string, wanted: number) => module.parameters!.find((p) => p.id === id)!.options.find((o) => o.number === wanted)?.value
+  const sized = { ...item.params, voltage: param('voltage', voltage) ?? item.params.voltage, current: param('current', currentMa) ?? item.params.current }
+  // 고른 전원 예시를 종류로 기록한다. 예시 없이 전압·전류만 맞췄으면 기록된 제품과 달라졌는지 확인한다
+  const params = supplyId && hasSupplyKind(module) ? syncSupplyKind(module, { ...sized, [SUPPLY_PARAM]: supplyId }) : syncSupplyKind(module, sized)
   const placed = state.placed.map((p) => (p === item ? { ...p, params } : p))
   // 보드 전원·다른 전원에 물려 있던 전원 핀은 새 전원으로 옮기고, 전류가 보드를 지나지 않도록 GND 전선도 전원 − 로 옮긴다.
   // 그 전원 핀에 함께 물린 부하(서보 드라이버 V+ 의 서보 전원선 등)는 그대로 둔다.
@@ -399,7 +403,16 @@ function autoConnectSupply(state: CircuitState, itemId: string, near: string | u
     return { ...state, statusMessage: `${item.label}을(를) 배치했습니다. 외부 전원이 필요한 부품이 아직 없어 연결하지 않았습니다 — 모터 드라이버나 큰 서보를 놓은 뒤 카드의 ⚡ 표시로 연결할 수 있습니다.` }
   const example = need.examples[0]
   const names = [...new Set(need.consumers.map((c) => c.label))].join(', ')
-  return connectSupply(state, itemId, need.pins, route, example.voltage, example.maxCurrentMa, `${item.label}을(를) ${example.voltage} V · ${formatCurrent(example.maxCurrentMa)}로 맞춰 ${names} 전원에 연결했습니다 (전선 {n}개).`)
+  return connectSupply(
+    state,
+    itemId,
+    need.pins,
+    route,
+    example.voltage,
+    example.maxCurrentMa,
+    `${item.label}을(를) ${example.name}(${example.voltage} V · ${formatCurrent(example.maxCurrentMa)})로 맞춰 ${names} 전원에 연결했습니다 (전선 {n}개).`,
+    example.id,
+  )
 }
 
 /** 모터를 드라이버의 빈 채널에 잇고, 그 채널의 제어·전원 핀을 배정하고, 모터 카드를 드라이버 옆으로 옮긴다 */
@@ -581,11 +594,13 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       const target = state.placed.find((p) => p.instanceId === action.instanceId)
       const param = target && getModule(target.moduleId).parameters?.find((p) => p.id === action.paramId)
       if (!target || !param?.options.some((o) => o.value === action.value)) return state
+      const module = getModule(target.moduleId)
+      const next = { ...target.params, [action.paramId]: action.value }
+      const supply = action.paramId === SUPPLY_PARAM ? findSupply(action.value) : undefined
+      const params = supply ? paramsForSupply(module, next, supply) : action.paramId === SUPPLY_PARAM ? next : syncSupplyKind(module, next)
       return {
         ...state,
-        placed: state.placed.map((p) =>
-          p === target ? { ...p, params: { ...p.params, [action.paramId]: action.value } } : p,
-        ),
+        placed: state.placed.map((p) => (p === target ? { ...p, params } : p)),
       }
     }
     case 'moveBreadboard':
@@ -749,7 +764,7 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       if (!supply) return state
       const placedState = reduce(state, { type: 'addModule', moduleId: 'external-power' })
       const item = placedState.placed.at(-1)!
-      return connectSupply(placedState, item.instanceId, action.pins, action.route, supply.voltage, supply.maxCurrentMa, `${supply.name}를 외부 전원으로 놓고 연결 {n}개를 만들었습니다.`)
+      return connectSupply(placedState, item.instanceId, action.pins, action.route, supply.voltage, supply.maxCurrentMa, `${supply.name}를 외부 전원으로 놓고 연결 {n}개를 만들었습니다.`, supply.id)
     }
     case 'mergeSupplies': {
       const keep = state.placed.find((p) => p.instanceId === action.keepId)
@@ -770,7 +785,10 @@ function reduce(state: CircuitState, action: CircuitAction): CircuitState {
       const options = getModule(keep.moduleId).parameters!.find((p) => p.id === 'current')!.options
       const total = [keep, ...others].reduce((sum, p) => sum + Number(p.params.current), 0)
       const option = options.find((o) => (o.number ?? 0) >= total) ?? options.at(-1)!
-      const placed = state.placed.filter((p) => !gone.has(p.instanceId)).map((p) => (p === keep ? { ...p, params: { ...p.params, current: option.value } } : p))
+      const keepModule = getModule(keep.moduleId)
+      const placed = state.placed
+        .filter((p) => !gone.has(p.instanceId))
+        .map((p) => (p === keep ? { ...p, params: syncSupplyKind(keepModule, { ...p.params, current: option.value }) } : p))
       const short = (option.number ?? 0) < total ? ` 필요한 ${formatCurrent(total)}를 낼 수 있는 선택지가 없어 ${option.label}로 정했습니다.` : ''
       return keepSelection(
         {

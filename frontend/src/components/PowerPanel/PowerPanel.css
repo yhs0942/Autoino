@@ -200,3 +200,105 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* ---------- 사용 중인 외부 전원 ---------- */
+.supply-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.supply-card__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.supply-card__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.88rem;
+}
+
+.supply-card__locate {
+  font-size: 0.72rem;
+}
+
+.supply-card__kind--adapter {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.supply-card__kind--battery {
+  color: var(--ok-text);
+  background: var(--ok-soft);
+}
+
+.supply-card__kind--usb {
+  color: #6d28d9;
+  background: #ede9fe;
+}
+
+.supply-card__kind--custom {
+  color: var(--warning-text);
+  background: var(--warning-soft);
+}
+
+.supply-card__specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.supply-card__specs > div {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.supply-card__specs dt {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.supply-card__specs dd {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.supply-card__specs dd small {
+  font-weight: 400;
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.supply-card__note,
+.supply-card__loads {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.supply-card__pick {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+}
+
+.supply-card__pick select {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 3px 4px;
+}

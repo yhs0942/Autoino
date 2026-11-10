@@ -9949,6 +9949,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "7.4",
        "current": "5000"
       },
@@ -10225,6 +10226,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "7.4",
        "current": "5000"
       },
@@ -10833,6 +10835,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "2000"
       },
@@ -11120,6 +11123,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "2000"
       },
@@ -12939,6 +12943,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "2000"
       },
@@ -13161,6 +13166,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "2000"
       },
@@ -13742,6 +13748,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "10000"
       },
@@ -13919,6 +13926,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "10000"
       },
@@ -14389,6 +14397,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "6",
        "current": "2000"
       },
@@ -14619,6 +14628,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "6",
        "current": "2000"
       },
@@ -15108,6 +15118,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "6",
        "current": "3000"
       },
@@ -15340,6 +15351,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "6",
        "current": "3000"
       },
@@ -15854,6 +15866,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "11.1",
        "current": "30000"
       },
@@ -16540,6 +16553,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "11.1",
        "current": "30000"
       },
@@ -18252,6 +18266,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "5000"
       },
@@ -18556,6 +18571,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "5000"
       },
@@ -19302,6 +19318,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "1000"
       },
@@ -19506,6 +19523,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "1000"
       },
@@ -25530,6 +25548,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "6",
        "current": "5000"
       },
@@ -25933,6 +25952,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "6",
        "current": "5000"
       },
@@ -26852,6 +26872,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "2000"
       },
@@ -26864,6 +26885,7 @@
       "x": 592,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "24",
        "current": "5000"
       },
@@ -27611,6 +27633,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "12",
        "current": "2000"
       },
@@ -27623,6 +27646,7 @@
       "x": 592,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "24",
        "current": "5000"
       },
@@ -30865,6 +30889,7 @@
       "x": 960,
       "y": 40,
       "params": {
+       "supply": "smps-5v10a",
        "voltage": "5",
        "current": "10000"
       },
@@ -31377,6 +31402,7 @@
       "x": 960,
       "y": 40,
       "params": {
+       "supply": "smps-5v10a",
        "voltage": "5",
        "current": "10000"
       },
@@ -33037,6 +33063,7 @@
       "x": 1040,
       "y": 40,
       "params": {
+       "supply": "usb-charger-5v2a",
        "voltage": "5",
        "current": "2000"
       },
@@ -33444,6 +33471,7 @@
       "x": 1040,
       "y": 40,
       "params": {
+       "supply": "usb-charger-5v2a",
        "voltage": "5",
        "current": "2000"
       },
@@ -34199,6 +34227,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "3000"
       },
@@ -34220,6 +34249,7 @@
       "x": 776,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "2000"
       },
@@ -34401,6 +34431,7 @@
       "x": 408,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "3000"
       },
@@ -34422,6 +34453,7 @@
       "x": 776,
       "y": 40,
       "params": {
+       "supply": "custom",
        "voltage": "5",
        "current": "2000"
       },

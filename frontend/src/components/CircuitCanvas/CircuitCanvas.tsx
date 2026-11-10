@@ -16,6 +16,8 @@ import { describeEndpoint, endpointKey, isPinConnected, moduleEndpoint, parseEnd
 import { compatiblePins, sourceLimitMa, sourceVoltage } from '../../engine/electrical'
 import { isServo, motorDriverOf, driverUsage, planMotorAttach, recommendDriver, type AttachPlan } from '../../engine/motorAttach'
 import { focusOf } from '../../engine/focus'
+import { supplyOf } from '../../engine/supplyInfo'
+import { SUPPLY_KIND_LABELS } from '../../data/supplies'
 import { roleOfKey, shareBoardPin, shareOf, shareRole } from '../../engine/shares'
 import { formatCurrent, type PowerNeed, type PowerReport, type SupplyExample } from '../../engine/power'
 import type { Circuit } from '../../engine/circuit'
@@ -152,7 +154,9 @@ function sourceSummary(module: Module, item: PlacedModule): string | null {
   if (!pin || module.pins.filter((p) => p.role === 'source').length > 1) return null
   const volts = sourceVoltage(module, item, pin)
   const limit = sourceLimitMa(module, item, pin)
-  return volts === null ? null : `${volts} V${limit === null ? '' : ` · ${formatCurrent(limit)}`}`
+  const supply = supplyOf(item)
+  const figures = volts === null ? null : `${volts} V${limit === null ? '' : ` · ${formatCurrent(limit)}`}`
+  return figures && supply ? `${SUPPLY_KIND_LABELS[supply.kind]} · ${figures}` : figures
 }
 
 export function CircuitCanvas({

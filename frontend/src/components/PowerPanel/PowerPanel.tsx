@@ -1,5 +1,7 @@
-import { SUPPLY_KIND_LABELS } from '../../data/supplies'
+import { SUPPLIES, SUPPLY_KIND_LABELS } from '../../data/supplies'
 import { formatCurrent, type PowerNeed, type PowerReport, type PowerSource, type SupplyExample } from '../../engine/power'
+import { CUSTOM_SUPPLY, type PlacedSupplyInfo } from '../../engine/supplyInfo'
+import type { SupplyKind } from '../../types'
 import './PowerPanel.css'
 
 interface PowerPanelProps {
@@ -9,6 +11,12 @@ interface PowerPanelProps {
   /** 전압이 같아 합칠 수 있는 외부 전원 묶음 */
   merges: { voltage: number; items: { instanceId: string; label: string }[] }[]
   onMerge: (keepId: string, otherIds: string[]) => void
+  /** 회로에 놓인 외부 전원과 그 종류 */
+  supplies: PlacedSupplyInfo[]
+  /** 외부 전원의 종류를 바꾼다 (전압·전류도 그 제품에 맞춰진다) */
+  onSetSupply: (instanceId: string, supplyId: string) => void
+  /** 작업 화면에서 그 부품을 고른다 */
+  onLocate: (instanceId: string) => void
 }
 
 /** 부품 카드·속성 패널에서 쓰는 짧은 전원 안내: 필요한 전압·전류와 바로 연결할 예시 */
@@ -149,27 +157,125 @@ function NeedCard({ need, index, onApply }: { need: PowerNeed; index: number; on
   )
 }
 
-function SourceRow({ source }: { source: PowerSource }) {
+const KIND_ORDER: SupplyKind[] = ['adapter', 'battery', 'usb']
+
+function statusBadge(status: PowerSource['status']) {
+  return STATUS_BADGES[status] ? <span className={`badge ${STATUS_BADGES[status]}`}>{STATUS_LABELS[status]}</span> : <span className="muted small">{STATUS_LABELS[status]}</span>
+}
+
+/** 놓인 외부 전원 하나: 어떤 제품인지, 사양, 지금 쓰는 전류, 어디에 전기를 주는지 */
+function SupplyCard({ info, onSetSupply, onLocate }: { info: PlacedSupplyInfo; onSetSupply: PowerPanelProps['onSetSupply']; onLocate: PowerPanelProps['onLocate'] }) {
+  const { supply, source } = info
+  const figure = (v: number | null, unit: string) => (v === null ? '—' : `${v} ${unit}`)
+  const loads = [...new Set(info.loads.map((l) => (l.pinName ? `${l.label} (${l.pinName})` : l.label)))]
+  return (
+    <section className="supply-card" data-testid={`supply-${info.instanceId}`}>
+      <header className="supply-card__head">
+        <span className={`badge supply-card__kind supply-card__kind--${supply?.kind ?? 'custom'}`}>{supply ? SUPPLY_KIND_LABELS[supply.kind] : '직접 설정'}</span>
+        <strong className="supply-card__name" data-testid="supply-name">
+          {supply ? supply.name : `${figure(info.voltage, 'V')} · ${info.limitMa === null ? '—' : formatCurrent(info.limitMa)} 전원`}
+        </strong>
+        <button type="button" className="link-button supply-card__locate" onClick={() => onLocate(info.instanceId)} title="작업 화면에서 이 전원을 고릅니다">
+          {info.label}
+        </button>
+      </header>
+      <dl className="supply-card__specs">
+        <div>
+          <dt>출력 전압</dt>
+          <dd>{figure(info.voltage, 'V')}</dd>
+        </div>
+        <div>
+          <dt>최대 전류</dt>
+          <dd>{info.limitMa === null ? '—' : formatCurrent(info.limitMa)}</dd>
+        </div>
+        {supply?.capacityMah !== undefined && (
+          <div>
+            <dt>배터리 용량</dt>
+            <dd>{supply.capacityMah.toLocaleString()} mAh</dd>
+          </div>
+        )}
+        <div>
+          <dt>지금 쓰는 전류</dt>
+          <dd>
+            {source ? formatCurrent(source.typicalMa) : '—'}
+            {source && <small> 최대 {formatCurrent(source.peakMa)}</small>}
+          </dd>
+        </div>
+        {info.runtimeHours !== undefined && (
+          <div>
+            <dt>예상 사용 시간</dt>
+            <dd data-testid="supply-runtime">약 {info.runtimeHours}시간</dd>
+          </div>
+        )}
+        {source && (
+          <div>
+            <dt>상태</dt>
+            <dd>{statusBadge(source.status)}</dd>
+          </div>
+        )}
+      </dl>
+      {supply ? (
+        <p className="supply-card__note">{supply.note}</p>
+      ) : info.matches.length ? (
+        <p className="supply-card__note">
+          전압·전류만 정한 전원입니다. 이 조건에 맞는 제품 예: {info.matches.slice(0, 3).map((m) => m.name).join(', ')}
+        </p>
+      ) : (
+        <p className="supply-card__note">전압·전류만 정한 전원입니다. 이 전압에서 이 전류를 내는 제품 예시가 목록에 없으니 실제 제품 라벨로 확인하세요.</p>
+      )}
+      <p className="supply-card__loads">{loads.length ? <>전기를 받는 부품: {loads.join(', ')}</> : '아직 아무 부품에도 + 가 연결되지 않았습니다.'}</p>
+      <label className="supply-card__pick">
+        <span>전원 종류</span>
+        <select value={supply?.id ?? CUSTOM_SUPPLY} onChange={(e) => onSetSupply(info.instanceId, e.target.value)} data-testid="supply-select">
+          <option value={CUSTOM_SUPPLY}>직접 설정 (전압·전류만)</option>
+          {KIND_ORDER.map((kind) => (
+            <optgroup key={kind} label={SUPPLY_KIND_LABELS[kind]}>
+              {SUPPLIES.filter((s) => s.kind === kind).map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </label>
+    </section>
+  )
+}
+
+function SourceRow({ source, kind }: { source: PowerSource; kind?: string }) {
   return (
     <tr className={source.status === 'overload' ? 'is-bad' : undefined}>
       <td>
         <strong>{source.label}</strong>
-        <div className="muted small">{source.voltage} V</div>
+        <div className="muted small">
+          {source.voltage} V{kind ? ` · ${kind}` : ''}
+        </div>
       </td>
       <td>
         {formatCurrent(source.typicalMa)}
         <div className="muted small">최대 {formatCurrent(source.peakMa)}</div>
       </td>
       <td>{source.limitMa === null ? '—' : formatCurrent(source.limitMa)}</td>
-      <td>{STATUS_BADGES[source.status] ? <span className={`badge ${STATUS_BADGES[source.status]}`}>{STATUS_LABELS[source.status]}</span> : <span className="muted small">{STATUS_LABELS[source.status]}</span>}</td>
+      <td>{statusBadge(source.status)}</td>
     </tr>
   )
 }
 
 /** 필요한 외부 전원의 전압·전류, 맞는 전원 예시, 현재 전원 상태를 보여 준다 */
-export function PowerPanel({ report, onApply, merges, onMerge }: PowerPanelProps) {
+export function PowerPanel({ report, onApply, merges, onMerge, supplies, onSetSupply, onLocate }: PowerPanelProps) {
+  const kindOf = new Map(supplies.filter((s) => s.source).map((s) => [s.source!.key, s.supply?.name ?? '직접 설정']))
   return (
     <div className="power-panel" data-testid="power-panel">
+      {supplies.length > 0 && (
+        <>
+          <h3 className="small-heading">사용 중인 외부 전원</h3>
+          {supplies.map((info) => (
+            <SupplyCard key={info.instanceId} info={info} onSetSupply={onSetSupply} onLocate={onLocate} />
+          ))}
+          <p className="muted small">전압·전류·용량은 흔한 제품의 대표값입니다. 실제 제품 라벨로 확인하세요. 사용 시간은 평상시 전류 기준입니다.</p>
+        </>
+      )}
       <h3 className="small-heading">필요한 외부 전원</h3>
       {report.needs.length ? (
         report.needs.map((need, i) => <NeedCard key={need.id} need={need} index={i} onApply={onApply} />)
@@ -192,7 +298,7 @@ export function PowerPanel({ report, onApply, merges, onMerge }: PowerPanelProps
           </thead>
           <tbody>
             {report.sources.map((s) => (
-              <SourceRow key={s.key} source={s} />
+              <SourceRow key={s.key} source={s} kind={kindOf.get(s.key)} />
             ))}
           </tbody>
         </table>
